@@ -1,0 +1,182 @@
+name: Build and publish
+
+on:
+  push:
+    branches:
+      - disabled
+jobs:
+  chartLint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: git pull
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4.2.0
+        with:
+          version: v3.17.0
+
+      - uses: actions/setup-python@v5.3.0
+        with:
+          python-version: '3.x'
+          check-latest: true
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.7.0
+
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+          if [[ -n "$changed" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run chart-testing (lint)
+        if: steps.list-changed.outputs.changed == 'true'
+        run: ct lint --target-branch ${{ github.event.repository.default_branch }}
+
+  version:
+    needs:
+      - chartLint
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.appVersion.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: paulhatch/semantic-version@v5.4.0
+        name: Application Version
+        id: appVersion
+        with:
+          tag_prefix: "v"
+          major_pattern: "(feat)"
+          minor_pattern: "(fix)"
+          version_format: "${major}.${minor}.${patch}"
+          bump_each_commit: 'true'
+
+      - name: Set app version
+        run: |
+          sed -i 's/^\(appVersion: \).*$/\1${{ steps.appVersion.outputs.version }}/gm' charts/puttable/Chart.yaml
+
+      - name: Commit app version
+        if: steps.appVersion.outputs.changed == 'true'
+        continue-on-error: true
+        run: |
+          git config --global user.name "$GITHUB_ACTOR"
+          git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git commit -am "update app version"
+          git push
+
+  docker:
+    needs:
+      - version
+    environment: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/mrsteakhouse/puttable:latest
+            ghcr.io/mrsteakhouse/puttable:${{ needs.version.outputs.version }}
+
+  tag:
+    needs:
+      - version
+      - docker
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create App Tag
+        run: |
+          git pull
+          git tag v${{ needs.version.outputs.version }}
+          git push origin --tags
+
+  chartVersion:
+    needs:
+      - docker
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git pull
+
+      - uses: paulhatch/semantic-version@v5.4.0
+        name: Chart Version
+        id: chartVersion
+        with:
+          tag_prefix: "puttable-"
+          major_pattern: "(feat)"
+          minor_pattern: "(fix)"
+          version_format: "${major}.${minor}.${patch}"
+          change_path: "charts"
+          bump_each_commit: 'true'
+
+      - name: Set chart version
+        run: |
+          sed -i 's/^\(version: \).*$/\1${{ steps.chartVersion.outputs.version }}/gm' charts/puttable/Chart.yaml
+
+      - name: Commit chart version
+        if: steps.chartVersion.outputs.changed == 'true'
+        continue-on-error: true
+        run: |
+          git config --global user.name "$GITHUB_ACTOR"
+          git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git commit -am "update chart version"
+          git push
+
+  chart:
+    needs:
+      - docker
+      - chartVersion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git pull
+
+      - name: Set git config
+        continue-on-error: true
+        run: |
+          git config --global user.name "$GITHUB_ACTOR"
+          git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Helm Chart Releaser
+        uses: helm/chart-releaser-action@v1.7.0
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
