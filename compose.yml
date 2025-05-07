@@ -1,12 +1,9 @@
-version: '3.8'
-
 services:
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
+    image: golang:1.24.3-alpine
     ports:
-      - "8080:8080"
+      - "8000:8000"
+    working_dir: /app
     volumes:
       - ./backend:/app
     command: ["go", "run", "main.go"]

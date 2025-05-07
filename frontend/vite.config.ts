@@ -5,7 +5,7 @@ export default defineConfig(({mode}) => {
     const proxy = mode === "development" ? {
         server: {
             proxy: {
-                '/api': 'http://backend:8080',
+                '/api': 'http://backend:8000',
             }
         }
     } : {};
