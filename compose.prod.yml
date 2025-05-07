@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    image: puttable-backend
+    container_name: backend
+    restart: always
+    expose:
+      - "8080"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+    image: puttable-frontend
+    container_name: frontend
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
