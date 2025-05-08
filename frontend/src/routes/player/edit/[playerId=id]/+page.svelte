@@ -10,30 +10,23 @@
     } from "flowbite-svelte";
     import {CirclePlusSolid} from "flowbite-svelte-icons"
     import fuzzysearch from "fuzzysearch-ts";
-    import {goto} from "$app/navigation";
 
     let searchTerm = $state("");
-    let items = $state([
+    let player = $state([
         {
             id: 1,
-            name: "Tournament #1",
-            date: new Date(2023, 2, 1).toLocaleDateString(),
-            participants: 12
+            name: "Donald Duck",
         },
         {
             id: 5,
-            name: "asdf",
-            date: new Date(2022, 1, 2).toLocaleDateString(),
-            participants: 4
+            name: "Evil Knevil",
         },
         {
             id: 2,
-            name: "Tournament 123",
-            date: new Date(2026, 4, 5).toLocaleDateString(),
-            participants: 1
+            name: "Mickey Mouse",
         }
     ])
-    let filteredItems = $derived(items.filter((item) =>
+    let filteredItems = $derived(player.filter((item) =>
         !searchTerm
         || fuzzysearch(searchTerm.toLowerCase(), item.name.toLowerCase())));
 </script>
@@ -47,20 +40,38 @@
     Add Tournament
 </Button>
 
+<div class="grid grid-cols-9 pt-5 px-10 gap-4">
+    {#each filteredItems as item}
+        <div class="col-span-6">{item.name}</div>
+        <div class="col-span-1">
+            <a href="/player/statistics?id={item.id}">Statistics</a>
+        </div>
+        <div class="col-span-1">
+            <Button>Edit</Button>
+        </div>
+        <div class="col-span-1">
+            <Button>Delete</Button>
+        </div>
+    {/each}
+</div>
+
 <TableSearch hoverable placeholder="Search by name" bind:inputValue={searchTerm}>
     <TableHead>
         <TableHeadCell sort={(a, b) => a.name.localeCompare(b.name)}>Name</TableHeadCell>
-        <TableHeadCell>Participants</TableHeadCell>
-        <TableHeadCell sort={(a, b) => a.date.localeCompare(b.date)} defaultSort>Date</TableHeadCell>
+        <TableHeadCell class="w-70">
+            <span class="sr-only">Edit</span>
+        </TableHeadCell>
     </TableHead>
     <TableBody>
         {#each filteredItems as item}
             <TableBodyRow
-                    onclick={() => {goto(`/tournament/${item.id}`)}}
+                    onclick={() => {}}
                     class="cursor-pointer">
                 <TableBodyCell>{item.name}</TableBodyCell>
-                <TableBodyCell>{item.participants}</TableBodyCell>
-                <TableBodyCell>{item.date}</TableBodyCell>
+                <TableBodyCell>
+                    <Button>Edit</Button>
+                    <Button>Delete</Button>
+                </TableBodyCell>
             </TableBodyRow>
         {/each}
     </TableBody>
