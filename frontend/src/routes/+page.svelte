@@ -39,6 +39,7 @@
 </script>
 
 <Button
+        href="/tournament/new"
         outline
         class="me-2 w-50 h-12"
         size="lg"

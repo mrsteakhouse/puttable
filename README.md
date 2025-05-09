@@ -19,21 +19,20 @@ A player is created by adding it to a tournament. For subsequent tournaments a p
 
 A tournament is an event where scores for each player are registered.
 The tournament has a score board to display achieved scores for each player sorted by given criteria.
-A tournament can be configured to enforce a minimum allowed number of player per round.
+A tournament can be configured to enforce a minimum allowed number of player per session.
 The number of holes to be played is configurable.
 
 ### Scorecard
 
-A scorecard holds the achieved score for each hole for a single user. The scorecard can be altered during active rounds.  
-
+A scorecard holds the achieved score for each hole for a single user. The scorecard can be altered during active session.
 ### Score
 
 A score is the amount of tries a player took to complete a hole.
 
-### Round
+### Session
 
-One or more player can play together in a round. Each player is assigned a scorecard for the particular round.
-The round stays active until it is submitted. Only submitted rounds will show up on the score board.
+One or more player can play together in a session. Each player is assigned a scorecard for the particular session.
+The session stays active until it is submitted. Only submitted session will show up on the score board.
 
 ## Todo
 
@@ -50,8 +49,8 @@ The round stays active until it is submitted. Only submitted rounds will show up
 - [ ] Different settings to sort the score board
   - [ ] lowest score
   - [ ] most hole-in-one
-  - [ ] use the best score for a round
+  - [ ] use the best score for a session
 - [ ] Score cart view
 - [ ] View to start a game with selected players
-- [ ] A view for playing a round with multiple player
+- [ ] A view for playing a session with multiple player
 - [ ] Build Helm chart
