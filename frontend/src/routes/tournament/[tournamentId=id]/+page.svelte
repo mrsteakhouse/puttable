@@ -1,13 +1,17 @@
 <script lang="ts">
     import type {PageProps} from "./$types";
     import DetailHeader from "$lib/DetailHeader.svelte";
-    import {Button, Label, Hr} from "flowbite-svelte";
-    import { marked } from "marked";
+    import {Button, Hr, Label, Tooltip} from "flowbite-svelte";
+    import {marked} from "marked";
     import moment from "moment";
+    import {goto} from "$app/navigation";
 
     let  { data }: PageProps = $props();
 
-
+    let allowStartSession = moment().isBetween(
+        data.tournament.startDateTime,
+        data.tournament.endDateTime
+    );
 </script>
 
 
@@ -38,7 +42,7 @@
         </Label>
     </div>
     <div>
-        {new Date(data.tournament.endDateTime).toLocaleString()}
+        {moment(data.tournament.endDateTime).format("kk:mm DD.MM.YYYY")}
     </div>
     <Hr class="col-span-2 my-2"></Hr>
     <div>
@@ -62,5 +66,14 @@
 </div>
 
 <div class="flex justify-center pt-10">
-    <Button href="/session/create">Start new Session</Button>
+    <Button id="start-new-session-button" onclick={() => goto("/session/create")} disabled={!allowStartSession}>Start new Session</Button>
+    {#if !allowStartSession}
+        <Tooltip triggeredBy="#start-new-session-button" placement="bottom">
+            {#if moment().isBefore(data.tournament.startDateTime)}
+                The Tournament has not began yet.
+            {:else if moment().isAfter(data.tournament.endDateTime)}
+                The Tournament is already finished.
+            {/if}
+        </Tooltip>
+    {/if}
 </div>

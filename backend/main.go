@@ -63,6 +63,11 @@ func main() {
 		}
 	})
 
+	root.Get("/api/v1/tournament", func(w http.ResponseWriter, r *http.Request) {
+		data, _ := json.Marshal(tournaments)
+		_, _ = w.Write(data)
+	})
+
 	root.Get("/api/v1/tournament/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id := getIdFromUrl(r, "id")
 		for _, tournament := range tournaments {

@@ -11,35 +11,18 @@
     import {CirclePlusSolid} from "flowbite-svelte-icons"
     import fuzzysearch from "fuzzysearch-ts";
     import {goto} from "$app/navigation";
+    import type {PageProps} from "./$types";
 
+    let {data}: PageProps = $props();
+    let items = $state(data.tournaments)
     let searchTerm = $state("");
-    let items = $state([
-        {
-            id: 1,
-            name: "Tournament #1",
-            date: new Date(2023, 2, 1).toLocaleDateString(),
-            participants: 12
-        },
-        {
-            id: 5,
-            name: "asdf",
-            date: new Date(2022, 1, 2).toLocaleDateString(),
-            participants: 4
-        },
-        {
-            id: 2,
-            name: "Tournament 123",
-            date: new Date(2026, 4, 5).toLocaleDateString(),
-            participants: 1
-        }
-    ])
-    let filteredItems = $derived(items.filter((item) =>
+    let filteredItems = $derived(data.tournaments.filter((item) =>
         !searchTerm
         || fuzzysearch(searchTerm.toLowerCase(), item.name.toLowerCase())));
 </script>
 
 <Button
-        href="/tournament/new"
+        href="/tournament/edit"
         outline
         class="me-2 w-50 h-12"
         size="lg"
