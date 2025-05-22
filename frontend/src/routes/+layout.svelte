@@ -1,11 +1,25 @@
 <script lang="ts">
     import '../app.css';
-    import {page} from "$app/state";
-    import {DarkMode, Navbar, NavBrand, NavHamburger, NavLi, NavUl} from "flowbite-svelte";
+    import { page } from "$app/state";
+    import { DarkMode, Navbar, NavBrand, NavHamburger, NavLi, NavUl } from "flowbite-svelte";
 
-    let {children} = $props()
+    import { onMount } from 'svelte'
+    import { invalidate } from '$app/navigation'
+
+    let { data, children } = $props()
+
+    let { session, supabase } = $derived(data)
     let activeUrl = $derived(page.url.pathname);
 
+    onMount(() => {
+        const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
+            if (newSession?.expires_at !== session?.expires_at) {
+                invalidate('supabase:auth')
+            }
+        })
+
+        return () => data.subscription.unsubscribe()
+    })
 </script>
 
 <svelte:head>

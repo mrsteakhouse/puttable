@@ -1,19 +1,16 @@
 <script lang="ts">
-    import {Button, Input} from "flowbite-svelte";
+    import { Button, Input } from "flowbite-svelte";
 
-    import {CirclePlusSolid} from "flowbite-svelte-icons"
+    import { CirclePlusSolid } from "flowbite-svelte-icons"
     import fuzzysearch from "fuzzysearch-ts";
     import moment from "moment";
     import TournamentCard from "$lib/TournamentCard.svelte";
-    import {TournamentDto} from "$lib/dto";
-    import {onMount} from "svelte";
-    import {supabase} from "$lib/supabase";
-    import {fail} from "@sveltejs/kit";
+    import type { PageProps } from './$types'
 
-    let tournaments: TournamentDto[] = $state([] as TournamentDto[])
+    let { data }: PageProps = $props();
 
     let searchTerm = $state("");
-    let filteredItems = $derived(tournaments?.filter((item) =>
+    let filteredItems = $derived(data.tournaments?.filter((item) =>
         !searchTerm
         || fuzzysearch(searchTerm.toLowerCase(), item.name.toLowerCase())
         || fuzzysearch(searchTerm.toLowerCase(), item.description.toLowerCase())) ?? []);
@@ -22,26 +19,6 @@
     let activeEvents = $derived(filteredItems.filter((tournament) => now.isBetween(tournament.startDateTime, tournament.endDateTime)))
     let futureEvents = $derived(filteredItems.filter((tournament) => now.isBefore(moment(tournament.startDateTime))))
     let pastEvents = $derived(filteredItems.filter((tournament) => now.isAfter(moment(tournament.endDateTime))))
-
-    onMount(async () => {
-        const {data, error} = await supabase.from('tournaments').select();
-
-        if (error && !data) {
-            fail(500, {message: error.message})
-            return;
-        }
-
-        tournaments = data.map(tournament =>
-            new TournamentDto(
-                tournament.id,
-                tournament.name,
-                moment(tournament.start_date),
-                moment(tournament.end_date),
-                tournament.number_of_holes,
-                tournament.minimum_participants,
-                tournament.description ?? ''
-            ));
-    });
 </script>
 
 <div class="max-w-6xl mx-auto px-4 py-8 space-y-8">
@@ -50,7 +27,7 @@
     <!-- 🔍 Filter -->
     <div class="max-w-md mx-auto">
         <Input
-                placeholder="Eventname oder Beschreibung durchsuchen..."
+                placeholder="Name oder Beschreibung durchsuchen..."
                 bind:value={searchTerm}/>
     </div>
 
