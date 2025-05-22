@@ -14,7 +14,7 @@
     let activeUrl = $derived(page.url.pathname);
     let userLoggedIn = $derived(user?.is_anonymous);
     let username = $derived(user?.user_metadata.name);
-    $inspect(user)
+
     onMount(() => {
         const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
             if (newSession?.expires_at !== session?.expires_at) {

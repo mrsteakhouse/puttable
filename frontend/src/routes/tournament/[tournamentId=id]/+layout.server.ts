@@ -1,13 +1,16 @@
 import type { TournamentDto } from '$lib/dto';
 import type { LayoutServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
+import { TOURNAMENT_VIEW } from '$lib/dependables';
 
-export const load: LayoutServerLoad = async ({params, locals: {supabase}}) => {
+export const load: LayoutServerLoad = async ({params, locals: {supabase}, depends}) => {
     const {data, error} = await supabase
         .from('tournaments')
         .select()
         .eq('id', params.tournamentId)
         .single();
+
+    depends(TOURNAMENT_VIEW);
 
     if (error && !data) {
         fail(500, {message: error.message})

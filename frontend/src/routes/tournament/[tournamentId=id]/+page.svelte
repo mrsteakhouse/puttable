@@ -5,6 +5,7 @@
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import { marked } from "marked";
+    import type { PageProps } from './$types';
 
     const tournamentId = Number(page.params.tournamentId);
 
