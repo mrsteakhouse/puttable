@@ -8,9 +8,10 @@
     import type { PageProps } from './$types'
 
     let { data }: PageProps = $props();
+    let tournaments = $derived(data.tournaments);
 
     let searchTerm = $state("");
-    let filteredItems = $derived(data.tournaments?.filter((item) =>
+    let filteredItems = $derived(tournaments?.filter((item) =>
         !searchTerm
         || fuzzysearch(searchTerm.toLowerCase(), item.name.toLowerCase())
         || fuzzysearch(searchTerm.toLowerCase(), item.description.toLowerCase())) ?? []);

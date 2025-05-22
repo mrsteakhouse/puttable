@@ -1,13 +1,10 @@
 <script lang="ts">
-    import {createForm} from 'felte';
-    import {validator} from '@felte/validator-zod';
-    import {z} from 'zod';
-    import {Alert, Button, Input, Label, Textarea} from 'flowbite-svelte';
+    import { createForm } from 'felte';
+    import { validator } from '@felte/validator-zod';
+    import { z } from 'zod';
+    import { Alert, Button, Input, Label, Textarea } from 'flowbite-svelte';
     import moment from "moment";
-    import {ArrowLeft} from "lucide-svelte";
-    import {DATETIME_WITH_TIMEZONE} from "$lib/constants";
-    import {supabase} from "$lib/supabase";
-    import {goto} from "$app/navigation";
+    import { ArrowLeft } from "lucide-svelte";
 
     const schema = z.object({
         name: z.string().min(1, 'Name ist erforderlich'),
@@ -22,10 +19,9 @@
 
     let {
         tournamentData = {
-            id: 0,
             name: '',
-            startDateTime: 0,
-            endDateTime: 0,
+            startDateTime: '',
+            endDateTime: '',
             minimumCompetitorsPerSession: 1,
             numberOfHoles: 18,
             description: ''
@@ -33,67 +29,33 @@
         isEdit = false,
     } = $props();
 
-    let initialValues = $derived({
+    let initialValues = {
         name: tournamentData.name,
-        startDate: tournamentData.startDateTime > 0 ? moment(tournamentData.startDateTime).format("YYYY-MM-DD") : '',
-        startTime: tournamentData.startDateTime > 0 ? moment(tournamentData.startDateTime).format("HH:mm") : '',
-        endDate: tournamentData.startDateTime > 0 ? moment(tournamentData.endDateTime).format("YYYY-MM-DD") : '',
-        endTime: tournamentData.startDateTime > 0 ? moment(tournamentData.endDateTime).format("HH:mm") : '',
+        startDate: tournamentData.startDateTime !== '' ? moment(tournamentData.startDateTime).format("YYYY-MM-DD") : '',
+        startTime: tournamentData.startDateTime !== '' ? moment(tournamentData.startDateTime).format("HH:mm") : '',
+        endDate: tournamentData.startDateTime !== '' ? moment(tournamentData.endDateTime).format("YYYY-MM-DD") : '',
+        endTime: tournamentData.startDateTime !== '' ? moment(tournamentData.endDateTime).format("HH:mm") : '',
         minParticipants: tournamentData.minimumCompetitorsPerSession,
         holeCount: tournamentData.numberOfHoles,
         description: tournamentData.description
-    });
+    };
 
     const {form, errors, isSubmitting} = createForm({
         initialValues,
-        onSubmit: async (values) => {
-            const startDateTime = moment(`${values.startDate}T${values.startTime}}`).format(DATETIME_WITH_TIMEZONE);
-            const endDateTime = moment(`${values.endDate}T${values.endTime}}`).format(DATETIME_WITH_TIMEZONE);
-            const dbData = {
-                name: values.name,
-                start_date: startDateTime,
-                end_date: endDateTime,
-                number_of_holes: values.holeCount,
-                minimum_participants: values.minParticipants,
-                description: values.description
-            };
-            let result;
-
-            if (isEdit) {
-                result = await supabase
-                    .from('tournaments')
-                    .update(dbData)
-                    .eq('id', 1)
-            } else {
-                result = await supabase
-                    .from('tournaments')
-                    .insert(dbData);
-            }
-
-            if (result.error) {
-                alert(result.error.details)
-            } else {
-                await goto('/tournament/1');
-            }
-        },
         extend: validator({schema})
     });
 </script>
 
 
-<form use:form class="max-w-xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-2xl shadow space-y-5">
-    {#if isEdit}
-        <a href={`/tournament/${tournamentData.id}`} class="text-blue-600 hover:underline flex items-center gap-1">
+<form method="POST" use:form class="max-w-xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-2xl shadow space-y-5">
+        <a href={isEdit ? `/tournament/${tournamentData.id}` : '/'} class="text-blue-600 hover:underline flex items-center gap-1">
             <ArrowLeft class="w-4 h-4"/>
             Zurück zur Ansicht
         </a>
-    {/if}
 
     <h2 class="text-2xl font-bold">
         {#if isEdit}Turnier bearbeiten{:else}Turnier erstellen{/if}
     </h2>
-
-    <input name="id" id="id" hidden={true} value={tournamentData.id}>
 
     <div>
         <Label for="name">Name</Label>

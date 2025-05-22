@@ -1,46 +1,20 @@
 <script lang="ts">
-    import {Button, Tooltip} from "flowbite-svelte";
-    import {ArrowLeft, Calendar, Flag, Info, Users} from "lucide-svelte";
+    import { Button, Tooltip } from "flowbite-svelte";
+    import { ArrowLeft, Calendar, Flag, Info, Users } from "lucide-svelte";
     import moment from "moment";
-    import {goto} from "$app/navigation";
-    import {onMount} from "svelte";
-    import {supabase} from "$lib/supabase";
-    import {fail} from "@sveltejs/kit";
-    import {TournamentDto} from "$lib/dto";
-    import {page} from "$app/state";
-    import {marked} from "marked";
+    import { goto } from "$app/navigation";
+    import { page } from "$app/state";
+    import { marked } from "marked";
 
     const tournamentId = Number(page.params.tournamentId);
 
-    let tournament = $state({}) as TournamentDto
+    let { data }: PageProps = $props();
+    let tournament = $derived(data.tournament);
 
     let allowStartSession = $derived(moment().isBetween(
         tournament.startDateTime,
         tournament.endDateTime
     ));
-
-    onMount(async () => {
-        const {data, error} = await supabase
-            .from('tournaments')
-            .select()
-            .eq('id', tournamentId)
-            .single();
-
-        if (error && !data) {
-            fail(500, {message: error.message})
-            return;
-        }
-
-        tournament = new TournamentDto(
-            data.id,
-            data.name,
-            moment(data.start_date),
-            moment(data.end_date),
-            data.number_of_holes,
-            data.minimum_participants,
-            data.description ?? ''
-        );
-    });
 </script>
 
 <div class="max-w-xl mx-auto p-6 py-8 space-y-6">

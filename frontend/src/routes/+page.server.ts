@@ -2,7 +2,8 @@ import type { PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
 import type { TournamentDto } from '$lib/dto';
 
-export const load: PageServerLoad = async ({ locals: { supabase } }) => {
+export const load: PageServerLoad = async ({ locals: { supabase }, depends }) => {
+    depends('supabase:auth')
     const { data, error } = await supabase.from('tournaments').select();
 
     if (error && !data) {

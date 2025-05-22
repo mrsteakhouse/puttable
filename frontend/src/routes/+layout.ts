@@ -27,6 +27,10 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
             },
         })
 
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+
     /**
      * It's fine to use `getSession` here, because on the client, `getSession` is
      * safe, and on the server, it reads `session` from the `LayoutData`, which
@@ -36,9 +40,6 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
         data: { session },
     } = await supabase.auth.getSession()
 
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
 
     return { session, supabase, user }
 }
