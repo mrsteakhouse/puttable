@@ -3,21 +3,45 @@
 
     import {CirclePlusSolid} from "flowbite-svelte-icons"
     import fuzzysearch from "fuzzysearch-ts";
-    import type {PageProps} from "./$types";
     import moment from "moment";
     import TournamentCard from "$lib/TournamentCard.svelte";
+    import {TournamentDto} from "$lib/dto";
+    import {onMount} from "svelte";
+    import {supabase} from "$lib/supabase";
+    import {fail} from "@sveltejs/kit";
 
-    let {data}: PageProps = $props();
+    let tournaments: TournamentDto[] = $state([] as TournamentDto[])
+
     let searchTerm = $state("");
-    let filteredItems = $derived(data.tournaments.filter((item) =>
+    let filteredItems = $derived(tournaments?.filter((item) =>
         !searchTerm
         || fuzzysearch(searchTerm.toLowerCase(), item.name.toLowerCase())
-        || fuzzysearch(searchTerm.toLowerCase(), item.description.toLowerCase())));
+        || fuzzysearch(searchTerm.toLowerCase(), item.description.toLowerCase())) ?? []);
 
     let now = $state(moment());
     let activeEvents = $derived(filteredItems.filter((tournament) => now.isBetween(tournament.startDateTime, tournament.endDateTime)))
     let futureEvents = $derived(filteredItems.filter((tournament) => now.isBefore(moment(tournament.startDateTime))))
     let pastEvents = $derived(filteredItems.filter((tournament) => now.isAfter(moment(tournament.endDateTime))))
+
+    onMount(async () => {
+        const {data, error} = await supabase.from('tournaments').select();
+
+        if (error && !data) {
+            fail(500, {message: error.message})
+            return;
+        }
+
+        tournaments = data.map(tournament =>
+            new TournamentDto(
+                tournament.id,
+                tournament.name,
+                moment(tournament.start_date),
+                moment(tournament.end_date),
+                tournament.number_of_holes,
+                tournament.minimum_participants,
+                tournament.description ?? ''
+            ));
+    });
 </script>
 
 <div class="max-w-6xl mx-auto px-4 py-8 space-y-8">
@@ -33,7 +57,7 @@
     <section>
         <h2 class="text-2xl font-semibold mb-4">✅ Aktive Turniere</h2>
         {#if activeEvents.length === 0}
-            <p class="text-gray-500">Keine aktiven Tourniere gefunden.</p>
+            <p class="text-gray-500">Keine aktiven Turniere gefunden.</p>
         {:else}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {#each activeEvents as event}
@@ -46,7 +70,7 @@
     <section>
         <h2 class="text-2xl font-semibold mb-4">📅 Bevorstehende Turniere</h2>
         {#if futureEvents.length === 0}
-            <p class="text-gray-500">Keine zukünftigen Events gefunden.</p>
+            <p class="text-gray-500">Keine zukünftigen Turniere gefunden.</p>
         {:else}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {#each futureEvents as event}
@@ -59,7 +83,7 @@
     <section>
         <h2 class="text-2xl font-semibold mt-12 mb-4">⌛ Vergangene Turniere</h2>
         {#if pastEvents.length === 0}
-            <p class="text-gray-500">Keine vergangenen Events gefunden.</p>
+            <p class="text-gray-500">Keine vergangenen Turniere gefunden.</p>
         {:else}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 opacity-80">
                 {#each pastEvents as event}

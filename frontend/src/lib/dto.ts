@@ -1,3 +1,5 @@
+import type {Moment} from "moment";
+
 export class PlayerDto {
     id: number;
     name: string;
@@ -14,9 +16,9 @@ export class SessionDto {
     id: number;
     tournamentId: number;
     scoreCard: Map<number, number[]>;
-    submissionDateTime: Date | null;
+    submissionDateTime: Moment | null;
 
-    constructor(id: number, tournamentId: number, scoreCard: Map<number, number[]>, submissionDateTime: Date | null) {
+    constructor(id: number, tournamentId: number, scoreCard: Map<number, number[]>, submissionDateTime: Moment | null) {
         this.id = id;
         this.tournamentId = tournamentId;
         this.scoreCard = scoreCard;
@@ -27,13 +29,13 @@ export class SessionDto {
 export class TournamentDto {
     id: number;
     name: string;
-    startDateTime: Date;
-    endDateTime: Date;
+    startDateTime: Moment;
+    endDateTime: Moment;
     numberOfHoles: number;
     minimumCompetitorsPerSession: number;
     description: string;
 
-    constructor(id: number, name: string, startDateTime: Date, endDateTime: Date, numberOfHoles: number, minimumCompetitorsPerSession: number, description: string) {
+    constructor(id: number, name: string, startDateTime: Moment, endDateTime: Moment, numberOfHoles: number, minimumCompetitorsPerSession: number, description: string) {
         this.id = id;
         this.name = name;
         this.startDateTime = startDateTime;

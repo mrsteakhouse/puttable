@@ -4,6 +4,7 @@
     import {Calendar, Flag, Info, Users} from 'lucide-svelte';
     import {goto} from "$app/navigation";
     import moment from "moment";
+    import {marked} from "marked";
 
     let {event} = $props();
 </script>
@@ -51,7 +52,7 @@
         <div class="flex items-start gap-2">
             <Info class="w-5 h-5 text-gray-600 mt-1"/>
             <p class="text-sm text-gray-700 dark:text-gray-400 whitespace-pre-line">
-                {event.description}
+                {@html marked(event.description)}
             </p>
         </div>
     </div>

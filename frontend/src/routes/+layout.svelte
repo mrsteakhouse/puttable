@@ -1,12 +1,11 @@
 <script lang="ts">
     import '../app.css';
     import {page} from "$app/state";
-    import {Navbar, NavBrand, NavLi, NavUl, NavHamburger, DarkMode} from "flowbite-svelte";
-    import {base} from "$app/paths";
+    import {DarkMode, Navbar, NavBrand, NavHamburger, NavLi, NavUl} from "flowbite-svelte";
 
-
-    let {children} = $props();
+    let {children} = $props()
     let activeUrl = $derived(page.url.pathname);
+
 </script>
 
 <svelte:head>
