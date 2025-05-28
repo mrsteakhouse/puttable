@@ -3,7 +3,7 @@
     import { page } from "$app/state";
     import { DarkMode, Dropdown, DropdownItem, Navbar, NavBrand, NavHamburger, NavLi, NavUl } from "flowbite-svelte";
     import { ChevronDownOutline } from 'flowbite-svelte-icons';
-    import { PUBLIC_SITE_BASE_URL } from '$env/static/public';
+    import { env } from '$env/dynamic/public';
 
     import { onMount } from 'svelte'
     import { goto, invalidate } from '$app/navigation'
@@ -33,7 +33,7 @@
             provider: 'keycloak',
             options: {
                 scopes: 'openid',
-                redirectTo: PUBLIC_SITE_BASE_URL
+                redirectTo: env.PUBLIC_SITE_BASE_URL
             }
         });
 
