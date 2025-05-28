@@ -6,7 +6,7 @@ export const playerSchema = z.object({
     id: z.number().optional()
 })
 
-export type PlayerSchema = z.infer<typeof sessionSchema>;
+export type PlayerSchema = z.infer<typeof playerSchema>;
 
 export const ratingClassSchema = z.object({
     name: z.string().min(1, 'Der Name ist erforderlich'),

@@ -4,17 +4,26 @@
     import type { PageProps } from './$types';
     import moment from 'moment/moment';
     import { DATETIME_DISPLAY } from '$lib/constants';
+    import { debounce } from '$lib/debounce';
 
     let { data }: PageProps = $props();
     const supabase = $derived(data.supabase);
     const session = $derived(data.session);
-    const scorecards: { id: number, data: number[], playerName: string }[] = $derived(session.scorecard.map(sc => {
+    let scorecards: {
+        id: number,
+        data: number[],
+        playerName: string,
+        playerId: number
+    }[] = $derived((session.scorecard ?? []).map(sc => {
         return {
             id: sc.id,
             data: sc.data,
-            playerName: `${sc.player.firstName} ${sc.player.lastName}`
+            playerName: `${sc.player.firstName} ${sc.player.lastName}`,
+            playerId: sc.player.id
         }
-    }))
+    }).sort((left, right) => left.playerName.localeCompare(right.playerName)))
+
+    $inspect(scorecards)
 
     let showModal = $state(false);
     let incompletePlayers: string[] = $state([]);
@@ -50,24 +59,49 @@
         await invalidateAll();
     }
 
+    // Create a debounced function for database updates
+    const debouncedUpdateDatabase = debounce(async (recordId: number, arrayIndex: number, newValue: number) => {
+        const { error } = await supabase.rpc('update_jsonb_array_element', {
+            record_id: recordId,
+            array_index: arrayIndex,
+            new_value: newValue
+        });
+
+        if (error) {
+            console.error('Error updating score:', error);
+        }
+    }, 500); // 500ms debounce
+
     async function handleInputChange(playerIndex: number, holeIndex: number, target: Event & {
         currentTarget: EventTarget & HTMLInputElement
     }) {
-        scorecards[playerIndex].data[holeIndex] = Number(target.currentTarget.value);
-        console.log(scorecards[playerIndex]);
-        const { error } = await supabase
-            .from('scorecards')
-            .update({
-                data: scorecards[playerIndex].data
-            })
-            .eq('id', scorecards[playerIndex].id);
+        const newValue = Number(target.currentTarget.value);
 
-        console.log(error);
+        // Update the local data immediately for UI responsiveness
+        scorecards[playerIndex].data[holeIndex] = newValue;
+
+        // Force reactivity by creating a new array reference
+        scorecards = [...scorecards];
+
+        // Debounce the database update
+        debouncedUpdateDatabase(
+            scorecards[playerIndex].id,
+            holeIndex,
+            newValue
+        );
     }
 </script>
 
 <div class="max-w-2xl mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">🎯 Session für {session.tournamentName}</h1>
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold">🎯 Session für {session.tournamentName}</h1>
+        <form method="POST" action="?/deleteSession"
+              onsubmit={() => confirm('Sind Sie sicher, dass Sie diese Session löschen möchten? Alle zugehörigen Scorecards werden ebenfalls gelöscht.')}>
+            <Button type="submit" color="red" size="sm">
+                🗑️ Session löschen
+            </Button>
+        </form>
+    </div>
 
     <Tabs tabStyle="underline">
         <TabItem open={true} title="Übersicht">
@@ -76,7 +110,9 @@
                 <div class="grid">Punktestand</div>
                 <div class="grid">Einsen</div>
                 {#each scorecards as sc}
-                    <div class="grid col-span-2">{sc.playerName}</div>
+                    <div class="grid col-span-2">
+                        <a href={`/player/${sc.playerId}`} class="text-blue-600 hover:underline">{sc.playerName}</a>
+                    </div>
                     <div class="grid">{totalScore(() => sc.data)}</div>
                     <div class="grid">{onesCount(() => sc.data)}</div>
                 {/each}
@@ -101,7 +137,7 @@
                         </div>
                         <div>
                             <Input class="w-15" type="number" max="7" min="0" bind:value={sc.data[index]}
-                                   oninput={(e) => handleInputChange(i, index, e)}/>
+                                   oninput={(e) => session.submissionDateTime == null && handleInputChange(i, index, e)}/>
                         </div>
                     {/each}
                 </div>

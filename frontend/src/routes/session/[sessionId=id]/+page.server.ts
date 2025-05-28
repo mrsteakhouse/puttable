@@ -1,8 +1,9 @@
 // src/routes/sessions/[id]/+page.server.ts
 import type { PageServerLoad } from './$types';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { type SessionDto } from '$lib/dto';
 import type { QueryData } from '@supabase/supabase-js';
+import type { Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals: { supabase }, params }) => {
     const scoreCardQuery = supabase
@@ -43,4 +44,49 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
     } as SessionDto
 
     return { session: sessionData };
+};
+
+export const actions: Actions = {
+    deleteSession: async ({ params, locals: { supabase } }) => {
+        const sessionId = params.sessionId;
+
+        // First, get the tournament ID for redirection
+        const { data: sessionData, error: sessionError } = await supabase
+            .from('sessions')
+            .select('tournament_id')
+            .eq('id', sessionId)
+            .single();
+
+        if (sessionError) {
+            console.error('Error getting session:', sessionError);
+            return { success: false, error: sessionError.message };
+        }
+
+        const tournamentId = sessionData.tournament_id;
+
+        // Delete all scorecards associated with this session
+        const { error: scorecardsError } = await supabase
+            .from('scorecards')
+            .delete()
+            .eq('session_id', sessionId);
+
+        if (scorecardsError) {
+            console.error('Error deleting scorecards:', scorecardsError);
+            return { success: false, error: scorecardsError.message };
+        }
+
+        // Delete the session
+        const { error: sessionDeleteError } = await supabase
+            .from('sessions')
+            .delete()
+            .eq('id', sessionId);
+
+        if (sessionDeleteError) {
+            console.error('Error deleting session:', sessionDeleteError);
+            return { success: false, error: sessionDeleteError.message };
+        }
+
+        // Redirect to the tournament page
+        throw redirect(303, `/tournament/${tournamentId}`);
+    }
 };

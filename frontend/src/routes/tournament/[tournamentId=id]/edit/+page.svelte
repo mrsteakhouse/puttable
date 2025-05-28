@@ -1,5 +1,5 @@
 <script lang="ts">
-    import TournamentForm from "$lib/TournamentForm.svelte";
+    import TournamentForm from "$lib/components/TournamentForm.svelte";
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();

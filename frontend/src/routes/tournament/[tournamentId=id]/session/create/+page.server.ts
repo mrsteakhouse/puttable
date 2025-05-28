@@ -5,6 +5,15 @@ import { fail, redirect } from '@sveltejs/kit';
 import { zod } from "sveltekit-superforms/adapters";
 import type { SuperValidated } from "sveltekit-superforms";
 import { type SessionSchema, sessionSchema } from "$lib/schemas";
+import { z } from 'zod';
+import type { RatingClassDto } from '$lib/dto';
+
+// Create a schema for the player creation form
+const playerFormSchema = z.object({
+    firstName: z.string().min(1, "Vorname muss angegeben werden"),
+    lastName: z.string().min(1, "Nachname muss angegeben werden"),
+    ratingClassId: z.number().min(1, "Wertungsklasse muss ausgewählt werden")
+});
 
 export const load: PageServerLoad = async ({ locals: { supabase }, params, parent }) => {
     const layoutData = await parent();
@@ -16,6 +25,7 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params, paren
 
     const ratingClassIds = tournament.ratingClasses.map(rc => rc.id);
 
+    // Fetch players for the tournament's rating classes
     const { data, error } = await supabase.from('players')
         .select()
         .in('rating_class_id', ratingClassIds);
@@ -33,17 +43,33 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params, paren
         }
     });
 
+    // Format rating classes for the dropdown in the player creation modal
+    const formattedRatingClasses: RatingClassDto[] = tournament.ratingClasses.map(rc => ({
+        id: rc.id,
+        name: rc.name
+    }));
+
+    // Initialize the session form
     const form: SuperValidated<SessionSchema> = await superValidate({
         tournamentId: tournament.id,
         tournamentHoles: tournament.numberOfHoles,
         player: []
     }, zod(sessionSchema));
 
-    return { form, players };
+    // Initialize the player form for the modal
+    const playerForm = await superValidate(zod(playerFormSchema));
+
+    return {
+        form,
+        players,
+        ratingClasses: formattedRatingClasses,
+        playerForm,
+        tournament
+    };
 };
 
 export const actions: Actions = {
-    default: async ({ locals: { supabase }, request }) => {
+    createSession: async ({ locals: { supabase }, request }) => {
         const form = await superValidate(request, zod(sessionSchema));
         if (!form.valid) return { form };
 
@@ -63,12 +89,54 @@ export const actions: Actions = {
         // Scorecards anlegen
         const scorecardInserts = form.data.player.map(player => ({
             session_id: session.id,
-            player: player.id,
+            player_id: player.id,
             data: Array(form.data.tournamentHoles).fill(0)
         }));
 
-        await supabase.from('scorecards').insert(scorecardInserts);
+        const {error } = await supabase.from('scorecards').insert(scorecardInserts);
+
+        if (error) {
+            return fail(500, {message: error.message, form});
+        }
 
         throw redirect(303, `/session/${session.id}`);
+    },
+
+    // Action for creating a new player
+    createPlayer: async ({ request, locals: { supabase } }) => {
+        // Validate form data
+        const form = await superValidate(request, zod(playerFormSchema));
+
+        if (!form.valid) {
+            return fail(400, { form });
+        }
+
+        // Insert new player
+        const { data, error } = await supabase
+            .from('players')
+            .insert({
+                firstname: form.data.firstName,
+                lastname: form.data.lastName,
+                rating_class_id: form.data.ratingClassId
+            })
+            .select()
+            .single();
+
+        if (error) {
+            return fail(500, {
+                form,
+                message: error.message
+            });
+        }
+
+        // Return the created player data
+        return {
+            form,
+            player: {
+                id: data.id,
+                firstName: data.firstname,
+                lastName: data.lastname
+            }
+        };
     },
 };

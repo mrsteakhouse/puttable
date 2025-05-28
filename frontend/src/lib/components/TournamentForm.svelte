@@ -137,12 +137,10 @@
                         {ratingClass.name}
                     </button>
                 {/each}
-                {#if isEdit}
-                    <Button type="button" class="mx-1 my-2 px-3 py-1 rounded-full border"
-                            onclick={openAddRatingClassModal}>
-                        <PlusIcon size="20"/>
-                    </Button>
-                {/if}
+                <Button type="button" class="mx-1 my-2 px-3 py-1 rounded-full border"
+                        onclick={openAddRatingClassModal}>
+                    <PlusIcon size="20"/>
+                </Button>
             </div>
         </div>
 

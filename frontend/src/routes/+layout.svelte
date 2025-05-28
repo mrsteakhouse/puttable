@@ -58,8 +58,8 @@
         <DarkMode/>
     </div>
     <NavUl {activeUrl} >
-        <NavLi href="/">Tournaments</NavLi>
-        <NavLi href="/player">Player</NavLi>
+        <NavLi href="/">Turniere</NavLi>
+        <NavLi href="/player">Spieler</NavLi>
         <NavLi class="cursor-pointer">
             {#if userLoggedIn ?? true}
                 Log In

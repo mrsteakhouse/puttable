@@ -4,7 +4,7 @@
     import { CirclePlusSolid } from "flowbite-svelte-icons"
     import fuzzysearch from "fuzzysearch-ts";
     import moment from "moment";
-    import TournamentCard from "$lib/TournamentCard.svelte";
+    import TournamentCard from "$lib/components/TournamentCard.svelte";
     import type { PageProps } from './$types'
 
     let { data }: PageProps = $props();

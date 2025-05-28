@@ -6,6 +6,10 @@
     import SuperDebug, { type SuperValidated } from "sveltekit-superforms";
     import type { SessionSchema } from "$lib/schemas";
     import fuzzysearch from 'fuzzysearch-ts';
+    import CreatePlayerModal from '$lib/components/CreatePlayerModal.svelte';
+    import { PlusIcon } from 'lucide-svelte';
+    import type { PlayerFormSchema } from '../../../../player/+page.server';
+    import type { PlayerDto } from '$lib/dto';
 
     let { data }: PageProps = $props();
 
@@ -13,12 +17,16 @@
         dataType: 'json'
     });
 
-    const players = $derived(data.players ?? []);
+    // Initialize player form for the modal
+    let playerForm = $derived(data.playerForm as SuperValidated<PlayerFormSchema>);
+
+    let players = $derived(data.players ?? []);
     let search = $state('');
     let filteredPlayers = $derived(players.filter((p) =>
         fuzzysearch(search, p.firstName.toLowerCase())
         || fuzzysearch(search, p.lastName.toLowerCase())
     ));
+    let createPlayerModalOpen = $state(false);
 
     const togglePlayer = (player: {firstName: string, lastName: string, id: number}) => {
         if ($form.player.findLast(p => p.id === player.id)) {
@@ -32,13 +40,23 @@
         return $form.player.findLast(p => p.id === id);
     }
 
+    function openCreatePlayerModal() {
+        createPlayerModalOpen = true;
+    }
+
+    function handlePlayerCreated(newPlayer: { id: number, firstName: string, lastName: string }) {
+        // Add the newly created player to the list and select it
+        players = [...players, newPlayer];
+        togglePlayer(newPlayer);
+    }
+
     const minParticipants = data.tournament?.minimumCompetitorsPerSession ?? 1;
 </script>
 
 <div class="max-w-2xl mx-auto p-6 space-y-6">
     <h1 class="text-2xl font-bold">➕ Neue Runde für {data.tournament?.name ?? ''}</h1>
 
-    <form use:enhance method="POST" class="space-y-6">
+    <form use:enhance method="POST" class="space-y-6" action="?/createSession">
         <Input
                 type="text"
                 name="search"
@@ -74,7 +92,19 @@
         </Button>
     </form>
 
-    <div class="border-t pt-4 text-sm text-gray-600">
-        Spieler nicht gefunden? <a class="underline" href="/players/create">Neuen Spieler hinzufügen</a>
+    <div class="border-t pt-4 text-sm text-gray-600 flex items-center justify-between">
+        <span>Spieler nicht gefunden?</span>
+        <Button size="sm" color="blue" onclick={openCreatePlayerModal}>
+            <PlusIcon class="mr-2 h-4 w-4" />
+            Neuen Spieler hinzufügen
+        </Button>
     </div>
+
+    <!-- Create Player Modal -->
+    <CreatePlayerModal
+        bind:open={createPlayerModalOpen}
+        ratingClasses={data.ratingClasses ?? []}
+        form={playerForm}
+        onPlayerCreated={handlePlayerCreated}
+    />
 </div>

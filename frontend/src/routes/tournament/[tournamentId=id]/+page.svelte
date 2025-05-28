@@ -1,17 +1,18 @@
 <script lang="ts">
-    import { Button, Tooltip, Badge } from "flowbite-svelte";
-    import { ArrowLeft, Calendar, Flag, Info, Users, Award } from "lucide-svelte";
+    import { Badge, Button, Card, Tooltip } from "flowbite-svelte";
+    import { ArrowLeft, Award, BarChart, Calendar, Clock, Flag, Info, User, Users } from "lucide-svelte";
     import moment from "moment";
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import { marked } from "marked";
     import type { PageProps } from './$types';
-    import type { TournamentDto } from '$lib/dto';
+    import type { SessionDto, TournamentDto } from '$lib/dto';
 
     const tournamentId = Number(page.params.tournamentId);
 
     let { data }: PageProps = $props();
     let tournament = $derived(data.tournament ?? {} as TournamentDto);
+    let sessions = $derived(data.sessions ?? [] as SessionDto[]);
 
     let allowStartSession = $derived(moment().isBetween(
         tournament.startDateTime,
@@ -79,13 +80,73 @@
     </div>
 
 
-    <div class="flex items-center pt-10">
-        <a
-                href={`/tournament/${tournament.id}/edit`}
-                class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm"
-        >
+    <div class="flex items-center pt-10 gap-2">
+        <Button color="blue" class="text-sm" href={`/tournament/${tournament.id}/edit`}>
             ✏️ Event bearbeiten
-        </a>
+        </Button>
+        <form method="POST" action="?/deleteTournament"
+              onsubmit={() => confirm('Sind Sie sicher, dass Sie dieses Event löschen möchten? Alle zugehörigen Sessions werden ebenfalls gelöscht.')}>
+            <Button type="submit" color="red" class="text-sm">
+                🗑️ Event löschen
+            </Button>
+        </form>
+    </div>
+
+    <!-- Sessions Overview Section -->
+    <div class="pt-10 space-y-4">
+        <h2 class="text-xl font-bold flex items-center gap-2">
+            <BarChart class="w-5 h-5"/>
+            Aktive Runden
+        </h2>
+
+        {#if sessions.filter(session => !session.submissionDateTime).length === 0}
+            <p class="text-gray-500 italic">Keine aktiven Runden vorhanden.</p>
+        {:else}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {#each sessions.filter(session => !session.submissionDateTime) as session}
+                    <Card class="hover:shadow-lg transition-shadow">
+                        <div class="p-2">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-lg">
+                                    <a href={`/session/${session.id}`} class="text-blue-600 hover:underline">
+                                        Runde #{session.id}
+                                    </a>
+                                </h3>
+                                <Badge color="yellow" class="flex items-center gap-1">
+                                    <Clock class="w-3 h-3"/>
+                                    Aktiv
+                                </Badge>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div class="flex items-center gap-1">
+                                    <User class="w-4 h-4 text-gray-600"/>
+                                    <span>{session.scorecard.length} Spieler</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-2 pt-2 border-t border-gray-100">
+                                <div class="grid grid-cols-3 gap-1 text-xs">
+                                    {#each session.scorecard.sort() as card, i}
+                                        {#if i < 3}
+                                            <div class="truncate">
+                                                <a href={`/player/${card.player.id}`}
+                                                   class="text-blue-600 hover:underline">
+                                                    {card.player.firstName} {card.player.lastName}
+                                                </a>
+                                            </div>
+                                        {/if}
+                                    {/each}
+                                    {#if session.scorecard.length > 3}
+                                        <div class="text-gray-500">+{session.scorecard.length - 3} weitere</div>
+                                    {/if}
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+                {/each}
+            </div>
+        {/if}
     </div>
 
     <div class="flex items-center pt-10">

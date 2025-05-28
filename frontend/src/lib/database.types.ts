@@ -34,36 +34,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      player_to_sessions: {
-        Row: {
-          player_id: number
-          session_id: number
-        }
-        Insert: {
-          player_id: number
-          session_id: number
-        }
-        Update: {
-          player_id?: number
-          session_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "player_to_sessions_player_id_fkey"
-            columns: ["player_id"]
-            isOneToOne: false
-            referencedRelation: "players"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "player_to_sessions_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "sessions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       players: {
         Row: {
           created_at: string
@@ -126,28 +96,14 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "rating_classes_to_tournaments_rating_class_id_fkey"
+            foreignKeyName: "rating_classes_to_tournaments_rating_classes_id_fkey"
             columns: ["rating_class_id"]
             isOneToOne: false
             referencedRelation: "rating_classes"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "rating_classes_to_tournaments_rating_classes_id_fk"
-            columns: ["rating_class_id"]
-            isOneToOne: false
-            referencedRelation: "rating_classes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rating_classes_to_tournaments_tournament_id_fkey"
-            columns: ["tournament_id"]
-            isOneToOne: false
-            referencedRelation: "tournaments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rating_classes_to_tournaments_tournaments_id_fk"
+            foreignKeyName: "rating_classes_to_tournaments_tournaments_id_fkey"
             columns: ["tournament_id"]
             isOneToOne: false
             referencedRelation: "tournaments"
@@ -197,21 +153,21 @@ export type Database = {
           id: number
           submitted_at: string | null
           tournament_id: number
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           id?: number
           submitted_at?: string | null
           tournament_id: number
-          user_id?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           id?: number
           submitted_at?: string | null
           tournament_id?: number
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -261,7 +217,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      update_jsonb_array_element: {
+        Args: { record_id: number; array_index: number; new_value: Json }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
