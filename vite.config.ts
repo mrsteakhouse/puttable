@@ -4,9 +4,4 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
-  server: {
-    proxy: {
-      '/api': 'http://backend:8000',
-    }
-  }
 });
