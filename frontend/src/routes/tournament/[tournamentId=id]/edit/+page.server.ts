@@ -57,7 +57,43 @@ export const actions = {
             return fail(400, { form });
         }
 
+        // Delete existing rating class associations
+        const { error: deleteError } = await supabase
+            .from('rating_classes_to_tournaments')
+            .delete()
+            .eq('tournament_id', params.tournamentId);
 
+        if (deleteError) {
+            console.error('Error deleting rating class associations:', deleteError);
+            return fail(400, { form });
+        }
+
+        // Create new rating class associations for all selected rating classes
+        const ratingClassAssociations = form.data.ratingClasses
+            .filter(ratingClass => ratingClass.id !== -1)
+            .map(ratingClass => ({
+                tournament_id: params.tournamentId,
+                rating_class_id: ratingClass.id
+            }));
+
+        // Add associations for newly created rating classes
+        const newRatingClassAssociations = newRatingClassIds.map(id => ({
+            tournament_id: params.tournamentId,
+            rating_class_id: id
+        }));
+
+        const allAssociations = [...ratingClassAssociations, ...newRatingClassAssociations];
+
+        if (allAssociations.length > 0) {
+            const { error: insertError } = await supabase
+                .from('rating_classes_to_tournaments')
+                .insert(allAssociations);
+
+            if (insertError) {
+                console.error('Error creating rating class associations:', insertError);
+                return fail(400, { form });
+            }
+        }
 
         redirect(303, `/tournament/${params.tournamentId}`);
     }

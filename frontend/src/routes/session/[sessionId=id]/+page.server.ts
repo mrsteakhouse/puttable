@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
     type ScoreCardQuery = QueryData<typeof scoreCardQuery>;
 
     const { data, error: sErr } = await scoreCardQuery;
-    if (sErr || !data) fail(404, { message: 'Session nicht gefunden' });
+    if (sErr || !data || data.length === 0) throw fail(404, { message: 'Session nicht gefunden' });
 
     const typedData: ScoreCardQuery = data;
 

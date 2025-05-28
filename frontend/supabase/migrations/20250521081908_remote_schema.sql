@@ -148,7 +148,13 @@ CREATE POLICY "Enable update for authenticated users only" ON "public"."tourname
 
 CREATE POLICY "Enable read access for all users" ON "public"."scorecards" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."scorecards" FOR INSERT WITH CHECK (true);
-CREATE POLICY "Enable update for all users" ON "public"."scorecards" FOR UPDATE WITH CHECK (true);
+CREATE POLICY "Enable update for all users" ON "public"."scorecards" FOR UPDATE USING (
+    EXISTS (
+        SELECT 1 FROM "public"."sessions" s
+        WHERE s.id = "session_id"
+        AND s.submitted_at IS NULL
+    )
+);
 
 ALTER TABLE "public"."players" ENABLE ROW LEVEL SECURITY;
 

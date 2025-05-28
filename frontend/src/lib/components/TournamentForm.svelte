@@ -4,6 +4,7 @@
     import SuperDebug, { superForm, type SuperValidated } from 'sveltekit-superforms';
     import type { TournamentSchema } from '$lib/schemas';
     import type { RatingClassDto } from '$lib/dto';
+    import { undefined } from 'zod';
 
     let { formData, tournamentId = 0, ratingClasses }: {
         formData: SuperValidated<TournamentSchema>,

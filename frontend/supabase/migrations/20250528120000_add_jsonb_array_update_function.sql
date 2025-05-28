@@ -6,10 +6,13 @@ CREATE OR REPLACE FUNCTION update_jsonb_array_element(
   new_value jsonb
 ) RETURNS void AS $$
 BEGIN
-  -- Direct SQL query with hardcoded table and column names
-  UPDATE scorecards
+  -- Only update if the associated session has not been submitted
+  UPDATE scorecards sc
   SET data = jsonb_set(data, ('{' || array_index || '}')::text[], new_value::jsonb, true)
-  WHERE id = record_id;
+  FROM sessions s
+  WHERE sc.id = record_id
+    AND sc.session_id = s.id
+    AND s.submitted_at IS NULL;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -19,4 +22,4 @@ GRANT EXECUTE ON FUNCTION update_jsonb_array_element TO anon;
 GRANT EXECUTE ON FUNCTION update_jsonb_array_element TO service_role;
 
 -- Add comment to explain function usage
-COMMENT ON FUNCTION update_jsonb_array_element IS 'Updates a specific element in the data column of the scorecards table. Example: SELECT update_jsonb_array_element(1, 2, ''5''::jsonb);';
+COMMENT ON FUNCTION update_jsonb_array_element IS 'Updates a specific element in the data column of the scorecards table, but only if the associated session has not been submitted. Example: SELECT update_jsonb_array_element(1, 2, ''5''::jsonb);';

@@ -4,15 +4,7 @@ import { superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import type { RatingClassDto } from '$lib/dto';
-
-// Create a schema for the player creation form
-const playerFormSchema = z.object({
-    firstName: z.string().min(1, "Vorname muss angegeben werden"),
-    lastName: z.string().min(1, "Nachname muss angegeben werden"),
-    ratingClassId: z.number().min(1, "Wertungsklasse muss ausgewählt werden")
-});
-
-export type PlayerFormSchema = z.infer<typeof playerFormSchema>;
+import { type PlayerFormSchema, playerFormSchema } from '$lib/schemas';
 
 export const load: PageServerLoad = async ({ locals: { supabase } }) => {
     // Fetch all players with their rating classes

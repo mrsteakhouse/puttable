@@ -23,8 +23,6 @@
         }
     }).sort((left, right) => left.playerName.localeCompare(right.playerName)))
 
-    $inspect(scorecards)
-
     let showModal = $state(false);
     let incompletePlayers: string[] = $state([]);
 
@@ -70,11 +68,16 @@
         if (error) {
             console.error('Error updating score:', error);
         }
-    }, 500); // 500ms debounce
+    }, 100); // 500ms debounce
 
     async function handleInputChange(playerIndex: number, holeIndex: number, target: Event & {
         currentTarget: EventTarget & HTMLInputElement
     }) {
+        // If session is already submitted, don't allow changes
+        if (session.submissionDateTime) {
+            return;
+        }
+
         const newValue = Number(target.currentTarget.value);
 
         // Update the local data immediately for UI responsiveness
@@ -137,7 +140,8 @@
                         </div>
                         <div>
                             <Input class="w-15" type="number" max="7" min="0" bind:value={sc.data[index]}
-                                   oninput={(e) => session.submissionDateTime == null && handleInputChange(i, index, e)}/>
+                                   oninput={(e) => handleInputChange(i, index, e)}
+                                   disabled={!!session.submissionDateTime}/>
                         </div>
                     {/each}
                 </div>

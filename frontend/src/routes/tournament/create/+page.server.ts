@@ -37,7 +37,7 @@ export const actions = {
             return fail(400, { form });
         }
 
-        await patchRatingClasses(supabase, form.data.ratingClasses);
+        const newRatingClassIds = await patchRatingClasses(supabase, form.data.ratingClasses);
 
         const { data, error } = await supabase
             .from('tournaments')
@@ -55,6 +55,33 @@ export const actions = {
         if (error || !data) {
             console.error(error);
             return fail(400, { form });
+        }
+
+        // Create rating class associations for all selected rating classes
+        const ratingClassAssociations = form.data.ratingClasses
+            .filter(ratingClass => ratingClass.id !== undefined)
+            .map(ratingClass => ({
+                tournament_id: data.id,
+                rating_class_id: ratingClass.id
+            }));
+
+        // Add associations for newly created rating classes
+        const newRatingClassAssociations = newRatingClassIds.map(id => ({
+            tournament_id: data.id,
+            rating_class_id: id
+        }));
+
+        const allAssociations = [...ratingClassAssociations, ...newRatingClassAssociations];
+
+        if (allAssociations.length > 0) {
+            const { error: insertError } = await supabase
+                .from('rating_classes_to_tournaments')
+                .insert(allAssociations);
+
+            if (insertError) {
+                console.error('Error creating rating class associations:', insertError);
+                return fail(400, { form });
+            }
         }
 
         redirect(303, `/tournament/${data.id}`);
