@@ -77,7 +77,7 @@ jobs:
 
       - name: Set app version
         run: |
-          sed -i 's/^\(appVersion: \).*$/\1${{ steps.appVersion.outputs.version }}/gm' chart/Chart.yaml
+          sed -i 's/^\(appVersion: \).*$/\1${{ steps.appVersion.outputs.version }}/gm' charts/puttable/Chart.yaml
 
       - name: Commit app version
         if: steps.appVersion.outputs.changed == 'true'
@@ -162,7 +162,7 @@ jobs:
 
       - name: Set charts version
         run: |
-          sed -i 's/^\(version: \).*$/\1${{ steps.chartVersion.outputs.version }}/gm' chart/Chart.yaml
+          sed -i 's/^\(version: \).*$/\1${{ steps.chartVersion.outputs.version }}/gm' charts/puttable/Chart.yaml
 
       - name: Commit charts version
         if: steps.chartVersion.outputs.changed == 'true'
