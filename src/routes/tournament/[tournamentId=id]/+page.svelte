@@ -1,12 +1,12 @@
 <script lang="ts">
     import { Badge, Button, Card, Tooltip } from "flowbite-svelte";
-    import { ArrowLeft, Award, BarChart, Calendar, Clock, Flag, Info, User, Users } from "lucide-svelte";
+    import { ArrowLeft, Award, BarChart, Calendar, Clock, Flag, Info, Medal, User, Users } from "lucide-svelte";
     import moment from "moment";
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import { marked } from "marked";
     import type { PageProps } from './$types';
-    import type { SessionDto, TournamentDto } from '$lib/dto';
+    import type { ScoreCardDto, SessionDto, TournamentDto } from '$lib/dto';
     import PermissionGuard from '$lib/components/PermissionGuard.svelte';
     import { Action, Resource } from '$lib/permissions';
 
@@ -20,6 +20,85 @@
         tournament.startDateTime,
         tournament.endDateTime
     ));
+
+    // Calculate total score for a scorecard
+    function totalScore(scorecard: ScoreCardDto): number {
+        return scorecard.data.reduce((a, b) => a + b, 0);
+    }
+
+    // Count number of ones (aces/holes-in-one) in a scorecard
+    function onesCount(scorecard: ScoreCardDto): number {
+        return scorecard.data.filter(score => score === 1).length;
+    }
+
+    // Get player rankings based on their best (lowest) score, grouped by rating class
+    function getPlayerRankingsByClass() {
+        // Get all submitted sessions
+        const submittedSessions = sessions.filter(session => session.submissionDateTime);
+
+        // Create a map to track the best score for each player
+        const playerBestScores = new Map<string, Map<number, {
+            playerId: number,
+            playerName: string,
+            score: number,
+            ones: number,
+            ratingClass: string
+        }>>();
+
+        // Process all scorecards from all submitted sessions
+        submittedSessions.forEach(session => {
+            session.scorecard.forEach(scorecard => {
+                const player = scorecard.player;
+                const score = totalScore(scorecard);
+
+                if (!playerBestScores.has(player.ratingClass)) {
+                    playerBestScores.set(player.ratingClass, new Map<number, {
+                        playerId: number,
+                        playerName: string,
+                        score: number,
+                        ones: number,
+                        ratingClass: string
+                    }>());
+                }
+                let ratingClassScores = playerBestScores.get(player.ratingClass)!;
+                // If we haven't seen this player before, or if this score is better than their previous best
+                if (!ratingClassScores.has(player.id) || score < ratingClassScores.get(player.id)!.score) {
+                    ratingClassScores.set(player.id, {
+                        playerId: player.id,
+                        playerName: `${player.firstName} ${player.lastName}`,
+                        score: score,
+                        ones: onesCount(scorecard),
+                        ratingClass: player.ratingClass
+                    });
+                }
+            });
+        });
+
+        // Convert each Map of players to an array and sort them
+        const sortedPlayersByClass = new Map<string, Array<{
+            playerId: number,
+            playerName: string,
+            score: number,
+            ones: number,
+            ratingClass: string
+        }>>();
+
+        playerBestScores.forEach((playersMap, ratingClass) => {
+            // Convert Map to Array
+            const playersArray = Array.from(playersMap.values());
+
+            // Sort by score (ascending) and then by ones (descending)
+            const sortedPlayers = playersArray.sort((a, b) =>
+                a.score === b.score ? b.ones - a.ones : a.score - b.score
+            );
+
+            sortedPlayersByClass.set(ratingClass, sortedPlayers);
+        });
+
+        return sortedPlayersByClass;
+    }
+
+    const playerRankingsByClass = $derived(getPlayerRankingsByClass());
 </script>
 
 <div class="max-w-xl mx-auto p-6 py-8 space-y-6">
@@ -98,6 +177,60 @@
         </PermissionGuard>
     </div>
 
+    <!-- Player Rankings Section -->
+    <div class="pt-10 space-y-4">
+        <h2 class="text-xl font-bold flex items-center gap-2">
+            <Medal class="w-5 h-5"/>
+            Rangliste
+        </h2>
+
+        {#if playerRankingsByClass.size === 0}
+            <p class="text-gray-500 italic">Keine Ergebnisse verfügbar.</p>
+        {:else}
+            {#each Array.from(playerRankingsByClass.entries()) as [ratingClass, players]}
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-2">
+                        <Badge large class="mr-2">{ratingClass}</Badge>
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-700">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3">Rang</th>
+                                    <th scope="col" class="px-4 py-3">Spieler</th>
+                                    <th scope="col" class="px-4 py-3">Punkte</th>
+                                    <th scope="col" class="px-4 py-3">Einsen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {#each players as player, index}
+                                    <tr class="bg-white border-b hover:bg-gray-50">
+                                        <td class="px-4 py-2 font-medium">
+                                            {index + 1}.
+                                            {#if index === 0}
+                                                🥇
+                                            {:else if index === 1}
+                                                🥈
+                                            {:else if index === 2}
+                                                🥉
+                                            {/if}
+                                        </td>
+                                        <td class="px-4 py-2">
+                                            <a href={`/player/${player.playerId}`} class="text-blue-600 hover:underline">
+                                                {player.playerName}
+                                            </a>
+                                        </td>
+                                        <td class="px-4 py-2 font-medium">{player.score}</td>
+                                        <td class="px-4 py-2">{player.ones}</td>
+                                    </tr>
+                                {/each}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {/each}
+        {/if}
+    </div>
 
     <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Read}>
 

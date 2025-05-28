@@ -82,6 +82,10 @@
 
         const newValue = Number(target.currentTarget.value);
 
+        if (newValue > 7 || newValue < 1) {
+            return;
+        }
+
         // Update the local data immediately for UI responsiveness
         scorecards[playerIndex].data[holeIndex] = newValue;
 

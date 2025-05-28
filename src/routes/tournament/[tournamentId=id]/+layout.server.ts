@@ -1,11 +1,9 @@
-import { RatingClassDto, SessionDto, type TournamentDto } from '$lib/dto';
+import { PlayerDto, RatingClassDto, SessionDto, type TournamentDto } from '$lib/dto';
 import type { LayoutServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
 import { TOURNAMENT_VIEW } from '$lib/dependables';
 
-export const load: LayoutServerLoad = async ({params, locals: {supabase}, depends}) => {
-    depends(TOURNAMENT_VIEW);
-
+export const load: LayoutServerLoad = async ({params, locals: {supabase}}) => {
     let {data, error} = await supabase
         .from('tournaments')
         .select()
@@ -37,7 +35,7 @@ export const load: LayoutServerLoad = async ({params, locals: {supabase}, depend
         .select(`
             id, 
             submitted_at, 
-            scorecards(id, data, player:players(id, firstname, lastname))
+            scorecards(id, data, player:players(id, firstname, lastname, rating_class:rating_classes(name)))
         `)
         .eq('tournament_id', params.tournamentId);
 
@@ -51,7 +49,7 @@ export const load: LayoutServerLoad = async ({params, locals: {supabase}, depend
             scorecard: session.scorecards.map((scorecard: {
                 id: number,
                 data: number[],
-                player: { id: number, firstname: string, lastname: string }
+                player: { id: number, firstname: string, lastname: string, rating_class: { name: string} }
             }) => {
                 return {
                     id: scorecard.id,
@@ -59,8 +57,9 @@ export const load: LayoutServerLoad = async ({params, locals: {supabase}, depend
                     player: {
                         id: scorecard.player.id,
                         firstName: scorecard.player.firstname,
-                        lastName: scorecard.player.lastname
-                    }
+                        lastName: scorecard.player.lastname,
+                        ratingClass: scorecard.player.rating_class.name
+                    } as PlayerDto
                 }
             })
         } as SessionDto;
