@@ -5,6 +5,8 @@
     import moment from 'moment/moment';
     import { DATETIME_DISPLAY } from '$lib/constants';
     import { debounce } from '$lib/debounce';
+    import PermissionGuard from '$lib/components/PermissionGuard.svelte';
+    import { Action, Resource } from '$lib/permissions';
 
     let { data }: PageProps = $props();
     const supabase = $derived(data.supabase);
@@ -97,34 +99,44 @@
 
 <div class="max-w-2xl mx-auto p-4">
     <div class="flex justify-between items-center mb-4">
-        <h1 class="text-2xl font-bold">🎯 Session für {session.tournamentName}</h1>
-        <form method="POST" action="?/deleteSession"
-              onsubmit={() => confirm('Sind Sie sicher, dass Sie diese Session löschen möchten? Alle zugehörigen Scorecards werden ebenfalls gelöscht.')}>
-            <Button type="submit" color="red" size="sm">
-                🗑️ Session löschen
-            </Button>
-        </form>
+        <h1 class="text-2xl font-bold">
+            {#if session.isFreeplay}
+                🎮 {session.tournamentName}
+            {:else}
+                🎯 Session für {session.tournamentName}
+            {/if}
+        </h1>
+        <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Delete}>
+            <form method="POST" action="?/deleteSession"
+                  onsubmit={() => confirm('Sind Sie sicher, dass Sie diese Session löschen möchten? Alle zugehörigen Scorecards werden ebenfalls gelöscht.')}>
+                <Button type="submit" color="red" size="sm">
+                    🗑️ Session löschen
+                </Button>
+            </form>
+        </PermissionGuard>
     </div>
 
     <Tabs tabStyle="underline">
         <TabItem open={true} title="Übersicht">
-            <div class="grid grid-cols-4 space-y-4 mt-4">
+            <div class="grid grid-cols-5 space-y-4 mt-4">
                 <div class="grid col-span-2">Spieler</div>
-                <div class="grid">Punktestand</div>
+                <div class="grid col-span-2">Punktestand</div>
                 <div class="grid">Einsen</div>
                 {#each scorecards as sc}
                     <div class="grid col-span-2">
                         <a href={`/player/${sc.playerId}`} class="text-blue-600 hover:underline">{sc.playerName}</a>
                     </div>
-                    <div class="grid">{totalScore(() => sc.data)}</div>
+                    <div class="grid col-span-2">{totalScore(() => sc.data)}</div>
                     <div class="grid">{onesCount(() => sc.data)}</div>
                 {/each}
             </div>
 
             {#if !session.submissionDateTime}
-                <Button onclick={submitScorecards} color="green">
-                    ✅ Scorecards einreichen
-                </Button>
+                <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Submit}>
+                    <Button onclick={submitScorecards} color="green">
+                        ✅ Scorecards einreichen
+                    </Button>
+                </PermissionGuard>
             {:else}
                 <div class="text-green-600 font-medium">✅ Bereits eingereicht
                     am {moment(session.submissionDateTime).format(DATETIME_DISPLAY)}</div>

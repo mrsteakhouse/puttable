@@ -26,19 +26,21 @@ export class ScoreCardDto {
 
 export class SessionDto {
     id: number;
-    tournamentId: number;
+    tournamentId: number | null;
     scorecard: ScoreCardDto[];
     submissionDateTime: string | null;
     tournamentName: string;
     holes: number;
+    isFreeplay: boolean;
 
-    constructor(id: number, tournamentId: number, scorecard: ScoreCardDto[], submissionDateTime: string | null, tournamentName: string, holes: number) {
+    constructor(id: number, tournamentId: number | null, scorecard: ScoreCardDto[], submissionDateTime: string | null, tournamentName: string, holes: number, isFreeplay: boolean = false) {
         this.id = id;
         this.tournamentId = tournamentId;
         this.scorecard = scorecard;
         this.submissionDateTime = submissionDateTime;
         this.tournamentName = tournamentName;
         this.holes = holes;
+        this.isFreeplay = isFreeplay;
     }
 }
 

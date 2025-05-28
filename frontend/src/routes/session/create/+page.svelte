@@ -1,17 +1,16 @@
-<!-- src/routes/tournaments/[id]/sessions/create/+page.svelte -->
 <script lang="ts">
     import { superForm } from 'sveltekit-superforms/client';
     import type { PageProps } from './$types';
-    import { Button, Input } from 'flowbite-svelte';
+    import { Button, Input, Label, Range } from 'flowbite-svelte';
     import SuperDebug, { type SuperValidated } from "sveltekit-superforms";
-    import type { PlayerFormSchema, SessionSchema } from "$lib/schemas";
     import fuzzysearch from 'fuzzysearch-ts';
     import CreatePlayerModal from '$lib/components/CreatePlayerModal.svelte';
     import { PlusIcon } from 'lucide-svelte';
+    import type { SessionSchema, PlayerFormSchema } from '$lib/schemas';
 
     let { data }: PageProps = $props();
 
-    const { form, errors, enhance } = superForm(data.form as SuperValidated<SessionSchema>, {
+    const { form, errors, enhance } = superForm<SessionSchema>(data.form as SuperValidated<SessionSchema>, {
         dataType: 'json'
     });
 
@@ -47,46 +46,54 @@
         players = [...players, newPlayer];
         togglePlayer(newPlayer);
     }
-
-    const minParticipants = data.tournament?.minimumCompetitorsPerSession ?? 1;
 </script>
 
 <div class="max-w-2xl mx-auto p-6 space-y-6">
-    <h1 class="text-2xl font-bold">➕ Neue Runde für {data.tournament?.name ?? ''}</h1>
+    <h1 class="text-2xl font-bold">🎮 Freies Spiel erstellen</h1>
+    <p class="text-gray-600">Erstelle eine Session ohne Turnier und Wertungsklasse.</p>
 
     <form use:enhance method="POST" class="space-y-6" action="?/createSession">
-        <Input
+        <div class="space-y-4">
+            <Label>Anzahl der Löcher</Label>
+            <div class="flex items-center space-x-4">
+                <Range id="holeCount" min="1" max="36" step="1" bind:value={$form.holeCount} />
+                <span class="text-lg font-medium">{$form.holeCount}</span>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <Label>Spieler auswählen</Label>
+            <Input
                 type="text"
                 name="search"
                 placeholder="🔍 Spieler suchen..."
                 bind:value={search}
                 class="w-full"
-        />
+            />
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {#each filteredPlayers as player}
-                <button
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {#each filteredPlayers as player}
+                    <button
                         type="button"
                         class={`border rounded p-2 text-center ${
-            isSelected(player.id)
-              ? 'bg-blue-600 text-white border-blue-600'
-              : 'bg-white hover:bg-gray-100'
-          }`}
+                            isSelected(player.id)
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white hover:bg-gray-100'
+                        }`}
                         onclick={() => togglePlayer(player)}
-                >
-                    {player.firstName} {player.lastName}
-                </button>
-            {/each}
+                    >
+                        {player.firstName} {player.lastName}
+                    </button>
+                {/each}
+            </div>
         </div>
 
-        {#if $form.player.length < minParticipants}
-            <p class="text-red-500 text-sm">Mindestens {minParticipants} Spieler erforderlich</p>
+        {#if $form.player.length < 1}
+            <p class="text-red-500 text-sm">Mindestens 1 Spieler erforderlich</p>
         {/if}
 
-        <input type="hidden" name="tournament_id" value={$form.tournamentId}/>
-
-        <Button type="submit" class="w-full" disabled={$form.player.length < minParticipants}>
-            🏌️ Runde starten
+        <Button type="submit" class="w-full" disabled={$form.player.length < 1}>
+            🏌️ Freies Spiel starten
         </Button>
     </form>
 
@@ -106,3 +113,5 @@
         onPlayerCreated={handlePlayerCreated}
     />
 </div>
+
+<SuperDebug data={form}/>

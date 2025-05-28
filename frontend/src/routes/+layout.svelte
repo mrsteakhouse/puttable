@@ -7,13 +7,16 @@
 
     import { onMount } from 'svelte'
     import { goto, invalidate } from '$app/navigation'
+    import PermissionGuard from '$lib/components/PermissionGuard.svelte';
+    import { Action, Resource } from '$lib/permissions';
 
     let { data, children } = $props()
 
     let { session, supabase, user } = $derived(data)
     let activeUrl = $derived(page.url.pathname);
     let userLoggedIn = $derived(user?.is_anonymous);
-    let username = $derived(user?.user_metadata.name);
+    // Use user_metadata.name from the session user
+    let username = $derived(user?.user_metadata.name || session?.user?.email);
 
     onMount(() => {
         const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
@@ -57,9 +60,15 @@
         <NavHamburger/>
         <DarkMode/>
     </div>
-    <NavUl {activeUrl} >
+    <NavUl {activeUrl}>
         <NavLi href="/">Turniere</NavLi>
         <NavLi href="/player">Spieler</NavLi>
+        <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Create}>
+            <NavLi href="/session/create">Freies Spiel</NavLi>
+        </PermissionGuard>
+        {#if !(userLoggedIn ?? true)}
+            <NavLi href="/admin">Admin</NavLi>
+        {/if}
         <NavLi class="cursor-pointer">
             {#if userLoggedIn ?? true}
                 Log In

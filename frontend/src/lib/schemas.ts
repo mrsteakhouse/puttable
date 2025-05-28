@@ -37,8 +37,8 @@ export type TournamentSchema = z.infer<typeof tournamentSchema>;
 
 export const sessionSchema = z.object({
     player: playerSchema.array().min(1, "Mindestens ein Spieler muss angegeben werden"),
-    tournamentId: z.number().gt(0).optional(),
-    tournamentHoles: z.number().gt(0).optional(),
+    tournamentId: z.number().optional(),
+    holeCount: z.number().gt(0).optional(),
 });
 
 export type SessionSchema = z.infer<typeof sessionSchema>;

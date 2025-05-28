@@ -34,6 +34,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      permissions: {
+        Row: {
+          action: string
+          created_at: string
+          description: string | null
+          id: number
+          name: string
+          resource: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          description?: string | null
+          id?: number
+          name: string
+          resource: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          description?: string | null
+          id?: number
+          name?: string
+          resource?: string
+        }
+        Relationships: []
+      }
       players: {
         Row: {
           created_at: string
@@ -111,6 +138,57 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          permission_id: number
+          role_id: number
+        }
+        Insert: {
+          permission_id: number
+          role_id: number
+        }
+        Update: {
+          permission_id?: number
+          role_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roles: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: number
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: number
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
       scorecards: {
         Row: {
           data: Json
@@ -152,22 +230,19 @@ export type Database = {
           created_at: string
           id: number
           submitted_at: string | null
-          tournament_id: number
-          user_id: string | null
+          tournament_id: number | null
         }
         Insert: {
           created_at?: string
           id?: number
           submitted_at?: string | null
-          tournament_id: number
-          user_id?: string | null
+          tournament_id?: number | null
         }
         Update: {
           created_at?: string
           id?: number
           submitted_at?: string | null
-          tournament_id?: number
-          user_id?: string | null
+          tournament_id?: number | null
         }
         Relationships: [
           {
@@ -212,14 +287,169 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          role_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          role_id: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          role_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      assign_permission_to_role: {
+        Args: { p_role_id: number; p_permission_id: number }
+        Returns: undefined
+      }
+      assign_role_to_user: {
+        Args: { p_user_id: string; p_role_name: string }
+        Returns: undefined
+      }
+      can_access_resource: {
+        Args: { resource_table: string; resource_id: number; action: string }
+        Returns: boolean
+      }
+      create_role: {
+        Args: { p_name: string; p_description: string }
+        Returns: number
+      }
+      current_user_has_permission: {
+        Args: { resource: string; action: string }
+        Returns: boolean
+      }
+      delete_role: {
+        Args: { p_role_id: number }
+        Returns: undefined
+      }
+      ensure_admin_exists: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      get_current_user_permissions: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          permission_name: string
+          resource: string
+          action: string
+        }[]
+      }
+      get_current_user_roles: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          role_id: number
+          role_name: string
+          role_description: string
+        }[]
+      }
+      get_user_permissions: {
+        Args: { user_id: string }
+        Returns: {
+          permission_name: string
+          resource: string
+          action: string
+        }[]
+      }
+      is_owner: {
+        Args: { resource_table: string; resource_id: number }
+        Returns: boolean
+      }
+      list_roles_with_permissions: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          role_id: number
+          role_name: string
+          role_description: string
+          permissions: Json
+        }[]
+      }
+      list_users_with_roles: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          user_id: string
+          email: string
+          user_name: string
+          roles: string[]
+        }[]
+      }
+      remove_permission_from_role: {
+        Args: { p_role_id: number; p_permission_id: number }
+        Returns: undefined
+      }
+      remove_role_from_user: {
+        Args: { p_user_id: string; p_role_name: string }
+        Returns: undefined
+      }
       update_jsonb_array_element: {
         Args: { record_id: number; array_index: number; new_value: Json }
         Returns: undefined
+      }
+      update_role: {
+        Args: { p_role_id: number; p_name: string; p_description: string }
+        Returns: undefined
+      }
+      user_has_permission: {
+        Args: { user_id: string; resource: string; action: string }
+        Returns: boolean
       }
     }
     Enums: {
@@ -344,4 +574,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

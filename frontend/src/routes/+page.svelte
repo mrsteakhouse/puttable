@@ -6,6 +6,8 @@
     import moment from "moment";
     import TournamentCard from "$lib/components/TournamentCard.svelte";
     import type { PageProps } from './$types'
+    import PermissionGuard from '$lib/components/PermissionGuard.svelte';
+    import { Action, Resource } from '$lib/permissions';
 
     let { data }: PageProps = $props();
 
@@ -73,14 +75,16 @@
     </section>
 
     <div class="max-w-md mx-auto">
-        <Button
-                href="/tournament/create"
-                outline
-                class="me-2 w-70 h-12"
-                size="lg"
-        >
-            <CirclePlusSolid class="me-2"/>
-            Turnier erstellen
-        </Button>
+        <PermissionGuard supabase={data.supabase} resource={Resource.Tournaments} action={Action.Create} >
+            <Button
+                    href="/tournament/create"
+                    outline
+                    class="me-2 w-70 h-12"
+                    size="lg"
+            >
+                <CirclePlusSolid class="me-2"/>
+                Turnier erstellen
+            </Button>
+        </PermissionGuard>
     </div>
 </div>

@@ -19,12 +19,21 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
 
     const typedData: ScoreCardQuery = data;
 
+    // Check if this is a freeplay session (no tournament)
+    const isFreeplay = !typedData.tournament;
+
+    // For freeplay sessions, we need to determine the number of holes from the first scorecard
+    const holes = isFreeplay
+        ? (typedData.scorecards.length > 0 ? typedData.scorecards[0].data.length : 0)
+        : typedData.tournament.number_of_holes;
+
     const sessionData = {
         id: typedData.id,
-        tournamentId: typedData.tournament.id,
-        tournamentName: typedData.tournament.name,
-        holes: typedData.tournament.number_of_holes,
+        tournamentId: isFreeplay ? null : typedData.tournament.id,
+        tournamentName: isFreeplay ? "Freies Spiel" : typedData.tournament.name,
+        holes: holes,
         submissionDateTime: typedData.submitted_at,
+        isFreeplay: isFreeplay,
         scorecard: typedData.scorecards.map((scorecard: {
             id: number,
             data: number[],
@@ -38,7 +47,6 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
                     firstName: scorecard.player.firstname,
                     lastName: scorecard.player.lastname
                 }
-
             }
         })
     } as SessionDto
@@ -86,7 +94,12 @@ export const actions: Actions = {
             return { success: false, error: sessionDeleteError.message };
         }
 
-        // Redirect to the tournament page
-        throw redirect(303, `/tournament/${tournamentId}`);
+        // Redirect to the tournament page if this was a tournament session,
+        // otherwise redirect to the home page
+        if (tournamentId) {
+            throw redirect(303, `/tournament/${tournamentId}`);
+        } else {
+            throw redirect(303, '/');
+        }
     }
 };

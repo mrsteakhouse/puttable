@@ -1,10 +1,24 @@
 <script lang="ts">
-    import { Alert, Button, Card, Input, Label, Modal, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
-    import { ArrowLeft, Pencil, Check, X, Trash, Calendar } from 'lucide-svelte';
+    import {
+        Alert,
+        Button,
+        Card,
+        Input,
+        Label,
+        Modal,
+        Table,
+        TableBody,
+        TableBodyCell,
+        TableBodyRow,
+        TableHead,
+        TableHeadCell
+    } from 'flowbite-svelte';
+    import { ArrowLeft, Check, Pencil, Trash, X } from 'lucide-svelte';
     import type { PageProps } from './$types';
     import { superForm } from 'sveltekit-superforms';
     import type { PlayerFormSchema } from '$lib/schemas';
-    import type { SessionDto } from '$lib/dto';
+    import PermissionGuard from '$lib/components/PermissionGuard.svelte';
+    import { Action, Resource } from '$lib/permissions';
 
     let { data }: PageProps = $props();
     let isEditing = $state(false);
@@ -107,12 +121,16 @@
 
             {#if !isEditing}
                 <div class="flex space-x-2">
-                    <Button color="light" size="sm" onclick={toggleEdit}>
-                        <Pencil class="w-4 h-4" />
-                    </Button>
-                    <Button color="red" size="sm" onclick={openDeleteModal}>
-                        <Trash class="w-4 h-4" />
-                    </Button>
+                    <PermissionGuard supabase={data.supabase} resource={Resource.Players} action={Action.Update}>
+                        <Button color="light" size="sm" onclick={toggleEdit}>
+                            <Pencil class="w-4 h-4"/>
+                        </Button>
+                    </PermissionGuard>
+                    <PermissionGuard supabase={data.supabase} resource={Resource.Players} action={Action.Delete}>
+                        <Button color="red" size="sm" onclick={openDeleteModal}>
+                            <Trash class="w-4 h-4"/>
+                        </Button>
+                    </PermissionGuard>
                 </div>
             {/if}
         </div>
@@ -198,7 +216,7 @@
             </Table>
         {:else}
             <Alert>
-                Keine Sessions gefunden. Der Spieler hat noch an keiner Session teilgenommen.
+                Der Spieler hat noch keine Löcher gespielt.
             </Alert>
         {/if}
     </div>

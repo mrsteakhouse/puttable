@@ -7,6 +7,8 @@
     import { marked } from "marked";
     import type { PageProps } from './$types';
     import type { SessionDto, TournamentDto } from '$lib/dto';
+    import PermissionGuard from '$lib/components/PermissionGuard.svelte';
+    import { Action, Resource } from '$lib/permissions';
 
     const tournamentId = Number(page.params.tournamentId);
 
@@ -57,20 +59,20 @@
 
         <div class="flex items-center gap-2">
             <Users class="w-5 h-5 text-gray-600"/>
-            <p>Mindestteilnehmer: {tournament.minimumCompetitorsPerSession}</p>
+            <p>Mindestteilnehmer:</p> {tournament.minimumCompetitorsPerSession}
         </div>
 
         <div class="flex items-center gap-2">
             <Flag class="w-5 h-5 text-gray-600"/>
-            <p>Lochanzahl: {tournament.numberOfHoles}</p>
+            <p>Lochanzahl:</p> {tournament.numberOfHoles}
         </div>
 
         <div class="flex items-center gap-2">
             <Award class="w-5 h-5 text-gray-600"/>
-            <p>Wertungsklassen:
+            <p>Wertungsklassen:</p>
             {#each tournament.ratingClasses as ratingClass}
                 <Badge large class="mx-2">{ratingClass.name}</Badge>
-            {/each}</p>
+            {/each}
         </div>
 
         <div class="flex items-start gap-2">
@@ -80,19 +82,26 @@
     </div>
 
 
-    <div class="flex items-center pt-10 gap-2">
-        <Button color="blue" class="text-sm" href={`/tournament/${tournament.id}/edit`}>
-            ✏️ Event bearbeiten
-        </Button>
-        <form method="POST" action="?/deleteTournament"
-              onsubmit={() => confirm('Sind Sie sicher, dass Sie dieses Event löschen möchten? Alle zugehörigen Sessions werden ebenfalls gelöscht.')}>
-            <Button type="submit" color="red" class="text-sm">
-                🗑️ Event löschen
+    <div class="flex items-center gap-2">
+        <PermissionGuard supabase={data.supabase} resource={Resource.Tournaments} action={Action.Update}>
+            <Button color="blue" class="text-sm" href={`/tournament/${tournament.id}/edit`}>
+                ✏️ Event bearbeiten
             </Button>
-        </form>
+        </PermissionGuard>
+        <PermissionGuard supabase={data.supabase} resource={Resource.Tournaments} action={Action.Delete}>
+            <form method="POST" action="?/deleteTournament"
+                  onsubmit={() => confirm('Sind Sie sicher, dass Sie dieses Event löschen möchten? Alle zugehörigen Sessions werden ebenfalls gelöscht.')}>
+                <Button type="submit" color="red" class="text-sm">
+                    🗑️ Event löschen
+                </Button>
+            </form>
+        </PermissionGuard>
     </div>
 
-    <!-- Sessions Overview Section -->
+
+    <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Read}>
+
+        <!-- Sessions Overview Section -->
     <div class="pt-10 space-y-4">
         <h2 class="text-xl font-bold flex items-center gap-2">
             <BarChart class="w-5 h-5"/>
@@ -148,19 +157,23 @@
             </div>
         {/if}
     </div>
+    </PermissionGuard>
 
-    <div class="flex items-center pt-10">
-        <Button id="start-new-session-button" onclick={() => goto(`/tournament/${tournamentId}/session/create`)} disabled={!allowStartSession}>
-            Neue Runde erstellen
-        </Button>
-        {#if !allowStartSession}
-            <Tooltip triggeredBy="#start-new-session-button" placement="bottom">
-                {#if moment().isBefore(tournament.startDateTime)}
-                    Das Turnier hat noch nicht begonnen.
-                {:else if moment().isAfter(tournament.endDateTime)}
-                    Das Turnier ist bereits beendet.
-                {/if}
-            </Tooltip>
-        {/if}
-    </div>
+    <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Create}>
+        <div class="flex items-center pt-10">
+            <Button id="start-new-session-button" onclick={() => goto(`/tournament/${tournamentId}/session/create`)}
+                    disabled={!allowStartSession}>
+                Neue Runde erstellen
+            </Button>
+            {#if !allowStartSession}
+                <Tooltip triggeredBy="#start-new-session-button" placement="bottom">
+                    {#if moment().isBefore(tournament.startDateTime)}
+                        Das Turnier hat noch nicht begonnen.
+                    {:else if moment().isAfter(tournament.endDateTime)}
+                        Das Turnier ist bereits beendet.
+                    {/if}
+                </Tooltip>
+            {/if}
+        </div>
+    </PermissionGuard>
 </div>

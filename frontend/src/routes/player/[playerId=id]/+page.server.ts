@@ -131,9 +131,9 @@ export const load: PageServerLoad = async ({ params, locals: { supabase } }) => 
         if (!sessionsMap.has(sessionId)) {
             sessionsMap.set(sessionId, {
                 id: sessionId,
-                tournamentId: scorecard.session.tournament.id,
-                tournamentName: scorecard.session.tournament.name,
-                holes: scorecard.session.tournament.number_of_holes,
+                tournamentId: scorecard.session.tournament?.id ?? 0,
+                tournamentName: scorecard.session.tournament?.name ?? '',
+                holes: scorecard.session.tournament?.number_of_holes ?? 18,
                 submissionDateTime: scorecard.session.submitted_at,
                 scorecard: []
             });

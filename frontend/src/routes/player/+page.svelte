@@ -1,13 +1,12 @@
 <script lang="ts">
-    import {
-        Alert,
-        Button
-    } from 'flowbite-svelte';
+    import { Alert, Button } from 'flowbite-svelte';
     import { PlusIcon } from 'lucide-svelte';
-    import { superForm, type SuperValidated } from 'sveltekit-superforms';
+    import { type SuperValidated } from 'sveltekit-superforms';
     import type { PageProps } from './$types';
-    import type { PlayerFormSchema } from './+page.server';
     import CreatePlayerModal from '$lib/components/CreatePlayerModal.svelte';
+    import PermissionGuard from '$lib/components/PermissionGuard.svelte';
+    import { Action, Resource } from '$lib/permissions';
+    import type { PlayerFormSchema } from '$lib/schemas';
 
     let { data }: PageProps = $props();
     let createPlayerModalOpen = $state(false);
@@ -28,10 +27,12 @@
 <div class="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-2xl shadow">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold">Spieler</h1>
-        <Button color="blue" onclick={openCreatePlayerModal}>
-            <PlusIcon class="mr-2 h-5 w-5"/>
-            Spieler anlegen
-        </Button>
+        <PermissionGuard supabase={data.supabase} resource={Resource.Players} action={Action.Create}>
+            <Button color="blue" onclick={openCreatePlayerModal}>
+                <PlusIcon class="mr-2 h-5 w-5"/>
+                Spieler anlegen
+            </Button>
+        </PermissionGuard>
     </div>
 
     {#if availablePlayers && availablePlayers.length > 0}
