@@ -1,9 +1,10 @@
 <script lang="ts">
-    import { Alert, Button, Card, Input, Label, Modal } from 'flowbite-svelte';
-    import { ArrowLeft, Pencil, Check, X, Trash } from 'lucide-svelte';
+    import { Alert, Button, Card, Input, Label, Modal, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
+    import { ArrowLeft, Pencil, Check, X, Trash, Calendar } from 'lucide-svelte';
     import type { PageProps } from './$types';
     import { superForm } from 'sveltekit-superforms';
     import type { PlayerFormSchema } from '$lib/schemas';
+    import type { SessionDto } from '$lib/dto';
 
     let { data }: PageProps = $props();
     let isEditing = $state(false);
@@ -117,7 +118,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card class="p-3">
             <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
                 Durchschnittliche Punktzahl
@@ -139,6 +140,17 @@
                 <span class="text-sm">{data.statistics.totalOnes} Einsen in {data.statistics.totalHolesPlayed} Löchern</span>
             </p>
         </Card>
+
+        <Card class="p-3">
+            <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+                Durchschnitt pro Scorecard
+            </h5>
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                <span class="text-4xl font-bold text-purple-600">{data.statistics.averageScorePerScorecard}</span>
+                <br>
+                <span class="text-sm">basierend auf {data.statistics.validScorecards} Scorecards</span>
+            </p>
+        </Card>
     </div>
 
     {#if data.statistics.totalHolesPlayed === 0}
@@ -146,6 +158,50 @@
             Keine Spielstatistiken verfügbar. Der Spieler hat noch keine Scorecards.
         </Alert>
     {/if}
+
+    <!-- Sessions Overview -->
+    <div class="mt-8">
+        <h2 class="text-xl font-bold mb-4">Gespielte Sessions</h2>
+
+        {#if data.sessions && data.sessions.length > 0}
+            <Table striped={true}>
+                <TableHead>
+                    <TableHeadCell>Datum</TableHeadCell>
+                    <TableHeadCell>Turnier</TableHeadCell>
+                    <TableHeadCell>Löcher</TableHeadCell>
+                    <TableHeadCell>Ergebnis</TableHeadCell>
+                    <TableHeadCell>Aktionen</TableHeadCell>
+                </TableHead>
+                <TableBody>
+                    {#each data.sessions as session}
+                        {@const playerScorecard = session.scorecard.find(sc => sc.player.id === data.player.id)}
+                        {@const totalScore = playerScorecard ? playerScorecard.data.reduce((sum, score) => sum + (score || 0), 0) : 0}
+                        <TableBodyRow>
+                            <TableBodyCell>
+                                {#if session.submissionDateTime}
+                                    {new Date(session.submissionDateTime).toLocaleDateString('de-DE')}
+                                {:else}
+                                    -
+                                {/if}
+                            </TableBodyCell>
+                            <TableBodyCell>{session.tournamentName}</TableBodyCell>
+                            <TableBodyCell>{session.holes}</TableBodyCell>
+                            <TableBodyCell>{totalScore}</TableBodyCell>
+                            <TableBodyCell>
+                                <a href="/session/{session.id}" class="text-blue-600 hover:underline">
+                                    Details
+                                </a>
+                            </TableBodyCell>
+                        </TableBodyRow>
+                    {/each}
+                </TableBody>
+            </Table>
+        {:else}
+            <Alert>
+                Keine Sessions gefunden. Der Spieler hat noch an keiner Session teilgenommen.
+            </Alert>
+        {/if}
+    </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
