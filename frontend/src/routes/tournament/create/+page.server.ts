@@ -5,10 +5,28 @@ import { tournamentSchema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms';
 import moment from 'moment';
 import { DATETIME_WITH_TIMEZONE } from '$lib/constants';
+import { RatingClassDto } from '$lib/dto';
+import { patchRatingClasses } from '$lib/server/RatingClassesPatcher';
 
-export const load: PageServerLoad = async ({ parent }) => {
+export const load: PageServerLoad = async ({ locals: { supabase }, parent }) => {
     const form = await superValidate(zod(tournamentSchema));
-    return { form };
+
+    const { data, error } = await supabase
+        .from('rating_classes')
+        .select();
+
+    if (error) {
+        throw fail(404, {message: "Keine Wertungsklassen gefunden"})
+    }
+
+    const ratingClasses: RatingClassDto[] = data?.map(ratingClass => {
+        return {
+            id: ratingClass.id,
+            name: ratingClass.name
+        }
+    }) ?? [];
+
+    return { form, ratingClasses };
 }
 
 export const actions = {
@@ -18,6 +36,8 @@ export const actions = {
         if (!form.valid) {
             return fail(400, { form });
         }
+
+        await patchRatingClasses(supabase, form.data.ratingClasses);
 
         const { data, error } = await supabase
             .from('tournaments')
@@ -32,8 +52,9 @@ export const actions = {
             .select('id')
             .single();
 
-        if (error) {
-            console.log(error.details)
+        if (error || !data) {
+            console.error(error);
+            return fail(400, { form });
         }
 
         redirect(303, `/tournament/${data.id}`);

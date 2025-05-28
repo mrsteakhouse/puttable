@@ -1,0 +1,134 @@
+<script lang="ts">
+    import { Button, Input, Modal, TabItem, Tabs } from 'flowbite-svelte';
+    import { invalidateAll } from '$app/navigation';
+    import type { PageProps } from './$types';
+    import moment from 'moment/moment';
+    import { DATETIME_DISPLAY } from '$lib/constants';
+
+    let { data }: PageProps = $props();
+    const supabase = $derived(data.supabase);
+    const session = $derived(data.session);
+    const scorecards: { id: number, data: number[], playerName: string }[] = $derived(session.scorecard.map(sc => {
+        return {
+            id: sc.id,
+            data: sc.data,
+            playerName: `${sc.player.firstName} ${sc.player.lastName}`
+        }
+    }))
+
+    let showModal = $state(false);
+    let incompletePlayers: string[] = $state([]);
+
+    // Schlagzählung pro Scorecard
+    function totalScore(dataGetter: () => number[]) {
+        return dataGetter().reduce((a, b) => a + b, 0);
+    }
+
+    function onesCount(dataGetter: () => number[]) {
+        return dataGetter().filter(score => score === 1).length
+    }
+
+    function isComplete(dataGetter: () => number[]) {
+        return dataGetter().every(score => score > 0);
+    }
+
+    async function submitScorecards() {
+        incompletePlayers = scorecards
+            .filter((sc) => !isComplete(() => sc.data))
+            .map((sc) => sc.playerName);
+
+        if (incompletePlayers.length > 0) {
+            showModal = true;
+            return;
+        }
+
+        await supabase
+            .from('sessions')
+            .update({ submitted_at: new Date().toISOString() })
+            .eq('id', session.id);
+
+        await invalidateAll();
+    }
+
+    async function handleInputChange(playerIndex: number, holeIndex: number, target: Event & {
+        currentTarget: EventTarget & HTMLInputElement
+    }) {
+        scorecards[playerIndex].data[holeIndex] = Number(target.currentTarget.value);
+        console.log(scorecards[playerIndex]);
+        const { error } = await supabase
+            .from('scorecards')
+            .update({
+                data: scorecards[playerIndex].data
+            })
+            .eq('id', scorecards[playerIndex].id);
+
+        console.log(error);
+    }
+</script>
+
+<div class="max-w-2xl mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">🎯 Session für {session.tournamentName}</h1>
+
+    <Tabs tabStyle="underline">
+        <TabItem open={true} title="Übersicht">
+            <div class="grid grid-cols-4 space-y-4 mt-4">
+                <div class="grid col-span-2">Spieler</div>
+                <div class="grid">Punktestand</div>
+                <div class="grid">Einsen</div>
+                {#each scorecards as sc}
+                    <div class="grid col-span-2">{sc.playerName}</div>
+                    <div class="grid">{totalScore(() => sc.data)}</div>
+                    <div class="grid">{onesCount(() => sc.data)}</div>
+                {/each}
+            </div>
+
+            {#if !session.submissionDateTime}
+                <Button onclick={submitScorecards} color="green">
+                    ✅ Scorecards einreichen
+                </Button>
+            {:else}
+                <div class="text-green-600 font-medium">✅ Bereits eingereicht
+                    am {moment(session.submissionDateTime).format(DATETIME_DISPLAY)}</div>
+            {/if}
+        </TabItem>
+
+        {#each scorecards as sc, i}
+            <TabItem title={sc.playerName}>
+                <div class="grid grid-cols-4 gap-2 mt-4">
+                    {#each [...Array(session.holes).keys()] as index}
+                        <div>
+                            Loch {index + 1}
+                        </div>
+                        <div>
+                            <Input class="w-15" type="number" max="7" min="0" bind:value={sc.data[index]}
+                                   oninput={(e) => handleInputChange(i, index, e)}/>
+                        </div>
+                    {/each}
+                </div>
+
+                <div class="mt-4 text-gray-700">
+                    <span class="font-semibold">Gesamt:</span> {totalScore(() => sc.data)}
+                </div>
+                <div class="mt-4 text-gray-700">
+                    <span class="font-semibold">Einsen:</span> {onesCount(() => sc.data)}
+                </div>
+            </TabItem>
+        {/each}
+    </Tabs>
+
+    <!-- ⚠️ Modal -->
+    <Modal bind:open={showModal} autoclose>
+        <div class="p-4">
+            <h2 class="text-lg font-bold mb-2">⚠️ Unvollständige Scorecards</h2>
+            <p class="text-sm mb-2">Folgende Spieler haben noch nicht alle Löcher gespielt:</p>
+            <ul class="list-disc ml-6 mb-4 text-sm">
+                {#each incompletePlayers as name}
+                    <li>{name}</li>
+                {/each}
+            </ul>
+            <div class="text-right">
+                <Button onclick={() => (showModal = false)}>Okay</Button>
+            </div>
+        </div>
+    </Modal>
+</div>

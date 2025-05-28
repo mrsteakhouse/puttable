@@ -4,8 +4,9 @@ import { superValidate, type SuperValidated } from 'sveltekit-superforms';
 import { type TournamentSchema, tournamentSchema } from '$lib/schemas';
 import { zod } from 'sveltekit-superforms/adapters';
 import moment from 'moment/moment';
-import { DATETIME_WITH_TIMEZONE } from '$lib/constants';
+import { DATETIME_WITH_TIMEZONE, PARSE_DATETIME_FORMAT } from '$lib/constants';
 import type { TournamentDto } from '$lib/dto';
+import { patchRatingClasses } from '$lib/server/RatingClassesPatcher';
 
 export const load: PageServerLoad = async ({ parent }) => {
     const { tournament: data } = await parent();
@@ -22,7 +23,8 @@ export const load: PageServerLoad = async ({ parent }) => {
         endTime: tournament.startDateTime !== '' ? moment(tournament.endDateTime).format("HH:mm") : '',
         minParticipants: tournament.minimumCompetitorsPerSession,
         holeCount: tournament.numberOfHoles,
-        description: tournament.description
+        description: tournament.description,
+        ratingClasses: tournament.ratingClasses
     } as TournamentSchema, zod(tournamentSchema));
 
     return { form };
@@ -36,21 +38,26 @@ export const actions = {
             return fail(400, { form });
         }
 
-        const result = await supabase
+        const newRatingClassIds = await patchRatingClasses(supabase, form.data.ratingClasses);
+
+        const { error } = await supabase
             .from('tournaments')
             .update({
                 name: form.data.name,
-                start_date: moment(`${form.data.startDate}T${form.data.startTime}`).format(DATETIME_WITH_TIMEZONE),
-                end_date: moment(`${form.data.endDate}T${form.data.endTime}`).format(DATETIME_WITH_TIMEZONE),
+                start_date: moment(`${form.data.startDate}T${form.data.startTime}Z`).format(DATETIME_WITH_TIMEZONE),
+                end_date: moment(`${form.data.endDate}T${form.data.endTime}Z`).format(DATETIME_WITH_TIMEZONE),
                 number_of_holes: form.data.holeCount,
                 minimum_participants: form.data.minParticipants,
                 description: form.data.description,
             })
             .eq('id', params.tournamentId);
 
-        if (result.error) {
-            alert(result.error.details)
+        if (error) {
+            console.error(error);
+            return fail(400, { form });
         }
+
+
 
         redirect(303, `/tournament/${params.tournamentId}`);
     }

@@ -5,4 +5,4 @@
     let { data }: PageProps = $props();
 </script>
 
-<TournamentForm formData={data.form}/>
+<TournamentForm formData={data.form} ratingClasses={data.ratingClasses} tournamentId={0}/>

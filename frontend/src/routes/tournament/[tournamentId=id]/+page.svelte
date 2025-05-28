@@ -1,16 +1,17 @@
 <script lang="ts">
-    import { Button, Tooltip } from "flowbite-svelte";
-    import { ArrowLeft, Calendar, Flag, Info, Users } from "lucide-svelte";
+    import { Button, Tooltip, Badge } from "flowbite-svelte";
+    import { ArrowLeft, Calendar, Flag, Info, Users, Award } from "lucide-svelte";
     import moment from "moment";
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import { marked } from "marked";
     import type { PageProps } from './$types';
+    import type { TournamentDto } from '$lib/dto';
 
     const tournamentId = Number(page.params.tournamentId);
 
     let { data }: PageProps = $props();
-    let tournament = $derived(data.tournament);
+    let tournament = $derived(data.tournament ?? {} as TournamentDto);
 
     let allowStartSession = $derived(moment().isBetween(
         tournament.startDateTime,
@@ -63,6 +64,14 @@
             <p>Lochanzahl: {tournament.numberOfHoles}</p>
         </div>
 
+        <div class="flex items-center gap-2">
+            <Award class="w-5 h-5 text-gray-600"/>
+            <p>Wertungsklassen:
+            {#each tournament.ratingClasses as ratingClass}
+                <Badge large class="mx-2">{ratingClass.name}</Badge>
+            {/each}</p>
+        </div>
+
         <div class="flex items-start gap-2">
             <Info class="w-5 h-5 text-gray-600 mt-1"/>
             <p class="whitespace-pre-line">{@html marked(tournament.description ?? '')}</p>
@@ -79,9 +88,8 @@
         </a>
     </div>
 
-
     <div class="flex items-center pt-10">
-        <Button id="start-new-session-button" onclick={() => goto("/session/create")} disabled={!allowStartSession}>
+        <Button id="start-new-session-button" onclick={() => goto(`/tournament/${tournamentId}/session/create`)} disabled={!allowStartSession}>
             Neue Runde erstellen
         </Button>
         {#if !allowStartSession}

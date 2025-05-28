@@ -8,13 +8,14 @@
     import type { PageProps } from './$types'
 
     let { data }: PageProps = $props();
-    let tournaments = $derived(data.tournaments);
 
+    let tournaments = $derived(data.tournaments);
     let searchTerm = $state("");
     let filteredItems = $derived(tournaments?.filter((item) =>
         !searchTerm
         || fuzzysearch(searchTerm.toLowerCase(), item.name.toLowerCase())
-        || fuzzysearch(searchTerm.toLowerCase(), item.description.toLowerCase())) ?? []);
+            || fuzzysearch(searchTerm.toLowerCase(), item.description.toLowerCase()))
+        ?? []);
 
     let now = $state(moment());
     let activeEvents = $derived(filteredItems.filter((tournament) => now.isBetween(tournament.startDateTime, tournament.endDateTime)))

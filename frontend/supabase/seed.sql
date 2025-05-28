@@ -12,12 +12,6 @@ INSERT INTO public.sessions (id, created_at, submitted_at, tournament_id, user_i
 INSERT INTO public.sessions (id, created_at, submitted_at, tournament_id, user_id) VALUES (5, '2025-05-20 11:14:25.287791+00', NULL, 1, 'dabb3c14-40a1-4088-98bf-44d2dbd29b3A');
 INSERT INTO public.sessions (id, created_at, submitted_at, tournament_id, user_id) VALUES (6, '2025-05-20 12:13:25.287791+00', NULL, 1, 'dabb3c14-40a1-4088-98bf-44d2dbd29b3e');
 
-INSERT INTO public.player_to_sessions (session_id, player_id) VALUES (4, 1);
-INSERT INTO public.player_to_sessions (session_id, player_id) VALUES (4, 3);
-INSERT INTO public.player_to_sessions (session_id, player_id) VALUES (5, 3);
-INSERT INTO public.player_to_sessions (session_id, player_id) VALUES (6, 2);
-INSERT INTO public.player_to_sessions (session_id, player_id) VALUES (6, 3);
-
 INSERT INTO public.rating_classes_to_tournaments (rating_class_id, tournament_id) VALUES (1, 1);
 INSERT INTO public.rating_classes_to_tournaments (rating_class_id, tournament_id) VALUES (2, 1);
 

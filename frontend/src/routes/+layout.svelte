@@ -68,11 +68,11 @@
             {/if}
             <ChevronDownOutline class="text-primary-800 ms-2 inline h-6 w-6 dark:text-white"/>
         </NavLi>
-        <Dropdown simple class="w-44">
+        <Dropdown simple>
             {#if userLoggedIn ?? true}
-                <DropdownItem onclick={handleLogin}>Login with SSO</DropdownItem>
+                <DropdownItem onclick={handleLogin}>Mit SSO einloggen</DropdownItem>
             {:else}
-                <DropdownItem onclick={handleLogout}>Sign out</DropdownItem>
+                <DropdownItem onclick={handleLogout}>Logout</DropdownItem>
             {/if}
         </Dropdown>
     </NavUl>

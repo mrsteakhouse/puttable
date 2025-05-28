@@ -1,10 +1,10 @@
 <script lang="ts">
-    import {Card} from "flowbite-svelte";
+    import { Card } from "flowbite-svelte";
 
-    import {Calendar, Flag, Info, Users} from 'lucide-svelte';
-    import {goto} from "$app/navigation";
+    import { Calendar, Flag, Info, Users } from 'lucide-svelte';
+    import { goto } from "$app/navigation";
     import moment from "moment";
-    import {marked} from "marked";
+    import { marked } from "marked";
 
     let {event: tournament} = $props();
 </script>

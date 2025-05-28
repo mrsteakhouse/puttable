@@ -5,7 +5,8 @@ import { TOURNAMENT_LIST } from '$lib/dependables';
 
 export const load: PageServerLoad = async ({ locals: { supabase }, depends }) => {
     depends('supabase:auth', TOURNAMENT_LIST);
-    const { data, error } = await supabase.from('tournaments').select();
+    const { data, error } = await supabase.from('tournaments')
+        .select();
 
     if (error && !data) {
         fail(500, { message: error.message })
@@ -20,7 +21,8 @@ export const load: PageServerLoad = async ({ locals: { supabase }, depends }) =>
             endDateTime: tournament.end_date,
             numberOfHoles: tournament.number_of_holes,
             minimumCompetitorsPerSession: tournament.minimum_participants,
-            description: tournament.description ?? ''
+            description: tournament.description ?? '',
+            ratingClasses: []
         }
     });
 

@@ -40,6 +40,7 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
         data: { session },
     } = await supabase.auth.getSession()
 
+    const authenticated: boolean = user?.is_anonymous ?? false;
 
-    return { session, supabase, user }
+    return { session, supabase, user, authenticated }
 }

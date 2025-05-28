@@ -24,12 +24,6 @@ SET default_table_access_method = "heap";
 create domain "public"."markdown" AS character varying CHECK (value ~ '^[\w\d*\-:\(\)`~_#\\+\{\}\[\].!\s,\.;\"]+$');
 create domain "public"."alphanumeric" as character varying NOT NULL CHECK (value ~ '^[\w\d\-\s,\.]+$');
 
-CREATE TABLE IF NOT EXISTS "public"."player_to_sessions" (
-    "session_id" bigint NOT NULL,
-    "player_id" bigint NOT NULL
-);
-ALTER TABLE "public"."player_to_sessions" OWNER TO "postgres";
-
 CREATE TABLE IF NOT EXISTS "public"."players" (
     "id" bigint NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
@@ -70,7 +64,7 @@ CREATE TABLE IF NOT EXISTS "public"."sessions" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "submitted_at" timestamp with time zone,
     "tournament_id" bigint NOT NULL,
-    "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL
+    "user_id" "uuid"
 );
 
 ALTER TABLE "public"."sessions" OWNER TO "postgres";
@@ -109,7 +103,7 @@ create table if not exists "public"."scorecards" (
     "id" bigint not null,
     "session_id" bigint not null,
     "player_id" bigint not null,
-    "data" json not null
+    "data" jsonb not null
 );
 
 ALTER TABLE "public"."scorecards" OWNER TO "postgres";
@@ -132,32 +126,29 @@ ALTER TABLE ONLY "public"."scorecards" ADD CONSTRAINT "scorecards_pkey" PRIMARY 
 ALTER TABLE ONLY "public"."players" ADD CONSTRAINT "players_rating_class_id_fkey" FOREIGN KEY ("rating_class_id") REFERENCES "public"."rating_classes"("id");
 
 ALTER TABLE ONLY "public"."sessions" ADD CONSTRAINT "sessions_tournament_id_fkey" FOREIGN KEY ("tournament_id") REFERENCES "public"."tournaments"("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE ONLY "public"."player_to_sessions" ADD CONSTRAINT "player_to_sessions_pkey" PRIMARY KEY ("session_id", "player_id");
-ALTER TABLE ONLY "public"."player_to_sessions" ADD CONSTRAINT "player_to_sessions_player_id_fkey" FOREIGN KEY ("player_id") REFERENCES "public"."players"("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."player_to_sessions" ADD CONSTRAINT "player_to_sessions_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "public"."sessions"("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE ONLY "public"."scorecards" ADD CONSTRAINT "scorecards_player_id_fkey" FOREIGN KEY ("player_id") REFERENCES "public"."players"("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE ONLY "public"."scorecards" ADD CONSTRAINT "scorecards_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "public"."sessions"("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 
+CREATE POLICY "Enable read access for all users" ON "public"."players" FOR SELECT USING (true);
 CREATE POLICY "Enable all users to insert" ON "public"."players" FOR INSERT WITH CHECK (true);
-CREATE POLICY "Enable insert for all users" ON "public"."player_to_sessions" FOR INSERT WITH CHECK (true);
-CREATE POLICY "Enable insert for all users" ON "public"."sessions" FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "Enable insert for authenticated users only" ON "public"."rating_classes" FOR INSERT TO "authenticated" WITH CHECK (true);
-CREATE POLICY "Enable insert for authenticated users only" ON "public"."tournaments" FOR INSERT TO "authenticated" WITH CHECK (true);
 
 CREATE POLICY "Enable read access for all users" ON "public"."sessions" FOR SELECT USING (true);
-CREATE POLICY "Enable read access for all users" ON "public"."player_to_sessions" FOR SELECT USING (true);
-CREATE POLICY "Enable read access for all users" ON "public"."players" FOR SELECT USING (true);
+CREATE POLICY "Enable insert for all users" ON "public"."sessions" FOR INSERT WITH CHECK (true);
+CREATE POLICY "Enable update for all users" ON "public"."sessions" FOR UPDATE WITH CHECK (submitted_at IS NOT NULL);
+
+CREATE POLICY "Enable insert for authenticated users only" ON "public"."rating_classes" FOR INSERT TO "authenticated" WITH CHECK (true);
 CREATE POLICY "Enable read access for all users" ON "public"."rating_classes" FOR SELECT USING (true);
--- CREATE POLICY "Enable read access for all users" ON "public"."tournaments" FOR SELECT USING (true);
+
 CREATE POLICY "Enable read access for all users" ON "public"."tournaments" FOR SELECT TO anon USING (true);
+CREATE POLICY "Enable read access for authenticated users" ON "public"."tournaments" FOR SELECT TO "authenticated" USING (true);
+CREATE POLICY "Enable insert for authenticated users only" ON "public"."tournaments" FOR INSERT TO "authenticated" WITH CHECK (true);
+CREATE POLICY "Enable update for authenticated users only" ON "public"."tournaments" FOR UPDATE TO "authenticated" WITH CHECK (true);
 
 CREATE POLICY "Enable read access for all users" ON "public"."scorecards" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."scorecards" FOR INSERT WITH CHECK (true);
-
-ALTER TABLE "public"."player_to_sessions" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Enable update for all users" ON "public"."scorecards" FOR UPDATE WITH CHECK (true);
 
 ALTER TABLE "public"."players" ENABLE ROW LEVEL SECURITY;
 
@@ -176,11 +167,6 @@ GRANT USAGE ON SCHEMA "public" TO "postgres";
 GRANT USAGE ON SCHEMA "public" TO "anon";
 GRANT USAGE ON SCHEMA "public" TO "authenticated";
 GRANT USAGE ON SCHEMA "public" TO "service_role";
-
-
-GRANT ALL ON TABLE "public"."player_to_sessions" TO "anon";
-GRANT ALL ON TABLE "public"."player_to_sessions" TO "authenticated";
-GRANT ALL ON TABLE "public"."player_to_sessions" TO "service_role";
 
 GRANT ALL ON TABLE "public"."players" TO "anon";
 GRANT ALL ON TABLE "public"."players" TO "authenticated";
