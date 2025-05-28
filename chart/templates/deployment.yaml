@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+        release: {{ .Release.Name }}
+    spec:
+      serviceAccountName: {{ include "puttable.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          env:
+            - name: PUBLIC_SUPABASE_URL
+              value: {{ .Values.puttable.supabase.url | quote }}
+            - name: PUBLIC_SUPABASE_ANON_KEY
+              {{- if .Values.puttable.supabase.apiKey.secret }}
+              valueFrom:
+                secretKeyRef:
+                  key: {{ .Values.puttable.supabase.apiKey.secret.secretKey }}
+                  name: {{ .Values.puttable.supabase.apiKey.secret.secretName }}
+              {{ else }}
+              value: {{ .Values.puttable.supabase.apiKey.value }}
+              {{- end }}
+            - name: PUBLIC_SITE_BASE_URL
+              value: {{ .Values.puttable.baseUrl }}
+            - name: PUBLIC_SUPABASE_AUTH_KEYCLOAK_REDIRECT_URI
+              value: {{ .Values.puttable.keycloak.redirectUri }}
+            - name: SUPABASE_AUTH_KEYCLOAK_CLIENT_ID
+              value: {{ .Values.puttable.keycloak.clientId }}
+            - name: SUPABASE_AUTH_KEYCLOAK_SECRET
+              {{- if .Values.puttable.keycloak.clientSecret.secret }}
+              valueFrom:
+                secretKeyRef:
+                  key: {{ .Values.puttable.keycloak.clientSecret.secret.secretKey }}
+                  name: {{ .Values.puttable.keycloak.clientSecret.secret.secretName }}
+              {{ else }}
+              value: {{ .Values.puttable.keycloak.clientSecret.value }}
+              {{- end }}
+            - name: SUPABASE_AUTH_KEYCLOAK_URL
+              value: {{ .Values.puttable.keycloak.realmUrl }}
+            - name: PORT
+              value: {{ .Values.service.targetPort }}
+
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value }}
+            {{- end }}
+          resources:
+            {{ toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
