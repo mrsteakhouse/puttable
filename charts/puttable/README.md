@@ -12,7 +12,7 @@ This Helm chart deploys the Puttable application on a Kubernetes cluster.
 To install the chart with the release name `my-puttable`:
 
 ```bash
-helm install my-puttable ./chart
+helm install my-puttable ./charts
 ```
 
 The command deploys Puttable on the Kubernetes cluster with default configuration. The [Parameters](#parameters) section lists the parameters that can be configured during installation.
@@ -142,29 +142,29 @@ The `values.yaml` file is organized into the following main sections:
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
 
 ```bash
-helm install my-puttable ./chart --set replicaCount=2
+helm install my-puttable ./charts --set replicaCount=2
 ```
 
 To enable the Ingress resource:
 
 ```bash
-helm install my-puttable ./chart --set ingress.enabled=true --set ingress.hosts[0].host=puttable.example.com
+helm install my-puttable ./charts --set ingress.enabled=true --set ingress.hosts[0].host=puttable.example.com
 ```
 
 To use a custom ServiceAccount:
 
 ```bash
-helm install my-puttable ./chart --set serviceAccount.name=my-service-account
+helm install my-puttable ./charts --set serviceAccount.name=my-service-account
 ```
 
 To enable autoscaling:
 
 ```bash
-helm install my-puttable ./chart --set autoscaling.enabled=true --set autoscaling.minReplicas=2 --set autoscaling.maxReplicas=5 --set autoscaling.targetCPUUtilizationPercentage=75
+helm install my-puttable ./charts --set autoscaling.enabled=true --set autoscaling.minReplicas=2 --set autoscaling.maxReplicas=5 --set autoscaling.targetCPUUtilizationPercentage=75
 ```
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
 
 ```bash
-helm install my-puttable ./chart -f values.yaml
+helm install my-puttable ./charts -f values.yaml
 ```
