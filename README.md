@@ -36,21 +36,21 @@ The session stays active until it is submitted. Only submitted session will show
 
 ## Todo
 
-- [ ] Define API routes
+- [x] Define API routes
 - [ ] Add development backend
-- [ ] Add database migrations
-- [ ] Decide on database schema
-- [ ] Create tournament
-- [ ] Add player to tournament
-- [ ] Create player
-  - [ ] Global with its own account
-  - [ ] Temporary for tournaments only
-- [ ] Tournament score board
-- [ ] Different settings to sort the score board
-  - [ ] lowest score
-  - [ ] most hole-in-one
-  - [ ] use the best score for a session
-- [ ] Score cart view
-- [ ] View to start a game with selected players
-- [ ] A view for playing a session with multiple player
-- [ ] Build Helm chart
+- [x] Add database migrations
+- [x] Decide on database schema
+- [x] Create tournament
+- [x] Add player to tournament
+- [x] Create player
+  - [x] Global with its own account
+  - [x] Temporary for tournaments only
+- [x] Tournament score board
+- [x] Different settings to sort the score board
+  - [x] lowest score
+  - [x] most hole-in-one
+  - [x] use the best score for a session
+- [x] Scorecard view
+- [x] View to start a game with selected players
+- [x] A view for playing a session with multiple player
+- [x] Build Helm chart
