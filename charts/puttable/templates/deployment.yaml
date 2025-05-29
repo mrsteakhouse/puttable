@@ -65,7 +65,7 @@ spec:
 
             {{- range $key, $value := .Values.env }}
             - name: {{ $key }}
-              value: {{ $value }}
+              value: {{ $value | quote }}
             {{- end }}
           {{- if .Values.probes.readiness.enabled }}
           readinessProbe:
