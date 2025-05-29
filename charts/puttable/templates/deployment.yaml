@@ -11,7 +11,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "puttable.selectorLabels" | nindent 6 }}
+      {{- include "puttable.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
