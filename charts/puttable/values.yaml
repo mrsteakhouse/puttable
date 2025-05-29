@@ -103,3 +103,22 @@ serviceAccount:
   name: ""
 
 securityContext:
+
+# Probe configuration
+probes:
+  readiness:
+    enabled: true
+    path: /v1/health
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+  liveness:
+    enabled: true
+    path: /v1/health
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3

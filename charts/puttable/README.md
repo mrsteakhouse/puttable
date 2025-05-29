@@ -77,6 +77,20 @@ The following table lists the configurable parameters of the Puttable chart and 
 | `serviceAccount.create`                    | Specifies whether a service account should be created | `true`                                                 |
 | `serviceAccount.annotations`               | Annotations to add to the service account           | `{}`                                                    |
 | `serviceAccount.name`                      | The name of the service account to use              | `""`                                                    |
+| `probes.readiness.enabled`                 | Enable readiness probe                              | `true`                                                  |
+| `probes.readiness.path`                    | Path for readiness probe                            | `/health`                                               |
+| `probes.readiness.initialDelaySeconds`     | Initial delay seconds for readiness probe           | `10`                                                    |
+| `probes.readiness.periodSeconds`           | Period seconds for readiness probe                  | `10`                                                    |
+| `probes.readiness.timeoutSeconds`          | Timeout seconds for readiness probe                 | `5`                                                     |
+| `probes.readiness.successThreshold`        | Success threshold for readiness probe               | `1`                                                     |
+| `probes.readiness.failureThreshold`        | Failure threshold for readiness probe               | `3`                                                     |
+| `probes.liveness.enabled`                  | Enable liveness probe                               | `true`                                                  |
+| `probes.liveness.path`                     | Path for liveness probe                             | `/health`                                               |
+| `probes.liveness.initialDelaySeconds`      | Initial delay seconds for liveness probe            | `20`                                                    |
+| `probes.liveness.periodSeconds`            | Period seconds for liveness probe                   | `10`                                                    |
+| `probes.liveness.timeoutSeconds`           | Timeout seconds for liveness probe                  | `5`                                                     |
+| `probes.liveness.successThreshold`         | Success threshold for liveness probe                | `1`                                                     |
+| `probes.liveness.failureThreshold`         | Failure threshold for liveness probe                | `3`                                                     |
 
 ## Values.yaml Structure
 
@@ -139,6 +153,24 @@ The `values.yaml` file is organized into the following main sections:
     - `serviceAccount.annotations`: Service account annotations
     - `serviceAccount.name`: Service account name
 
+11. **Probe Settings**
+    - `probes.readiness`: Readiness probe configuration
+      - `enabled`: Enable/disable readiness probe
+      - `path`: Path for readiness probe
+      - `initialDelaySeconds`: Initial delay seconds
+      - `periodSeconds`: Period seconds
+      - `timeoutSeconds`: Timeout seconds
+      - `successThreshold`: Success threshold
+      - `failureThreshold`: Failure threshold
+    - `probes.liveness`: Liveness probe configuration
+      - `enabled`: Enable/disable liveness probe
+      - `path`: Path for liveness probe
+      - `initialDelaySeconds`: Initial delay seconds
+      - `periodSeconds`: Period seconds
+      - `timeoutSeconds`: Timeout seconds
+      - `successThreshold`: Success threshold
+      - `failureThreshold`: Failure threshold
+
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
 
 ```bash
@@ -161,6 +193,12 @@ To enable autoscaling:
 
 ```bash
 helm install my-puttable ./charts --set autoscaling.enabled=true --set autoscaling.minReplicas=2 --set autoscaling.maxReplicas=5 --set autoscaling.targetCPUUtilizationPercentage=75
+```
+
+To customize the health probes:
+
+```bash
+helm install my-puttable ./charts --set probes.readiness.initialDelaySeconds=30 --set probes.liveness.initialDelaySeconds=40
 ```
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
