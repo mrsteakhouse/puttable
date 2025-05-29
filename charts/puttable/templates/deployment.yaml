@@ -61,7 +61,7 @@ spec:
             - name: SUPABASE_AUTH_KEYCLOAK_URL
               value: {{ .Values.puttable.keycloak.realmUrl }}
             - name: PORT
-              value: {{ .Values.service.targetPort }}
+              value: {{ .Values.service.targetPort | quote }}
 
             {{- range $key, $value := .Values.env }}
             - name: {{ $key }}
