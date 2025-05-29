@@ -171,7 +171,7 @@
             <form method="POST" action="?/deleteTournament"
                   onsubmit={() => confirm('Sind Sie sicher, dass Sie dieses Event löschen möchten? Alle zugehörigen Sessions werden ebenfalls gelöscht.')}>
                 <Button type="submit" color="red" class="text-sm">
-                    🗑️ Event löschen
+                    🗑️ Turnier löschen
                 </Button>
             </form>
         </PermissionGuard>
