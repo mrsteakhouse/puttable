@@ -3,7 +3,7 @@
     import { superForm } from 'sveltekit-superforms/client';
     import type { PageProps } from './$types';
     import { Button, Input } from 'flowbite-svelte';
-    import SuperDebug, { type SuperValidated } from "sveltekit-superforms";
+    import { type SuperValidated } from "sveltekit-superforms";
     import type { PlayerFormSchema, SessionSchema } from "$lib/schemas";
     import fuzzysearch from 'fuzzysearch-ts';
     import CreatePlayerModal from '$lib/components/CreatePlayerModal.svelte';

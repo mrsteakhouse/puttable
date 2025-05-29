@@ -12,5 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: {{ .Release.Name }}
-    release: {{ .Release.Name }}
+    {{- include "puttable.selectorLabels" . | nindent 4 }}

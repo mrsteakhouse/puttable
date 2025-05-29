@@ -2,11 +2,11 @@
     import { superForm } from 'sveltekit-superforms/client';
     import type { PageProps } from './$types';
     import { Button, Input, Label, Range } from 'flowbite-svelte';
-    import SuperDebug, { type SuperValidated } from "sveltekit-superforms";
+    import { type SuperValidated } from "sveltekit-superforms";
     import fuzzysearch from 'fuzzysearch-ts';
     import CreatePlayerModal from '$lib/components/CreatePlayerModal.svelte';
     import { PlusIcon } from 'lucide-svelte';
-    import type { SessionSchema, PlayerFormSchema } from '$lib/schemas';
+    import type { PlayerFormSchema, SessionSchema } from '$lib/schemas';
 
     let { data }: PageProps = $props();
 
@@ -113,5 +113,3 @@
         onPlayerCreated={handlePlayerCreated}
     />
 </div>
-
-<SuperDebug data={form}/>
