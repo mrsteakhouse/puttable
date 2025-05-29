@@ -101,9 +101,9 @@
     }
 </script>
 
-<div class="max-w-2xl mx-auto p-4">
+<div class="max-w-2xl mx-auto p-4 dark:bg-gray-800 dark:rounded-lg">
     <div class="flex justify-between items-center mb-4">
-        <h1 class="text-2xl font-bold">
+        <h1 class="text-2xl font-bold dark:text-white">
             {#if session.isFreeplay}
                 🎮 {session.tournamentName}
             {:else}
@@ -122,13 +122,13 @@
 
     <Tabs tabStyle="underline">
         <TabItem open={true} title="Übersicht">
-            <div class="grid grid-cols-5 space-y-4 mt-4">
-                <div class="grid col-span-2">Spieler</div>
-                <div class="grid col-span-2">Punktestand</div>
-                <div class="grid">Einsen</div>
+            <div class="grid grid-cols-5 space-y-4 mt-4 dark:text-gray-300">
+                <div class="grid col-span-2 font-medium dark:text-white">Spieler</div>
+                <div class="grid col-span-2 font-medium dark:text-white">Punktestand</div>
+                <div class="grid font-medium dark:text-white">Einsen</div>
                 {#each scorecards as sc}
                     <div class="grid col-span-2">
-                        <a href={`/player/${sc.playerId}`} class="text-blue-600 hover:underline">{sc.playerName}</a>
+                        <a href={`/player/${sc.playerId}`} class="text-blue-600 dark:text-blue-400 hover:underline">{sc.playerName}</a>
                     </div>
                     <div class="grid col-span-2">{totalScore(() => sc.data)}</div>
                     <div class="grid">{onesCount(() => sc.data)}</div>
@@ -142,14 +142,14 @@
                     </Button>
                 </PermissionGuard>
             {:else}
-                <div class="text-green-600 font-medium">✅ Bereits eingereicht
+                <div class="text-green-600 dark:text-green-400 font-medium">✅ Bereits eingereicht
                     am {moment(session.submissionDateTime).format(DATETIME_DISPLAY)}</div>
             {/if}
         </TabItem>
 
         {#each scorecards as sc, i}
             <TabItem title={sc.playerName}>
-                <div class="grid grid-cols-4 gap-2 mt-4">
+                <div class="grid grid-cols-4 gap-2 mt-4 dark:text-gray-300">
                     {#each [...Array(session.holes).keys()] as index}
                         <div>
                             Loch {index + 1}
@@ -162,11 +162,11 @@
                     {/each}
                 </div>
 
-                <div class="mt-4 text-gray-700">
-                    <span class="font-semibold">Gesamt:</span> {totalScore(() => sc.data)}
+                <div class="mt-4 text-gray-700 dark:text-gray-300">
+                    <span class="font-semibold dark:text-white">Gesamt:</span> {totalScore(() => sc.data)}
                 </div>
-                <div class="mt-4 text-gray-700">
-                    <span class="font-semibold">Einsen:</span> {onesCount(() => sc.data)}
+                <div class="mt-4 text-gray-700 dark:text-gray-300">
+                    <span class="font-semibold dark:text-white">Einsen:</span> {onesCount(() => sc.data)}
                 </div>
             </TabItem>
         {/each}
@@ -174,10 +174,10 @@
 
     <!-- ⚠️ Modal -->
     <Modal bind:open={showModal} autoclose>
-        <div class="p-4">
-            <h2 class="text-lg font-bold mb-2">⚠️ Unvollständige Scorecards</h2>
-            <p class="text-sm mb-2">Folgende Spieler haben noch nicht alle Löcher gespielt:</p>
-            <ul class="list-disc ml-6 mb-4 text-sm">
+        <div class="p-4 dark:bg-gray-800">
+            <h2 class="text-lg font-bold mb-2 dark:text-white">⚠️ Unvollständige Scorecards</h2>
+            <p class="text-sm mb-2 dark:text-gray-300">Folgende Spieler haben noch nicht alle Löcher gespielt:</p>
+            <ul class="list-disc ml-6 mb-4 text-sm dark:text-gray-300">
                 {#each incompletePlayers as name}
                     <li>{name}</li>
                 {/each}

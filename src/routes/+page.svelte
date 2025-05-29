@@ -26,7 +26,7 @@
 </script>
 
 <div class="max-w-6xl mx-auto px-4 py-8 space-y-8">
-    <h1 class="text-3xl font-bold text-center">📋 Geplante Turniere</h1>
+    <h1 class="text-3xl font-bold text-center dark:text-white">📋 Geplante Turniere</h1>
 
     <!-- 🔍 Filter -->
     <div class="max-w-md mx-auto">
@@ -36,9 +36,9 @@
     </div>
 
     <section>
-        <h2 class="text-2xl font-semibold mb-4">✅ Aktive Turniere</h2>
+        <h2 class="text-2xl font-semibold mb-4 dark:text-white">✅ Aktive Turniere</h2>
         {#if activeEvents.length === 0}
-            <p class="text-gray-500">Keine aktiven Turniere gefunden.</p>
+            <p class="text-gray-500 dark:text-gray-400">Keine aktiven Turniere gefunden.</p>
         {:else}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {#each activeEvents as event}
@@ -49,9 +49,9 @@
     </section>
 
     <section>
-        <h2 class="text-2xl font-semibold mb-4">📅 Bevorstehende Turniere</h2>
+        <h2 class="text-2xl font-semibold mb-4 dark:text-white">📅 Bevorstehende Turniere</h2>
         {#if futureEvents.length === 0}
-            <p class="text-gray-500">Keine zukünftigen Turniere gefunden.</p>
+            <p class="text-gray-500 dark:text-gray-400">Keine zukünftigen Turniere gefunden.</p>
         {:else}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {#each futureEvents as event}
@@ -62,9 +62,9 @@
     </section>
 
     <section>
-        <h2 class="text-2xl font-semibold mt-12 mb-4">⌛ Vergangene Turniere</h2>
+        <h2 class="text-2xl font-semibold mt-12 mb-4 dark:text-white">⌛ Vergangene Turniere</h2>
         {#if pastEvents.length === 0}
-            <p class="text-gray-500">Keine vergangenen Turniere gefunden.</p>
+            <p class="text-gray-500 dark:text-gray-400">Keine vergangenen Turniere gefunden.</p>
         {:else}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 opacity-80">
                 {#each pastEvents as event}
