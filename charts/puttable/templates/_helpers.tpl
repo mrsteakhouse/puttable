@@ -48,7 +48,7 @@ Selector labels
 {{- define "puttable.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "puttable.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/component: cronjob
+app.kubernetes.io/component: deployment
 {{- end }}
 
 {{/*
