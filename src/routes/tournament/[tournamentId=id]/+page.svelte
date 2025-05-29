@@ -101,24 +101,24 @@
     const playerRankingsByClass = $derived(getPlayerRankingsByClass());
 </script>
 
-<div class="max-w-xl mx-auto p-6 py-8 space-y-6">
-    <a href="/" class="text-blue-600 hover:underline flex items-center gap-1">
+<div class="max-w-xl mx-auto p-6 py-8 space-y-6 dark:bg-gray-800 dark:rounded-lg">
+    <a href="/" class="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
         <ArrowLeft class="w-4 h-4"/>
         Zurück zur Übersicht
     </a>
 
-    <h1 class="text-3xl font-bold">{tournament.name}</h1>
+    <h1 class="text-3xl font-bold dark:text-white">{tournament.name}</h1>
 
-    <div class="space-y-4 text-sm">
+    <div class="space-y-4 text-sm dark:text-gray-300">
         <div class="flex items-start gap-2">
-            <Calendar class="w-5 h-5 text-gray-600 mt-1"/>
+            <Calendar class="w-5 h-5 text-gray-600 dark:text-gray-400 mt-1"/>
             <div>
-                <p class="font-medium">Start:</p>
+                <p class="font-medium dark:text-white">Start:</p>
                 <p>
                     {moment(tournament.startDateTime).format('LLLL')}
                     <br/>
                     {#if moment(tournament.startDateTime).isAfter(moment())}
-                        <span class="text-xs text-gray-500 italic">({moment(tournament.startDateTime).fromNow()}
+                        <span class="text-xs text-gray-500 dark:text-gray-400 italic">({moment(tournament.startDateTime).fromNow()}
                             )</span>
                     {/if}
                 </p>
@@ -126,37 +126,37 @@
         </div>
 
         <div class="flex items-start gap-2">
-            <Calendar class="w-5 h-5 text-gray-600 mt-1"/>
+            <Calendar class="w-5 h-5 text-gray-600 dark:text-gray-400 mt-1"/>
             <div>
-                <p class="font-medium">Ende:</p>
+                <p class="font-medium dark:text-white">Ende:</p>
                 <p>{moment(tournament.endDateTime).format('LLLL')}</p>
                 {#if moment(tournament.endDateTime).isAfter(moment())}
-                    <span class="text-xs text-gray-500 italic">({moment(tournament.endDateTime).fromNow()})</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 italic">({moment(tournament.endDateTime).fromNow()})</span>
                 {/if}
             </div>
         </div>
 
         <div class="flex items-center gap-2">
-            <Users class="w-5 h-5 text-gray-600"/>
-            <p>Mindestteilnehmer:</p> {tournament.minimumCompetitorsPerSession}
+            <Users class="w-5 h-5 text-gray-600 dark:text-gray-400"/>
+            <p class="dark:text-white">Mindestteilnehmer:</p> {tournament.minimumCompetitorsPerSession}
         </div>
 
         <div class="flex items-center gap-2">
-            <Flag class="w-5 h-5 text-gray-600"/>
-            <p>Lochanzahl:</p> {tournament.numberOfHoles}
+            <Flag class="w-5 h-5 text-gray-600 dark:text-gray-400"/>
+            <p class="dark:text-white">Lochanzahl:</p> {tournament.numberOfHoles}
         </div>
 
         <div class="flex items-center gap-2">
-            <Award class="w-5 h-5 text-gray-600"/>
-            <p>Wertungsklassen:</p>
+            <Award class="w-5 h-5 text-gray-600 dark:text-gray-400"/>
+            <p class="dark:text-white">Wertungsklassen:</p>
             {#each tournament.ratingClasses as ratingClass}
                 <Badge large class="mx-2">{ratingClass.name}</Badge>
             {/each}
         </div>
 
         <div class="flex items-start gap-2">
-            <Info class="w-5 h-5 text-gray-600 mt-1"/>
-            <p class="whitespace-pre-line">{@html marked(tournament.description ?? '')}</p>
+            <Info class="w-5 h-5 text-gray-600 dark:text-gray-400 mt-1"/>
+            <p class="whitespace-pre-line dark:text-gray-300">{@html marked(tournament.description ?? '')}</p>
         </div>
     </div>
 
@@ -179,22 +179,22 @@
 
     <!-- Player Rankings Section -->
     <div class="pt-10 space-y-4">
-        <h2 class="text-xl font-bold flex items-center gap-2">
-            <Medal class="w-5 h-5"/>
+        <h2 class="text-xl font-bold flex items-center gap-2 dark:text-white">
+            <Medal class="w-5 h-5 dark:text-gray-400"/>
             Rangliste
         </h2>
 
         {#if playerRankingsByClass.size === 0}
-            <p class="text-gray-500 italic">Keine Ergebnisse verfügbar.</p>
+            <p class="text-gray-500 dark:text-gray-400 italic">Keine Ergebnisse verfügbar.</p>
         {:else}
             {#each Array.from(playerRankingsByClass.entries()) as [ratingClass, players]}
                 <div class="mb-8">
-                    <h3 class="text-lg font-semibold mb-2">
+                    <h3 class="text-lg font-semibold mb-2 dark:text-white">
                         <Badge large class="mr-2">{ratingClass}</Badge>
                     </h3>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-gray-700">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <table class="w-full text-sm text-left text-gray-700 dark:text-gray-300">
+                            <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-700">
                                 <tr>
                                     <th scope="col" class="px-4 py-3">Rang</th>
                                     <th scope="col" class="px-4 py-3">Spieler</th>
@@ -204,8 +204,8 @@
                             </thead>
                             <tbody>
                                 {#each players as player, index}
-                                    <tr class="bg-white border-b hover:bg-gray-50">
-                                        <td class="px-4 py-2 font-medium">
+                                    <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td class="px-4 py-2 font-medium dark:text-white">
                                             {index + 1}.
                                             {#if index === 0}
                                                 🥇
@@ -216,11 +216,11 @@
                                             {/if}
                                         </td>
                                         <td class="px-4 py-2">
-                                            <a href={`/player/${player.playerId}`} class="text-blue-600 hover:underline">
+                                            <a href={`/player/${player.playerId}`} class="text-blue-600 dark:text-blue-400 hover:underline">
                                                 {player.playerName}
                                             </a>
                                         </td>
-                                        <td class="px-4 py-2 font-medium">{player.score}</td>
+                                        <td class="px-4 py-2 font-medium dark:text-white">{player.score}</td>
                                         <td class="px-4 py-2">{player.ones}</td>
                                     </tr>
                                 {/each}
@@ -236,21 +236,21 @@
 
         <!-- Sessions Overview Section -->
     <div class="pt-10 space-y-4">
-        <h2 class="text-xl font-bold flex items-center gap-2">
-            <BarChart class="w-5 h-5"/>
+        <h2 class="text-xl font-bold flex items-center gap-2 dark:text-white">
+            <BarChart class="w-5 h-5 dark:text-gray-400"/>
             Aktive Runden
         </h2>
 
         {#if sessions.filter(session => !session.submissionDateTime).length === 0}
-            <p class="text-gray-500 italic">Keine aktiven Runden vorhanden.</p>
+            <p class="text-gray-500 dark:text-gray-400 italic">Keine aktiven Runden vorhanden.</p>
         {:else}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {#each sessions.filter(session => !session.submissionDateTime) as session}
-                    <Card class="hover:shadow-lg transition-shadow">
+                    <Card class="hover:shadow-lg transition-shadow dark:bg-gray-800">
                         <div class="p-2">
                             <div class="flex justify-between items-start mb-2">
-                                <h3 class="font-semibold text-lg">
-                                    <a href={`/session/${session.id}`} class="text-blue-600 hover:underline">
+                                <h3 class="font-semibold text-lg dark:text-white">
+                                    <a href={`/session/${session.id}`} class="text-blue-600 dark:text-blue-400 hover:underline">
                                         Runde #{session.id}
                                     </a>
                                 </h3>
@@ -260,27 +260,27 @@
                                 </Badge>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="grid grid-cols-2 gap-2 text-sm dark:text-gray-300">
                                 <div class="flex items-center gap-1">
-                                    <User class="w-4 h-4 text-gray-600"/>
+                                    <User class="w-4 h-4 text-gray-600 dark:text-gray-400"/>
                                     <span>{session.scorecard.length} Spieler</span>
                                 </div>
                             </div>
 
-                            <div class="mt-2 pt-2 border-t border-gray-100">
+                            <div class="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
                                 <div class="grid grid-cols-3 gap-1 text-xs">
                                     {#each session.scorecard.sort() as card, i}
                                         {#if i < 3}
                                             <div class="truncate">
                                                 <a href={`/player/${card.player.id}`}
-                                                   class="text-blue-600 hover:underline">
+                                                   class="text-blue-600 dark:text-blue-400 hover:underline">
                                                     {card.player.firstName} {card.player.lastName}
                                                 </a>
                                             </div>
                                         {/if}
                                     {/each}
                                     {#if session.scorecard.length > 3}
-                                        <div class="text-gray-500">+{session.scorecard.length - 3} weitere</div>
+                                        <div class="text-gray-500 dark:text-gray-400">+{session.scorecard.length - 3} weitere</div>
                                     {/if}
                                 </div>
                             </div>
