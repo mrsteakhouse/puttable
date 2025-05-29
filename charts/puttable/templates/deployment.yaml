@@ -16,7 +16,7 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "betbot.labels" . | nindent 8 }}
+        {{- include "puttable.labels" . | nindent 8 }}
       {{- with .Values.podAnnotations }}
       annotations:
         {{ toYaml . | nindent 8 }}
