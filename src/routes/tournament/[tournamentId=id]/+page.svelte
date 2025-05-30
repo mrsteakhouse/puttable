@@ -33,8 +33,14 @@
 
     // Get player rankings based on their best (lowest) score, grouped by rating class
     function getPlayerRankingsByClass() {
-        // Get all submitted sessions
-        const submittedSessions = sessions.filter(session => session.submissionDateTime);
+        // Get all submitted sessions that were submitted during the tournament time
+        const submittedSessions = sessions.filter(session =>
+            session.submissionDateTime &&
+            moment(session.submissionDateTime).isBetween(
+                tournament.startDateTime,
+                tournament.endDateTime
+            )
+        );
 
         // Create a map to track the best score for each player
         const playerBestScores = new Map<string, Map<number, {
