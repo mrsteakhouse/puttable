@@ -1,12 +1,22 @@
-import type { PageServerLoad, Actions } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
+import type { Actions, PageServerLoad } from './$types';
+import { fail } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
-import { z } from 'zod';
 import type { RatingClassDto } from '$lib/dto';
 import { type PlayerFormSchema, playerFormSchema } from '$lib/schemas';
+import { hasPermission } from '$lib/rbac';
+import { Action, Resource } from '$lib/permissions';
 
 export const load: PageServerLoad = async ({ locals: { supabase } }) => {
+    // Check if user is authenticated
+    if (!await hasPermission(supabase, Resource.Players, Action.Read)) {
+        return {
+            players: [],
+            ratingClasses: [],
+            form: await superValidate<PlayerFormSchema>(zod(playerFormSchema))
+        };
+    }
+
     // Fetch all players with their rating classes
     const { data: players, error: playersError } = await supabase
         .from('players')

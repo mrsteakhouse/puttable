@@ -3,7 +3,6 @@
     import { page } from "$app/state";
     import { DarkMode, Dropdown, DropdownItem, Navbar, NavBrand, NavHamburger, NavLi, NavUl } from "flowbite-svelte";
     import { ChevronDownOutline } from 'flowbite-svelte-icons';
-    import { env } from '$env/dynamic/public';
 
     import { onMount } from 'svelte'
     import { goto, invalidate } from '$app/navigation'
@@ -28,22 +27,9 @@
         return () => data.subscription.unsubscribe()
     })
 
-    const handleLogin = async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'keycloak',
-            options: {
-                scopes: 'openid',
-                redirectTo: env.PUBLIC_SITE_BASE_URL
-            }
-        });
-
-        if (error) {
-            await goto('/auth/error')
-        }
-    }
-
     const handleLogout = async () => {
         await supabase.auth.signOut();
+        await goto('/', { invalidateAll: true });
     }
 </script>
 
@@ -60,31 +46,29 @@
         <NavHamburger/>
         <DarkMode/>
     </div>
-    <NavUl {activeUrl}>
-        <NavLi href="/">Turniere</NavLi>
-        <NavLi href="/player">Spieler</NavLi>
-        <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Create}>
-            <NavLi href="/session/create">Freies Spiel</NavLi>
-        </PermissionGuard>
-        {#if !(userLoggedIn ?? true)}
-            <NavLi href="/admin">Admin</NavLi>
-        {/if}
-        <NavLi class="cursor-pointer">
-            {#if userLoggedIn ?? true}
-                Log In
-            {:else}
-                {username}
-            {/if}
-            <ChevronDownOutline class="text-primary-800 ms-2 inline h-6 w-6 dark:text-white"/>
-        </NavLi>
-        <Dropdown simple>
-            {#if userLoggedIn ?? true}
-                <DropdownItem onclick={handleLogin}>Mit SSO einloggen</DropdownItem>
-            {:else}
-                <DropdownItem onclick={handleLogout}>Logout</DropdownItem>
-            {/if}
-        </Dropdown>
-    </NavUl>
+
+    {#if !(userLoggedIn ?? true)}
+        <NavUl {activeUrl}>
+
+            <PermissionGuard supabase={data.supabase} resource={Resource.Tournaments} action={Action.Read}>
+                <NavLi href="/tournament">Turniere</NavLi>
+            </PermissionGuard>
+            <PermissionGuard supabase={data.supabase} resource={Resource.Players} action={Action.Read}>
+                <NavLi href="/player">Spieler</NavLi>
+            </PermissionGuard>
+            <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Create}>
+                <NavLi href="/session/create">Freies Spiel</NavLi>
+            </PermissionGuard>
+                <NavLi href="/admin">Admin</NavLi>
+            <NavLi class="cursor-pointer">
+                    {username}
+                <ChevronDownOutline class="text-primary-800 ms-2 inline h-6 w-6 dark:text-white"/>
+            </NavLi>
+            <Dropdown simple>
+                    <DropdownItem onclick={handleLogout}>Logout</DropdownItem>
+            </Dropdown>
+        </NavUl>
+    {/if}
 </Navbar>
 <div class="text-gray-900 dark:text-white text-base font-medium tracking-tight p-8">
     {@render children()}

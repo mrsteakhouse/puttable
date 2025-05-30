@@ -1,5 +1,13 @@
 import { redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
+import { canAccessResource, hasPermission } from '$lib/rbac';
+import { Action, Resource } from '$lib/permissions';
+
+export const load: PageServerLoad = async ({ locals: {supabase} }) => {
+    if (!await hasPermission(supabase, Resource.Tournaments, Action.Read)) {
+        throw redirect(303, '/');
+    }
+}
 
 export const actions: Actions = {
     deleteTournament: async ({ params, locals: { supabase } }) => {

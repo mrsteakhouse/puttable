@@ -5,8 +5,15 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { playerFormSchema, type PlayerFormSchema } from '$lib/schemas';
 import { SessionDto } from '$lib/dto';
+import { canAccessResource, hasPermission } from '$lib/rbac';
+import { Action, Resource } from '$lib/permissions';
 
 export const load: PageServerLoad = async ({ params, locals: { supabase } }) => {
+    // Check if user is authenticated
+    if (!await canAccessResource(supabase, Resource.Players, Number(params.playerId), Action.Read)) {
+        throw redirect(303, '/player');
+    }
+
     const playerId = parseInt(params.playerId);
 
     if (isNaN(playerId)) {
