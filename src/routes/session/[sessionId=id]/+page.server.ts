@@ -4,8 +4,14 @@ import { fail, redirect } from '@sveltejs/kit';
 import { type SessionDto } from '$lib/dto';
 import type { QueryData } from '@supabase/supabase-js';
 import type { Actions } from './$types';
+import { hasPermission } from '$lib/rbac';
+import { Action, Resource } from '$lib/permissions';
 
 export const load: PageServerLoad = async ({ locals: { supabase }, params }) => {
+    if (!await hasPermission(supabase, Resource.Sessions, Action.Read)) {
+        throw redirect(303, '/');
+    }
+
     const scoreCardQuery = supabase
         .from('sessions')
         .select("id, submitted_at, tournament:tournaments(id, name, number_of_holes), scorecards(id, data, player:players(id, firstname, lastname))")

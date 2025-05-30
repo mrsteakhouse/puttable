@@ -1,6 +1,6 @@
 <script lang="ts">
-    import {ArrowLeftOutline, EditSolid} from "flowbite-svelte-icons";
-    import {Heading} from "flowbite-svelte";
+    import { ArrowLeftOutline, EditSolid } from "flowbite-svelte-icons";
+    import { Heading } from "flowbite-svelte";
 
     let {heading, editLink} = $props();
 </script>

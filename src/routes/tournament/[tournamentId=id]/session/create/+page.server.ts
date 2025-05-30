@@ -7,6 +7,8 @@ import type { SuperValidated } from "sveltekit-superforms";
 import { type SessionSchema, sessionSchema } from "$lib/schemas";
 import { z } from 'zod';
 import type { RatingClassDto } from '$lib/dto';
+import { hasPermission } from '$lib/rbac';
+import { Action, Resource } from '$lib/permissions';
 
 // Create a schema for the player creation form
 const playerFormSchema = z.object({
@@ -15,7 +17,11 @@ const playerFormSchema = z.object({
     ratingClassId: z.number().min(1, "Wertungsklasse muss ausgewählt werden")
 });
 
-export const load: PageServerLoad = async ({ locals: { supabase }, params, parent }) => {
+export const load: PageServerLoad = async ({ locals: { supabase }, parent }) => {
+    if (!await hasPermission(supabase, Resource.Sessions, Action.Create)) {
+        throw redirect(303, '/');
+    }
+
     const layoutData = await parent();
     const tournament = layoutData.tournament;
 

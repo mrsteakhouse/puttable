@@ -5,8 +5,14 @@ import { zod } from "sveltekit-superforms/adapters";
 import type { SuperValidated } from "sveltekit-superforms";
 import { playerFormSchema, type SessionSchema, sessionSchema } from "$lib/schemas";
 import type { RatingClassDto } from '$lib/dto';
+import { hasPermission } from '$lib/rbac';
+import { Action, Resource } from '$lib/permissions';
 
 export const load: PageServerLoad = async ({ locals: { supabase } }) => {
+    if (!await hasPermission(supabase, Resource.Sessions, Action.Create)) {
+        throw redirect(303, '/');
+    }
+
     // Fetch all players
     const { data: playersData, error: playersError } = await supabase.from('players')
         .select();

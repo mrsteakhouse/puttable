@@ -4,11 +4,17 @@ import { superValidate, type SuperValidated } from 'sveltekit-superforms';
 import { type TournamentSchema, tournamentSchema } from '$lib/schemas';
 import { zod } from 'sveltekit-superforms/adapters';
 import moment from 'moment/moment';
-import { DATETIME_WITH_TIMEZONE, PARSE_DATETIME_FORMAT } from '$lib/constants';
+import { DATETIME_WITH_TIMEZONE } from '$lib/constants';
 import type { TournamentDto } from '$lib/dto';
 import { patchRatingClasses } from '$lib/server/RatingClassesPatcher';
+import { hasPermission } from '$lib/rbac';
+import { Action, Resource } from '$lib/permissions';
 
-export const load: PageServerLoad = async ({ parent }) => {
+export const load: PageServerLoad = async ({ parent, locals: { supabase } }) => {
+    if (!await hasPermission(supabase, Resource.Tournaments, Action.Update)) {
+        throw redirect(303, '/');
+    }
+
     const { tournament: data } = await parent();
     const tournament = data as TournamentDto
     if (!tournament) {

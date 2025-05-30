@@ -10,12 +10,16 @@
     import { Action, Resource } from '$lib/permissions';
     import { onMount } from 'svelte';
     import type { TournamentDto } from '$lib/dto';
+    import { goto } from '$app/navigation';
 
     let { data }: PageProps = $props();
 
     let tournaments: TournamentDto[] = $state([]);
 
     onMount(async () => {
+        if (!data.session?.user) {
+            await goto('/');
+        }
         const { data: tournamentData, error } = await data.supabase.from('tournaments')
             .select();
 
