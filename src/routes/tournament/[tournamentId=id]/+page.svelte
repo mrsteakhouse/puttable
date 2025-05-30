@@ -18,7 +18,7 @@
     let tournament = $derived(data.tournament ?? {} as TournamentDto);
     let sessions = $derived(data.sessions ?? [] as SessionDto[]);
     let subscription: any = null;
-    let hasManagerRole = isManager(data.supabase);
+    let managerRole = $state(false);
 
     let allowStartSession = $derived(moment().isBetween(
         tournament.startDateTime,
@@ -28,7 +28,8 @@
     // Set up realtime subscription for scorecard changes
     onMount(async () => {
         const supabase = data.supabase;
-        if (!await hasManagerRole) {
+        managerRole = await isManager(supabase);
+        if (!managerRole) {
             return;
         }
 
@@ -222,57 +223,62 @@
     </div>
 
     <!-- Player Rankings Section -->
+
     <div class="pt-10 space-y-4">
         <h2 class="text-xl font-bold flex items-center gap-2 dark:text-white">
             <Medal class="w-5 h-5 dark:text-gray-400"/>
             Rangliste
         </h2>
-
-        {#if playerRankingsByClass.size === 0}
-            <p class="text-gray-500 dark:text-gray-400 italic">Keine Ergebnisse verfügbar.</p>
-        {:else}
-            {#each Array.from(playerRankingsByClass.entries()) as [ratingClass, players]}
-                <div class="mb-8">
-                    <h3 class="text-lg font-semibold mb-2 dark:text-white">
-                        <Badge large class="mr-2">{ratingClass}</Badge>
-                    </h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-gray-700 dark:text-gray-300">
-                            <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th scope="col" class="px-4 py-3">Rang</th>
-                                    <th scope="col" class="px-4 py-3">Spieler</th>
-                                    <th scope="col" class="px-4 py-3">Punkte</th>
-                                    <th scope="col" class="px-4 py-3">Einsen</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {#each players as player, index}
-                                    <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <td class="px-4 py-2 font-medium dark:text-white">
-                                            {index + 1}.
-                                            {#if index === 0}
-                                                🥇
-                                            {:else if index === 1}
-                                                🥈
-                                            {:else if index === 2}
-                                                🥉
-                                            {/if}
-                                        </td>
-                                        <td class="px-4 py-2">
-                                            <a href={`/player/${player.playerId}`} class="text-blue-600 dark:text-blue-400 hover:underline">
-                                                {player.playerName}
-                                            </a>
-                                        </td>
-                                        <td class="px-4 py-2 font-medium dark:text-white">{player.score}</td>
-                                        <td class="px-4 py-2">{player.ones}</td>
+        {#if managerRole || moment().isAfter(tournament.endDateTime)}
+            {#if playerRankingsByClass.size === 0}
+                <p class="text-gray-500 dark:text-gray-400 italic">Keine Ergebnisse verfügbar.</p>
+            {:else}
+                {#each Array.from(playerRankingsByClass.entries()) as [ratingClass, players]}
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold mb-2 dark:text-white">
+                            <Badge large class="mr-2">{ratingClass}</Badge>
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left text-gray-700 dark:text-gray-300">
+                                <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-700">
+                                    <tr>
+                                        <th scope="col" class="px-4 py-3">Rang</th>
+                                        <th scope="col" class="px-4 py-3">Spieler</th>
+                                        <th scope="col" class="px-4 py-3">Punkte</th>
+                                        <th scope="col" class="px-4 py-3">Einsen</th>
                                     </tr>
-                                {/each}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {#each players as player, index}
+                                        <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <td class="px-4 py-2 font-medium dark:text-white">
+                                                {index + 1}.
+                                                {#if index === 0}
+                                                    🥇
+                                                {:else if index === 1}
+                                                    🥈
+                                                {:else if index === 2}
+                                                    🥉
+                                                {/if}
+                                            </td>
+                                            <td class="px-4 py-2">
+                                                <a href={`/player/${player.playerId}`} class="text-blue-600 dark:text-blue-400 hover:underline">
+                                                    {player.playerName}
+                                                </a>
+                                            </td>
+                                            <td class="px-4 py-2 font-medium dark:text-white">{player.score}</td>
+                                            <td class="px-4 py-2">{player.ones}</td>
+                                        </tr>
+                                    {/each}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-            {/each}
+                {/each}
+            {/if}
+        {:else}
+            <p class="text-gray-500 dark:text-gray-400 italic">Die Rangliste wird nach Abschluss des Turniers verfügbar
+                sein.</p>
         {/if}
     </div>
 
