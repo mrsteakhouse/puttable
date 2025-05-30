@@ -41,6 +41,10 @@
         return dataGetter().every(score => score > 0);
     }
 
+    function playedHolesCount(dataGetter: () => number[]) {
+        return dataGetter().filter(score => score > 0).length;
+    }
+
     async function submitScorecards() {
         incompletePlayers = scorecards
             .filter((sc) => !isComplete(() => sc.data))
@@ -122,16 +126,20 @@
 
     <Tabs tabStyle="underline">
         <TabItem open={true} title="Übersicht">
-            <div class="grid grid-cols-5 space-y-4 mt-4 dark:text-gray-300">
+            <div class="grid grid-cols-6 space-y-4 mt-4 dark:text-gray-300">
                 <div class="grid col-span-2 font-medium dark:text-white">Spieler</div>
-                <div class="grid col-span-2 font-medium dark:text-white">Punktestand</div>
+                <div class="grid font-medium dark:text-white">Punktestand</div>
                 <div class="grid font-medium dark:text-white">Einsen</div>
+                <div class="grid font-medium dark:text-white">Gespielte Löcher</div>
+                <div class="grid"></div>
                 {#each scorecards as sc}
                     <div class="grid col-span-2">
                         <a href={`/player/${sc.playerId}`} class="text-blue-600 dark:text-blue-400 hover:underline">{sc.playerName}</a>
                     </div>
-                    <div class="grid col-span-2">{totalScore(() => sc.data)}</div>
+                    <div class="grid">{totalScore(() => sc.data)}</div>
                     <div class="grid">{onesCount(() => sc.data)}</div>
+                    <div class="grid">{playedHolesCount(() => sc.data)}</div>
+                    <div class="grid"></div>
                 {/each}
             </div>
 
