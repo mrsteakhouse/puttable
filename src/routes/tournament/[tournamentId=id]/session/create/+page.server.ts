@@ -17,9 +17,9 @@ const playerFormSchema = z.object({
     ratingClassId: z.number().min(1, "Wertungsklasse muss ausgewählt werden")
 });
 
-export const load: PageServerLoad = async ({ locals: { supabase }, parent }) => {
+export const load: PageServerLoad = async ({ locals: { supabase }, params, parent }) => {
     if (!await hasPermission(supabase, Resource.Sessions, Action.Create)) {
-        throw redirect(303, '/');
+        throw redirect(303, `/tournament/${params.tournamentId}`);
     }
 
     const layoutData = await parent();
