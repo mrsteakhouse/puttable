@@ -9,17 +9,55 @@
     import type { ScoreCardDto, SessionDto, TournamentDto } from '$lib/dto';
     import PermissionGuard from '$lib/components/PermissionGuard.svelte';
     import { Action, Resource } from '$lib/permissions';
+    import { onDestroy, onMount } from 'svelte';
+    import { isManager } from '$lib/rbac';
 
     const tournamentId = Number(page.params.tournamentId);
 
     let { data }: PageProps = $props();
     let tournament = $derived(data.tournament ?? {} as TournamentDto);
     let sessions = $derived(data.sessions ?? [] as SessionDto[]);
+    let subscription: any = null;
+    let hasManagerRole = isManager(data.supabase);
 
     let allowStartSession = $derived(moment().isBetween(
         tournament.startDateTime,
         tournament.endDateTime
     ));
+
+    // Set up realtime subscription for scorecard changes
+    onMount(async () => {
+        const supabase = data.supabase;
+        if (!await hasManagerRole) {
+            return;
+        }
+
+        // Get all session IDs for this tournament
+        const sessionIds = sessions.map(session => session.id);
+
+        if (sessionIds.length > 0) {
+            subscription = supabase
+                .channel('tournament-session-changes')
+                .on('postgres_changes', {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'sessions',
+                    filter: `id=in.(${sessionIds.join(',')})`
+                }, () => {
+                    // When a session is updated, refresh the tournament data
+                    // This will update the rankings and other derived data
+                    window.location.reload();
+                })
+                .subscribe();
+        }
+    });
+
+    // Clean up subscription when component is destroyed
+    onDestroy(() => {
+        if (subscription) {
+            data.supabase.removeChannel(subscription);
+        }
+    });
 
     // Calculate total score for a scorecard
     function totalScore(scorecard: ScoreCardDto): number {

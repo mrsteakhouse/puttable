@@ -7,6 +7,7 @@
     import { debounce } from '$lib/debounce';
     import PermissionGuard from '$lib/components/PermissionGuard.svelte';
     import { Action, Resource } from '$lib/permissions';
+    import { onDestroy, onMount } from 'svelte';
 
     let { data }: PageProps = $props();
     const supabase = $derived(data.supabase);
@@ -27,6 +28,38 @@
 
     let showModal = $state(false);
     let incompletePlayers: string[] = $state([]);
+    let subscription: any = null;
+
+    // Set up realtime subscription for scorecard changes
+    onMount(() => {
+        subscription = supabase
+            .channel('scorecard-changes')
+            .on('postgres_changes', {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'scorecards',
+                filter: `session_id=eq.${session.id}`
+            }, (payload) => {
+                // Update the local data when a scorecard is updated
+                const updatedScorecard = payload.new;
+                const scorecardIndex = scorecards.findIndex(sc => sc.id === updatedScorecard.id);
+
+                if (scorecardIndex !== -1) {
+                    // Update the scorecard data
+                    scorecards[scorecardIndex].data = updatedScorecard.data;
+                    // Force reactivity by creating a new array reference
+                    scorecards = [...scorecards];
+                }
+            })
+            .subscribe();
+    });
+
+    // Clean up subscription when component is destroyed
+    onDestroy(() => {
+        if (subscription) {
+            supabase.removeChannel(subscription);
+        }
+    });
 
     // Schlagzählung pro Scorecard
     function totalScore(dataGetter: () => number[]) {
