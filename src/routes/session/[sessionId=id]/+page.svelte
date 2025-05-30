@@ -46,6 +46,11 @@
 
                 if (scorecardIndex !== -1) {
                     // Update the scorecard data
+                    for (let i = 0; i < updatedScorecard.data.length; i++) {
+                        if (updatedScorecard.data[i] !== scorecards[scorecardIndex].data[i]) {
+                            scorecards[scorecardIndex].data[i] = updatedScorecard.data[i]
+                        }
+                    }
                     scorecards[scorecardIndex].data = updatedScorecard.data;
                     // Force reactivity by creating a new array reference
                     scorecards = [...scorecards];
@@ -107,7 +112,7 @@
         if (error) {
             console.error('Error updating score:', error);
         }
-    }, 100); // 500ms debounce
+    }, 500); // 500ms debounce
 
     async function handleInputChange(playerIndex: number, holeIndex: number, target: Event & {
         currentTarget: EventTarget & HTMLInputElement
