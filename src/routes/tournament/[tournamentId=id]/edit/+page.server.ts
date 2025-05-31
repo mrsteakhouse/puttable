@@ -50,8 +50,8 @@ export const actions = {
             .from('tournaments')
             .update({
                 name: form.data.name,
-                start_date: moment(`${form.data.startDate}T${form.data.startTime}Z`).format(DATETIME_WITH_TIMEZONE),
-                end_date: moment(`${form.data.endDate}T${form.data.endTime}Z`).format(DATETIME_WITH_TIMEZONE),
+                start_date: moment(`${form.data.startDate}T${form.data.startTime}`).toISOString(),
+                end_date: moment(`${form.data.endDate}T${form.data.endTime}`).toISOString(),
                 number_of_holes: form.data.holeCount,
                 minimum_participants: form.data.minParticipants,
                 description: form.data.description,

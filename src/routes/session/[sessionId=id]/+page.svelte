@@ -95,7 +95,7 @@
 
         await supabase
             .from('sessions')
-            .update({ submitted_at: new Date().toISOString() })
+            .update({ submitted_at: moment().toISOString() })
             .eq('id', session.id);
 
         await invalidateAll();
