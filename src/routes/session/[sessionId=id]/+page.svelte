@@ -101,16 +101,55 @@
         await invalidateAll();
     }
 
-    // Create a debounced function for database updates
-    const debouncedUpdateDatabase = debounce(async (recordId: number, arrayIndex: number, newValue: number) => {
-        const { error } = await supabase.rpc('update_jsonb_array_element', {
-            record_id: recordId,
-            array_index: arrayIndex,
-            new_value: newValue
-        });
+    // Store pending changes
+    let pendingChanges: {
+        recordId: number,
+        arrayIndex: number,
+        newValue: number
+    }[] = [];
 
-        if (error) {
-            console.error('Error updating score:', error);
+    // Create a debounced function for database updates
+    const debouncedUpdateDatabase = debounce(async () => {
+        // Process all pending changes
+        const changes = [...pendingChanges]; // Create a copy of the current changes
+        pendingChanges = []; // Clear the pending changes
+
+        // Create a map to store the latest change for each record and array index
+        const latestChanges = new Map<string, { recordId: number, arrayIndex: number, newValue: number }>();
+
+        // Process changes to keep only the latest change for each record and array index
+        for (const change of changes) {
+            const key = `${change.recordId}-${change.arrayIndex}`;
+            latestChanges.set(key, change);
+        }
+
+        // Group latest changes by recordId to minimize database calls
+        const changesByRecordId = {} as Record<number, { arrayIndex: number, newValue: number }[]>;
+
+        for (const change of latestChanges.values()) {
+            if (!changesByRecordId[change.recordId]) {
+                changesByRecordId[change.recordId] = [];
+            }
+            changesByRecordId[change.recordId].push({
+                arrayIndex: change.arrayIndex,
+                newValue: change.newValue
+            });
+        }
+
+        // Process each group of changes
+        for (const [recordId, recordChanges] of Object.entries(changesByRecordId)) {
+            // Process each change for this record
+            for (const change of recordChanges) {
+                const { error } = await supabase.rpc('update_jsonb_array_element', {
+                    record_id: Number(recordId),
+                    array_index: change.arrayIndex,
+                    new_value: change.newValue
+                });
+
+                if (error) {
+                    console.error('Error updating score:', error);
+                }
+            }
         }
     }, 500); // 500ms debounce
 
@@ -134,12 +173,15 @@
         // Force reactivity by creating a new array reference
         scorecards = [...scorecards];
 
-        // Debounce the database update
-        debouncedUpdateDatabase(
-            scorecards[playerIndex].id,
-            holeIndex,
-            newValue
-        );
+        // Add the change to the pending changes
+        pendingChanges.push({
+            recordId: scorecards[playerIndex].id,
+            arrayIndex: holeIndex,
+            newValue: newValue
+        });
+
+        // Trigger the debounced update
+        debouncedUpdateDatabase();
     }
 </script>
 
@@ -164,20 +206,47 @@
 
     <Tabs tabStyle="underline">
         <TabItem open={true} title="Übersicht">
-            <div class="grid grid-cols-6 space-y-4 mt-4 dark:text-gray-300">
-                <div class="grid col-span-2 font-medium dark:text-white">Spieler</div>
-                <div class="grid font-medium dark:text-white">Punktestand</div>
-                <div class="grid font-medium dark:text-white">Einsen</div>
-                <div class="grid font-medium dark:text-white">Gespielte Löcher</div>
-                <div class="grid"></div>
+            <!-- Responsive grid that adapts to screen size -->
+            <div class="mt-4 dark:text-gray-300">
+                <!-- Header row - hidden on small screens, visible on md and up -->
+                <div class="hidden md:grid md:grid-cols-6 md:gap-2 font-medium dark:text-white mb-2">
+                    <div class="col-span-2">Spieler</div>
+                    <div>Punktestand</div>
+                    <div>Einsen</div>
+                    <div>Gespielte Löcher</div>
+                    <div></div>
+                </div>
+
+                <!-- Player cards for small screens, grid for larger screens -->
                 {#each scorecards as sc}
-                    <div class="grid col-span-2">
-                        <a href={`/player/${sc.playerId}`} class="text-blue-600 dark:text-blue-400 hover:underline">{sc.playerName}</a>
+                    <!-- Mobile view (card style) -->
+                    <div class="md:hidden bg-gray-50 dark:bg-gray-700 p-3 rounded-lg mb-3">
+                        <div class="font-medium dark:text-white mb-1">
+                            <a href={`/player/${sc.playerId}`} class="text-blue-600 dark:text-blue-400 hover:underline">{sc.playerName}</a>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-sm">
+                            <div>
+                                <span class="font-medium dark:text-white">Punktestand:</span> {totalScore(() => sc.data)}
+                            </div>
+                            <div>
+                                <span class="font-medium dark:text-white">Einsen:</span> {onesCount(() => sc.data)}
+                            </div>
+                            <div>
+                                <span class="font-medium dark:text-white">Löcher:</span> {playedHolesCount(() => sc.data)}
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid">{totalScore(() => sc.data)}</div>
-                    <div class="grid">{onesCount(() => sc.data)}</div>
-                    <div class="grid">{playedHolesCount(() => sc.data)}</div>
-                    <div class="grid"></div>
+
+                    <!-- Desktop view (grid row) -->
+                    <div class="hidden md:grid md:grid-cols-6 md:gap-2 md:mb-2 items-center">
+                        <div class="col-span-2">
+                            <a href={`/player/${sc.playerId}`} class="text-blue-600 dark:text-blue-400 hover:underline">{sc.playerName}</a>
+                        </div>
+                        <div>{totalScore(() => sc.data)}</div>
+                        <div>{onesCount(() => sc.data)}</div>
+                        <div>{playedHolesCount(() => sc.data)}</div>
+                        <div></div>
+                    </div>
                 {/each}
             </div>
 
