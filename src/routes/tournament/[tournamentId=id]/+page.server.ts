@@ -48,6 +48,6 @@ export const actions: Actions = {
         }
 
         // Redirect to the tournaments list page
-        throw redirect(303, '/');
+        throw redirect(303, '/tournament');
     }
 };
