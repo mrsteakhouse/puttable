@@ -23,10 +23,18 @@
     let { data }: PageProps = $props();
     let isEditing = $state(false);
     let showDeleteModal = $state(false);
+    let deleteForm: HTMLFormElement;
 
     // Function to open delete confirmation modal
     function openDeleteModal() {
         showDeleteModal = true;
+    }
+
+    // Function to handle player deletion
+    function handleDelete() {
+        if (deleteForm) {
+            deleteForm.submit();
+        }
     }
 
     // Initialize the form
@@ -229,8 +237,8 @@
     </p>
     <div class="flex justify-end space-x-2">
         <Button color="light" onclick={() => showDeleteModal = false}>Abbrechen</Button>
-        <form method="POST" action="?/deletePlayer">
-            <Button type="submit" color="red">Löschen</Button>
+        <form method="POST" action="?/deletePlayer" bind:this={deleteForm}>
+            <Button type="button" color="red" onclick={() => { handleDelete(); showDeleteModal = false; }}>Löschen</Button>
         </form>
     </div>
 </Modal>

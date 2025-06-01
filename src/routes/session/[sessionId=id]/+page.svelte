@@ -27,8 +27,10 @@
     }).sort((left, right) => left.playerName.localeCompare(right.playerName)))
 
     let showModal = $state(false);
+    let showDeleteModal = $state(false);
     let incompletePlayers: string[] = $state([]);
     let subscription: any = null;
+    let deleteForm: HTMLFormElement;
 
     // Set up realtime subscription for scorecard changes
     onMount(() => {
@@ -65,6 +67,18 @@
             supabase.removeChannel(subscription);
         }
     });
+
+    // Function to open delete confirmation modal
+    function openDeleteModal() {
+        showDeleteModal = true;
+    }
+
+    // Function to handle session deletion
+    function handleDelete() {
+        if (deleteForm) {
+            deleteForm.submit();
+        }
+    }
 
     // Schlagzählung pro Scorecard
     function totalScore(dataGetter: () => number[]) {
@@ -195,9 +209,8 @@
             {/if}
         </h1>
         <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Delete}>
-            <form method="POST" action="?/deleteSession"
-                  onsubmit={() => confirm('Sind Sie sicher, dass Sie diese Session löschen möchten? Alle zugehörigen Scorecards werden ebenfalls gelöscht.')}>
-                <Button type="submit" color="red" size="sm">
+            <form method="POST" action="?/deleteSession" bind:this={deleteForm}>
+                <Button type="button" color="red" size="sm" onclick={openDeleteModal}>
                     🗑️ Session löschen
                 </Button>
             </form>
@@ -300,6 +313,17 @@
             <div class="text-right">
                 <Button onclick={() => (showModal = false)}>Okay</Button>
             </div>
+        </div>
+    </Modal>
+
+    <!-- Delete Confirmation Modal -->
+    <Modal title="Session löschen" bind:open={showDeleteModal} size="sm">
+        <p class="text-gray-700 dark:text-gray-400 mb-6">
+            Sind Sie sicher, dass Sie diese Session löschen möchten? Alle zugehörigen Scorecards werden ebenfalls gelöscht.
+        </p>
+        <div class="flex justify-end space-x-2">
+            <Button color="light" onclick={() => showDeleteModal = false}>Abbrechen</Button>
+            <Button type="button" color="red" onclick={() => { handleDelete(); showDeleteModal = false; }}>Löschen</Button>
         </div>
     </Modal>
 </div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Badge, Button, Card, Tooltip } from "flowbite-svelte";
+    import { Badge, Button, Card, Modal, Tooltip } from "flowbite-svelte";
     import { ArrowLeft, Award, BarChart, Calendar, Clock, Flag, Info, Medal, User, Users } from "lucide-svelte";
     import moment from "moment";
     import { goto } from "$app/navigation";
@@ -19,6 +19,8 @@
     let sessions = $derived(data.sessions ?? [] as SessionDto[]);
     let subscription: any = null;
     let managerRole = $state(false);
+    let showDeleteModal = $state(false);
+    let deleteForm: HTMLFormElement;
 
     let allowStartSession = $derived(moment().isBetween(
         tournament.startDateTime,
@@ -59,6 +61,18 @@
             data.supabase.removeChannel(subscription);
         }
     });
+
+    // Function to open delete confirmation modal
+    function openDeleteModal() {
+        showDeleteModal = true;
+    }
+
+    // Function to handle tournament deletion
+    function handleDelete() {
+        if (deleteForm) {
+            deleteForm.submit();
+        }
+    }
 
     // Calculate total score for a scorecard
     function totalScore(scorecard: ScoreCardDto): number {
@@ -213,9 +227,8 @@
             </Button>
         </PermissionGuard>
         <PermissionGuard supabase={data.supabase} resource={Resource.Tournaments} action={Action.Delete}>
-            <form method="POST" action="?/deleteTournament"
-                  onsubmit={() => confirm('Sind Sie sicher, dass Sie dieses Event löschen möchten? Alle zugehörigen Sessions werden ebenfalls gelöscht.')}>
-                <Button type="submit" color="red" class="text-sm">
+            <form method="POST" action="?/deleteTournament" bind:this={deleteForm}>
+                <Button type="button" color="red" class="text-sm" onclick={openDeleteModal}>
                     🗑️ Turnier löschen
                 </Button>
             </form>
@@ -359,4 +372,16 @@
             {/if}
         </div>
     </PermissionGuard>
+
+    <!-- Delete Confirmation Modal -->
+    <Modal title="Turnier löschen" bind:open={showDeleteModal} size="sm">
+        <p class="text-gray-700 dark:text-gray-400 mb-6">
+            Sind Sie sicher, dass Sie dieses Event löschen möchten? Alle zugehörigen Sessions werden ebenfalls gelöscht.
+        </p>
+        <div class="flex justify-end space-x-2">
+            <Button color="light" onclick={() => showDeleteModal = false}>Abbrechen</Button>
+            <Button type="button" color="red" onclick={() => { handleDelete(); showDeleteModal = false; }}>Löschen
+            </Button>
+        </div>
+    </Modal>
 </div>
