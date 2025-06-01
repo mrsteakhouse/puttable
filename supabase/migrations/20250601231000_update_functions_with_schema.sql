@@ -4,7 +4,9 @@
 CREATE OR REPLACE FUNCTION public.is_owner(
     resource_table text,
     resource_id bigint
-) RETURNS boolean AS $$
+) RETURNS boolean
+    SET search_path = ''
+    AS $$
 DECLARE
     is_owner boolean;
 BEGIN
@@ -30,7 +32,9 @@ CREATE OR REPLACE FUNCTION public.can_access_resource(
     resource_table text,
     resource_id bigint,
     action text
-) RETURNS boolean AS $$
+) RETURNS boolean
+    SET search_path = ''
+    AS $$
 DECLARE
     has_permission boolean;
 BEGIN
@@ -53,7 +57,9 @@ RETURNS TABLE (
     email text,
     user_name text,
     roles text[]
-) AS $$
+)
+    SET search_path = ''
+    AS $$
 BEGIN
     RETURN QUERY
     SELECT
@@ -75,7 +81,7 @@ RETURNS TABLE (
     role_name text,
     role_description text,
     permissions jsonb
-) AS $$
+) SET search_path = '' AS $$
 BEGIN
     RETURN QUERY
     SELECT
@@ -102,7 +108,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.create_role(
     p_name text,
     p_description text
-) RETURNS bigint AS $$
+) RETURNS bigint SET search_path = '' AS $$
 DECLARE
     v_role_id bigint;
 BEGIN
@@ -119,7 +125,7 @@ CREATE OR REPLACE FUNCTION public.update_role(
     p_role_id bigint,
     p_name text,
     p_description text
-) RETURNS void AS $$
+) RETURNS void SET search_path = '' AS $$
 BEGIN
     UPDATE public.roles
     SET name = p_name,
@@ -131,7 +137,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Update delete_role function
 CREATE OR REPLACE FUNCTION public.delete_role(
     p_role_id bigint
-) RETURNS void AS $$
+) RETURNS void SET search_path = '' AS $$
 BEGIN
     DELETE FROM public.roles
     WHERE id = p_role_id;
@@ -142,7 +148,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.assign_permission_to_role(
     p_role_id bigint,
     p_permission_id bigint
-) RETURNS void AS $$
+) RETURNS void SET search_path = '' AS $$
 BEGIN
     INSERT INTO public.role_permissions (role_id, permission_id)
     VALUES (p_role_id, p_permission_id)
@@ -154,7 +160,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.remove_permission_from_role(
     p_role_id bigint,
     p_permission_id bigint
-) RETURNS void AS $$
+) RETURNS void SET search_path = '' AS $$
 BEGIN
     DELETE FROM public.role_permissions
     WHERE role_id = p_role_id AND permission_id = p_permission_id;
@@ -165,7 +171,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.current_user_has_permission(
     resource text,
     action text
-) RETURNS boolean AS $$
+) RETURNS boolean SET search_path = '' AS $$
 BEGIN
     RETURN public.user_has_permission(auth.uid(), resource, action);
 END;
@@ -177,7 +183,7 @@ RETURNS TABLE (
     permission_name text,
     resource text,
     action text
-) AS $$
+) SET search_path = '' AS $$
 BEGIN
     RETURN QUERY
     SELECT * FROM public.get_user_permissions(auth.uid());
@@ -190,7 +196,7 @@ RETURNS TABLE (
     role_id bigint,
     role_name text,
     role_description text
-) AS $$
+) SET search_path = '' AS $$
 BEGIN
     RETURN QUERY
     SELECT r.id, r.name, r.description
@@ -202,7 +208,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Update assign_default_role function
 CREATE OR REPLACE FUNCTION public.assign_default_role()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER SET search_path = '' AS $$
 BEGIN
     -- Assign the 'player' role to the new user
     INSERT INTO public.user_roles (user_id, role_id)
@@ -216,7 +222,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.assign_role_to_user(
     p_user_id uuid,
     p_role_name text
-) RETURNS void AS $$
+) RETURNS void SET search_path = '' AS $$
 DECLARE
     v_role_id bigint;
 BEGIN
@@ -238,7 +244,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.remove_role_from_user(
     p_user_id uuid,
     p_role_name text
-) RETURNS void AS $$
+) RETURNS void SET search_path = '' AS $$
 DECLARE
     v_role_id bigint;
 BEGIN
@@ -260,7 +266,7 @@ CREATE OR REPLACE FUNCTION public.user_has_permission(
     user_id uuid,
     resource text,
     action text
-) RETURNS boolean AS $$
+) RETURNS boolean SET search_path = '' AS $$
 DECLARE
     has_permission boolean;
 BEGIN
@@ -286,7 +292,7 @@ CREATE OR REPLACE FUNCTION public.get_user_permissions(
     permission_name text,
     resource text,
     action text
-) AS $$
+) SET search_path = '' AS $$
 BEGIN
     RETURN QUERY
     SELECT DISTINCT p.name, p.resource, p.action
@@ -302,7 +308,7 @@ CREATE OR REPLACE FUNCTION public.update_jsonb_array_element(
   record_id bigint,
   array_index int,
   new_value jsonb
-) RETURNS void AS $$
+) RETURNS void SET search_path = '' AS $$
 BEGIN
   -- Only update if the associated session has not been submitted and user has permission
   UPDATE public.scorecards sc
@@ -312,5 +318,42 @@ BEGIN
     AND sc.session_id = s.id
     AND s.submitted_at IS NULL
     AND public.user_has_permission(auth.uid(), 'scorecards', 'update');
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION public.ensure_admin_exists()
+    RETURNS void SET search_path = '' AS $$
+DECLARE
+    admin_exists boolean;
+BEGIN
+    -- Check if any user has the admin role
+    SELECT EXISTS (
+        SELECT 1 FROM public.user_roles ur
+                          JOIN public.roles r ON ur.role_id = r.id
+        WHERE r.name = 'admin'
+    ) INTO admin_exists;
+
+    -- If no admin exists, create a default admin user
+    -- This is just a placeholder - in a real application, you would
+    -- either manually assign an admin or have a more sophisticated approach
+    IF NOT admin_exists THEN
+        -- Log a message - in a real application, you might want to
+        -- create a notification or take other action
+        RAISE NOTICE 'No admin user found. Please assign an admin role to at least one user.';
+    END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Create trigger to automatically create a user record when a new auth user is created
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+    RETURNS trigger SET search_path = '' AS $$
+BEGIN
+    INSERT INTO public.users (id, email, display_name)
+    VALUES (
+               NEW.id,
+               NEW.email,
+               COALESCE(NEW.raw_user_meta_data->>'name', NEW.email)
+           );
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
