@@ -1,0 +1,78 @@
+{
+  "id": "puttable",
+  "realm": "puttable",
+  "enabled": true,
+  "displayName": "Puttable",
+  "displayNameHtml": "<div class=\"kc-logo-text\"><span>Puttable</span></div>",
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "offlineSessionIdleTimeout": 2592000,
+  "accessCodeLifespan": 60,
+  "accessCodeLifespanUserAction": 300,
+  "accessCodeLifespanLogin": 1800,
+  "clients": [
+    {
+      "clientId": "puttable-dev",
+      "name": "Puttable Development Client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "puttable-secret",
+      "redirectUris": [
+        "http://192.168.179.65:5173/*"
+      ],
+      "webOrigins": [
+        "http://192.168.179.65:5173"
+      ],
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "fullScopeAllowed": true,
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "testuser",
+      "email": "testuser@example.com",
+      "enabled": true,
+      "firstName": "Test",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-puttable"
+      ]
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "user",
+        "description": "Regular user role"
+      }
+    ]
+  },
+  "defaultRoles": [
+    "user"
+  ]
+}
