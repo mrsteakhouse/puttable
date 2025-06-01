@@ -1,9 +1,8 @@
 <script lang="ts">
-    import { Alert, Button, Input, Label, Modal } from 'flowbite-svelte';
-    import { superForm, type SuperForm, type SuperValidated } from 'sveltekit-superforms';
+    import { Alert, Button, Input, Label, Modal, Select } from 'flowbite-svelte';
+    import { superForm, type SuperValidated } from 'sveltekit-superforms';
     import type { RatingClassDto } from '$lib/dto';
-    import { createEventDispatcher } from 'svelte';
-    import type { PlayerFormSchema } from '../../routes/player/+page.server';
+    import type { PlayerFormSchema } from '$lib/schemas';
 
     // Props
     let {
@@ -18,11 +17,20 @@
         onPlayerCreated: (player: { id: number, firstName: string, lastName: string }) => void
     } = $props();
 
+    let selectItems = $derived(ratingClasses.map(ratingClass => {
+        return {
+            value: ratingClass.id,
+            name: ratingClass.name
+        }
+    }))
+
     // Form handling
     const { form: formData, errors, constraints, enhance, reset } = superForm<PlayerFormSchema>(form, {
         dataType: 'json',
         onResult: handleResult
     });
+
+    $formData.ratingClassId = -1;
 
     // Close the modal
     function closeModal() {
@@ -64,17 +72,17 @@
 
         <div>
             <Label for="ratingClassId">Wertungsklasse</Label>
-            <select
+            <Select
                 id="ratingClassId"
                 name="ratingClassId"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 bind:value={$formData.ratingClassId}
+                placeholder=""
             >
-                <option value="">Wertungsklasse auswählen</option>
+                <option selected value={-1} disabled>Wertungsklasse auswählen</option>
                 {#each ratingClasses as ratingClass}
                     <option value={ratingClass.id}>{ratingClass.name}</option>
                 {/each}
-            </select>
+            </Select>
             {#if $errors.ratingClassId}
                 <Alert color="red" class="mt-1">{$errors.ratingClassId}</Alert>
             {/if}
