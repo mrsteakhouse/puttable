@@ -20,8 +20,7 @@
     let players = $derived(data.players ?? []);
     let search = $state('');
     let filteredPlayers = $derived(players.filter((p) =>
-        fuzzysearch(search, p.firstName.toLowerCase())
-        || fuzzysearch(search, p.lastName.toLowerCase())
+        fuzzysearch(search.toLowerCase(), p.firstName.toLowerCase() + p.lastName.toLowerCase())
     ));
     let createPlayerModalOpen = $state(false);
 
