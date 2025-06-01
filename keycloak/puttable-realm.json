@@ -4,6 +4,7 @@
   "enabled": true,
   "displayName": "Puttable",
   "displayNameHtml": "<div class=\"kc-logo-text\"><span>Puttable</span></div>",
+  "loginTheme": "puttable",
   "accessTokenLifespan": 300,
   "ssoSessionIdleTimeout": 1800,
   "ssoSessionMaxLifespan": 36000,
