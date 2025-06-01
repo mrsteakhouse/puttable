@@ -301,7 +301,7 @@
     </Tabs>
 
     <!-- ⚠️ Modal -->
-    <Modal bind:open={showModal} autoclose>
+    <Modal bind:open={showModal} autoclose size="sm">
         <div class="p-4 dark:bg-gray-800">
             <h2 class="text-lg font-bold mb-2 dark:text-white">⚠️ Unvollständige Scorecards</h2>
             <p class="text-sm mb-2 dark:text-gray-300">Folgende Spieler haben noch nicht alle Löcher gespielt:</p>
