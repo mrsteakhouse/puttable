@@ -217,7 +217,7 @@
         </PermissionGuard>
     </div>
 
-    <Tabs tabStyle="underline">
+    <Tabs tabStyle="underline" ulClass="flex-wrap">
         <TabItem open={true} title="Übersicht">
             <!-- Responsive grid that adapts to screen size -->
             <div class="mt-4 dark:text-gray-300">
