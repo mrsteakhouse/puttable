@@ -70,8 +70,8 @@ jobs:
         id: appVersion
         with:
           tag_prefix: "v"
-          major_pattern: "(feat)"
-          minor_pattern: "(fix)"
+          major_pattern: "feat"
+          minor_pattern: "fix"
           version_format: "${major}.${minor}.${patch}"
           bump_each_commit: 'true'
 
@@ -154,8 +154,8 @@ jobs:
         id: chartVersion
         with:
           tag_prefix: "puttable-"
-          major_pattern: "(feat)"
-          minor_pattern: "(fix)"
+          major_pattern: "feat"
+          minor_pattern: "fix"
           version_format: "${major}.${minor}.${patch}"
           change_path: "charts"
           bump_each_commit: 'true'
