@@ -89,6 +89,7 @@
                 aria-required="true"
                 aria-invalid={$errors.ratingClassId ? 'true' : undefined}
                 aria-describedby={$errors.ratingClassId ? 'ratingClassId-error' : undefined}
+                placeholder=""
             >
                 <option selected value={-1} disabled>Wertungsklasse auswählen</option>
                 {#each ratingClasses as ratingClass}

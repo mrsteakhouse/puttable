@@ -25,6 +25,22 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
 
     const typedData: ScoreCardQuery = data;
 
+    // Fetch all players for the add player modal
+    const { data: playersData, error: playersError } = await supabase
+        .from('players')
+        .select('id, firstname, lastname');
+
+    if (playersError) {
+        console.error('Error fetching players:', playersError);
+    }
+
+    // Format players for the add player modal
+    const players = playersData ? playersData.map(player => ({
+        id: player.id,
+        firstName: player.firstname,
+        lastName: player.lastname
+    })) : [];
+
     // Check if this is a freeplay session (no tournament)
     const isFreeplay = !typedData.tournament;
 
@@ -57,7 +73,10 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
         })
     } as SessionDto
 
-    return { session: sessionData };
+    return {
+        session: sessionData,
+        players: players
+    };
 };
 
 export const actions: Actions = {

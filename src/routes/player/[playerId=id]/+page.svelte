@@ -118,7 +118,7 @@
                                 aria-invalid={$errors.ratingClassId ? 'true' : undefined}
                                 aria-describedby={$errors.ratingClassId ? 'ratingClassId-error' : undefined}
                             >
-                                <option value="">Wertungsklasse auswählen</option>
+                                <option value="" disabled>Wertungsklasse auswählen</option>
                                 {#each data.ratingClasses as ratingClass}
                                     <option value={ratingClass.id}>{ratingClass.name}</option>
                                 {/each}

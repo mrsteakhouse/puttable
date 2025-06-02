@@ -8,6 +8,11 @@
     import PermissionGuard from '$lib/components/PermissionGuard.svelte';
     import { Action, Resource } from '$lib/permissions';
     import { onDestroy, onMount } from 'svelte';
+    import { hasPermission } from '$lib/rbac';
+    import AddPlayerToSessionModal from '$lib/components/AddPlayerToSessionModal.svelte';
+    import MovePlayerToSessionModal from '$lib/components/MovePlayerToSessionModal.svelte';
+    import RemovePlayerFromSessionModal from '$lib/components/RemovePlayerFromSessionModal.svelte';
+    import { PlusIcon, ArrowRightIcon, TrashIcon } from 'lucide-svelte';
 
     let { data }: PageProps = $props();
     const supabase = $derived(data.supabase);
@@ -28,12 +33,41 @@
 
     let showModal = $state(false);
     let showDeleteModal = $state(false);
+    let showAddPlayerModal = $state(false);
+    let showMovePlayerModal = $state(false);
+    let showRemovePlayerModal = $state(false);
     let incompletePlayers: string[] = $state([]);
     let subscription: any = null;
     let deleteForm: HTMLFormElement;
 
-    // Set up realtime subscription for scorecard changes
-    onMount(() => {
+    // Track if user has any permissions for actions
+    let canUpdate = $state(false);
+    let canDelete = $state(false);
+    let canSubmit = $state(false);
+
+    // Determine if we should show the Actions tab
+    let showActionsTab = $derived(canUpdate || canDelete || canSubmit);
+
+    // Get all players for the add player modal
+    let allPlayers = $derived(data.players ?? []);
+    // Get existing player IDs for filtering in the add player modal
+    let existingPlayerIds = $derived(scorecards.map(sc => sc.playerId));
+    // Format players for the move and remove player modals
+    let formattedPlayers = $derived(scorecards.map(sc => ({
+        id: sc.id,
+        playerId: sc.playerId,
+        playerName: sc.playerName,
+        scorecardId: sc.id
+    })));
+
+    // Set up realtime subscription for scorecard changes and check permissions
+    onMount(async () => {
+        // Check permissions
+        canUpdate = await hasPermission(supabase, Resource.Sessions, Action.Update);
+        canDelete = await hasPermission(supabase, Resource.Sessions, Action.Delete);
+        canSubmit = await hasPermission(supabase, Resource.Sessions, Action.Submit);
+
+        // Set up realtime subscription
         subscription = supabase
             .channel('scorecard-changes')
             .on('postgres_changes', {
@@ -208,13 +242,6 @@
                 🎯 Session für {session.tournamentName}
             {/if}
         </h1>
-        <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Delete}>
-            <form method="POST" action="?/deleteSession" bind:this={deleteForm}>
-                <Button type="button" color="red" size="sm" onclick={openDeleteModal}>
-                    🗑️ Session löschen
-                </Button>
-            </form>
-        </PermissionGuard>
     </div>
 
     <Tabs tabStyle="underline" ulClass="flex-wrap">
@@ -298,6 +325,53 @@
                 </div>
             </TabItem>
         {/each}
+
+        {#if showActionsTab}
+            <TabItem title="Aktionen">
+                <div class="space-y-4 mt-4">
+                    <h2 class="text-xl font-semibold dark:text-white">Verfügbare Aktionen</h2>
+
+                    {#if !session.submissionDateTime}
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-medium dark:text-white">Spielerverwaltung</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Update}>
+                                    <Button type="button" color="blue" onclick={() => showAddPlayerModal = true}>
+                                        <PlusIcon class="h-4 w-4 mr-1" />
+                                        Spieler hinzufügen
+                                    </Button>
+                                </PermissionGuard>
+                                <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Update}>
+                                    <Button type="button" color="blue" onclick={() => showMovePlayerModal = true}>
+                                        <ArrowRightIcon class="h-4 w-4 mr-1" />
+                                        Spieler verschieben
+                                    </Button>
+                                </PermissionGuard>
+                                <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Update}>
+                                    <Button type="button" color="red" onclick={() => showRemovePlayerModal = true}>
+                                        <TrashIcon class="h-4 w-4 mr-1" />
+                                        Spieler entfernen
+                                    </Button>
+                                </PermissionGuard>
+                            </div>
+                        </div>
+                    {/if}
+
+                    <div class="space-y-2">
+                        <h3 class="text-lg font-medium dark:text-white">Gefahrenzone</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Delete}>
+                                <form method="POST" action="?/deleteSession" bind:this={deleteForm}>
+                                    <Button type="button" color="red" onclick={openDeleteModal}>
+                                        🗑️ Session löschen
+                                    </Button>
+                                </form>
+                            </PermissionGuard>
+                        </div>
+                    </div>
+                </div>
+            </TabItem>
+        {/if}
     </Tabs>
 
     <!-- ⚠️ Modal -->
@@ -326,4 +400,28 @@
             <Button type="button" color="red" onclick={() => { handleDelete(); showDeleteModal = false; }}>Löschen</Button>
         </div>
     </Modal>
+
+    <!-- Add Player Modal -->
+    <AddPlayerToSessionModal
+        bind:open={showAddPlayerModal}
+        sessionId={session.id}
+        players={allPlayers}
+        existingPlayerIds={existingPlayerIds}
+        supabase={supabase}
+    />
+
+    <!-- Move Player Modal -->
+    <MovePlayerToSessionModal
+        bind:open={showMovePlayerModal}
+        currentSessionId={session.id}
+        players={formattedPlayers}
+        supabase={supabase}
+    />
+
+    <!-- Remove Player Modal -->
+    <RemovePlayerFromSessionModal
+        bind:open={showRemovePlayerModal}
+        players={formattedPlayers}
+        supabase={supabase}
+    />
 </div>
