@@ -12,7 +12,7 @@
     import AddPlayerToSessionModal from '$lib/components/AddPlayerToSessionModal.svelte';
     import MovePlayerToSessionModal from '$lib/components/MovePlayerToSessionModal.svelte';
     import RemovePlayerFromSessionModal from '$lib/components/RemovePlayerFromSessionModal.svelte';
-    import { PlusIcon, ArrowRightIcon, TrashIcon } from 'lucide-svelte';
+    import { ArrowRightIcon, PlusIcon, TrashIcon } from 'lucide-svelte';
 
     let { data }: PageProps = $props();
     const supabase = $derived(data.supabase);
@@ -38,7 +38,7 @@
     let showRemovePlayerModal = $state(false);
     let incompletePlayers: string[] = $state([]);
     let subscription: any = null;
-    let deleteForm: HTMLFormElement;
+    let deleteForm: HTMLFormElement | null = $state(null);
 
     // Track if user has any permissions for actions
     let canUpdate = $state(false);
@@ -46,7 +46,7 @@
     let canSubmit = $state(false);
 
     // Determine if we should show the Actions tab
-    let showActionsTab = $derived(canUpdate || canDelete || canSubmit);
+    let showActionsTab = $derived(canUpdate || canDelete);
 
     // Get all players for the add player modal
     let allPlayers = $derived(data.players ?? []);
@@ -291,11 +291,11 @@
             </div>
 
             {#if !session.submissionDateTime}
-                <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Submit}>
+                {#if canSubmit}
                     <Button onclick={submitScorecards} color="green">
                         ✅ Scorecards einreichen
                     </Button>
-                </PermissionGuard>
+                {/if}
             {:else}
                 <div class="text-green-600 dark:text-green-400 font-medium">✅ Bereits eingereicht
                     am {moment(session.submissionDateTime).format(DATETIME_DISPLAY)}</div>
