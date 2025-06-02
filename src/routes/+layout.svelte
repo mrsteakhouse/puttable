@@ -34,7 +34,15 @@
 </script>
 
 <svelte:head>
-    <title>Puttable</title>
+    <title>Puttable - Mini Golf Score Tracking</title>
+    <meta name="description" content="Track and manage mini golf tournaments, players, and scores with Puttable - the ultimate mini golf scoring platform." />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="Puttable - Mini Golf Score Tracking" />
+    <meta property="og:description" content="Track and manage mini golf tournaments, players, and scores with Puttable." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://puttable.com" />
+    <meta property="og:image" content="https://puttable.com/favicon.png" />
+    <link rel="canonical" href="https://puttable.com{page.url.pathname}" />
 </svelte:head>
 
 <Navbar>
