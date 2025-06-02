@@ -3,7 +3,7 @@ import { redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ locals: { session } }) => {
     if (!!session?.user) {
-        throw redirect(304, "/tournament")
+        throw redirect(303, "tournament")
     }
 
     return {
