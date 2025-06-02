@@ -112,7 +112,7 @@
         </section>
     </div>
 
-    <div class="max-w-md mx-auto">
+    <div class="max-w-md mx-auto flex justify-center">
         <PermissionGuard supabase={data.supabase} resource={Resource.Tournaments} action={Action.Create}>
             <Button
                     href="/tournament/create"
