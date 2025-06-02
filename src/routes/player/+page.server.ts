@@ -30,7 +30,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
                 name
             )
         `)
-        .order('firstname', { 'ascending': true });
+        .order('lastname', { 'ascending': true });
 
     if (playersError) {
         return fail(500, { message: playersError.message });
