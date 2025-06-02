@@ -3,7 +3,8 @@ export enum Resource {
     RatingClasses = 'rating_classes',
     Tournaments = 'tournaments',
     Players = 'players',
-    Scorecards = 'scorecards'
+    Scorecards = 'scorecards',
+    None = 'none'
 }
 
 export enum Action {
@@ -11,5 +12,6 @@ export enum Action {
     Delete = 'delete',
     Update = 'update',
     Create = 'create',
-    Submit = 'submit'
+    Submit = 'submit',
+    None = 'none'
 }
