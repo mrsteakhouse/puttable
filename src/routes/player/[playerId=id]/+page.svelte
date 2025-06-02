@@ -63,10 +63,10 @@
     }
 </script>
 
-<div class="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-2xl shadow">
+<div class="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-2xl shadow" role="main">
     <div class="mb-6">
-        <a href="/player" class="text-blue-600 hover:underline flex items-center gap-1">
-            <ArrowLeft class="w-4 h-4"/>
+        <a href="/player" class="text-blue-600 hover:underline flex items-center gap-1" aria-label="Zurück zur Spielerliste">
+            <ArrowLeft class="w-4 h-4" aria-hidden="true"/>
             Zurück zur Spielerliste
         </a>
     </div>
@@ -75,20 +75,35 @@
         <div class="flex justify-between items-start">
             <div class="flex-grow">
                 {#if isEditing}
-                    <form method="POST" action="?/updatePlayer" use:enhance class="space-y-4">
+                    <form method="POST" action="?/updatePlayer" use:enhance class="space-y-4" aria-labelledby="edit-player-heading">
+                        <h2 id="edit-player-heading" class="sr-only">Spieler bearbeiten</h2>
                         <div class="mb-4">
                             <Label for="firstName">Vorname</Label>
-                            <Input id="firstName" name="firstName" bind:value={$form.firstName} />
+                            <Input
+                                id="firstName"
+                                name="firstName"
+                                bind:value={$form.firstName}
+                                aria-required="true"
+                                aria-invalid={$errors.firstName ? 'true' : undefined}
+                                aria-describedby={$errors.firstName ? 'firstName-error' : undefined}
+                            />
                             {#if $errors.firstName}
-                                <Alert color="red" class="mt-1">{$errors.firstName}</Alert>
+                                <Alert color="red" class="mt-1" id="firstName-error">{$errors.firstName}</Alert>
                             {/if}
                         </div>
 
                         <div class="mb-4">
                             <Label for="lastName">Nachname</Label>
-                            <Input id="lastName" name="lastName" bind:value={$form.lastName} />
+                            <Input
+                                id="lastName"
+                                name="lastName"
+                                bind:value={$form.lastName}
+                                aria-required="true"
+                                aria-invalid={$errors.lastName ? 'true' : undefined}
+                                aria-describedby={$errors.lastName ? 'lastName-error' : undefined}
+                            />
                             {#if $errors.lastName}
-                                <Alert color="red" class="mt-1">{$errors.lastName}</Alert>
+                                <Alert color="red" class="mt-1" id="lastName-error">{$errors.lastName}</Alert>
                             {/if}
                         </div>
 
@@ -99,6 +114,9 @@
                                 name="ratingClassId"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 bind:value={$form.ratingClassId}
+                                aria-required="true"
+                                aria-invalid={$errors.ratingClassId ? 'true' : undefined}
+                                aria-describedby={$errors.ratingClassId ? 'ratingClassId-error' : undefined}
                             >
                                 <option value="">Wertungsklasse auswählen</option>
                                 {#each data.ratingClasses as ratingClass}
@@ -106,37 +124,58 @@
                                 {/each}
                             </select>
                             {#if $errors.ratingClassId}
-                                <Alert color="red" class="mt-1">{$errors.ratingClassId}</Alert>
+                                <Alert color="red" class="mt-1" id="ratingClassId-error">{$errors.ratingClassId}</Alert>
                             {/if}
                         </div>
 
                         <div class="flex space-x-2">
-                            <Button type="submit" color="green" disabled={$submitting}>
-                                <Check class="w-4 h-4 mr-1" />
+                            <Button
+                                type="submit"
+                                color="green"
+                                disabled={$submitting}
+                                aria-disabled={$submitting}
+                                aria-label="Änderungen speichern"
+                            >
+                                <Check class="w-4 h-4 mr-1" aria-hidden="true" />
                                 Speichern
                             </Button>
-                            <Button type="button" color="light" onclick={cancelEdit}>
-                                <X class="w-4 h-4 mr-1" />
+                            <Button
+                                type="button"
+                                color="light"
+                                onclick={cancelEdit}
+                                aria-label="Bearbeitung abbrechen"
+                            >
+                                <X class="w-4 h-4 mr-1" aria-hidden="true" />
                                 Abbrechen
                             </Button>
                         </div>
                     </form>
                 {:else}
-                    <h1 class="text-2xl font-bold">{data.player.firstname} {data.player.lastname}</h1>
+                    <h1 id="player-name" class="text-2xl font-bold">{data.player.firstname} {data.player.lastname}</h1>
                     <p class="text-gray-600 dark:text-gray-400">Wertungsklasse: {data.player.rating_classes?.name || 'Keine'}</p>
                 {/if}
             </div>
 
             {#if !isEditing}
-                <div class="flex space-x-2">
+                <div class="flex space-x-2" role="toolbar" aria-label="Spieler-Aktionen">
                     <PermissionGuard supabase={data.supabase} resource={Resource.Players} action={Action.Update}>
-                        <Button color="light" size="sm" onclick={toggleEdit}>
-                            <Pencil class="w-4 h-4"/>
+                        <Button
+                            color="light"
+                            size="sm"
+                            onclick={toggleEdit}
+                            aria-label="Spieler bearbeiten"
+                        >
+                            <Pencil class="w-4 h-4" aria-hidden="true"/>
                         </Button>
                     </PermissionGuard>
                     <PermissionGuard supabase={data.supabase} resource={Resource.Players} action={Action.Delete}>
-                        <Button color="red" size="sm" onclick={openDeleteModal}>
-                            <Trash class="w-4 h-4"/>
+                        <Button
+                            color="red"
+                            size="sm"
+                            onclick={openDeleteModal}
+                            aria-label="Spieler löschen"
+                        >
+                            <Trash class="w-4 h-4" aria-hidden="true"/>
                         </Button>
                     </PermissionGuard>
                 </div>
@@ -144,12 +183,12 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" role="region" aria-label="Spielerstatistiken">
         <Card class="p-3">
-            <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <h5 id="avg-score-heading" class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
                 Durchschnittliche Punktzahl
             </h5>
-            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight" aria-labelledby="avg-score-heading">
                 <span class="text-4xl font-bold text-blue-600">{data.statistics.averageScore}</span>
                 <br>
                 <span class="text-sm">basierend auf {data.statistics.totalHolesPlayed} gespielten Löchern</span>
@@ -157,10 +196,10 @@
         </Card>
 
         <Card class="p-3">
-            <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <h5 id="ones-rate-heading" class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
                 Einsen Rate
             </h5>
-            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight" aria-labelledby="ones-rate-heading">
                 <span class="text-4xl font-bold text-green-600">{data.statistics.onesRate}%</span>
                 <br>
                 <span class="text-sm">{data.statistics.totalOnes} Einsen in {data.statistics.totalHolesPlayed} Löchern</span>
@@ -168,10 +207,10 @@
         </Card>
 
         <Card class="p-3">
-            <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <h5 id="avg-scorecard-heading" class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
                 Durchschnitt pro Scorecard
             </h5>
-            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight" aria-labelledby="avg-scorecard-heading">
                 <span class="text-4xl font-bold text-purple-600">{data.statistics.averageScorePerScorecard}</span>
                 <br>
                 <span class="text-sm">basierend auf {data.statistics.validScorecards} Scorecards</span>
@@ -180,17 +219,18 @@
     </div>
 
     {#if data.statistics.totalHolesPlayed === 0}
-        <Alert class="mt-6">
+        <Alert class="mt-6" role="alert">
             Keine Spielstatistiken verfügbar. Der Spieler hat noch keine Scorecards.
         </Alert>
     {/if}
 
     <!-- Sessions Overview -->
-    <div class="mt-8">
-        <h2 class="text-xl font-bold mb-4">Gespielte Sessions</h2>
+    <div class="mt-8" role="region" aria-labelledby="sessions-heading">
+        <h2 id="sessions-heading" class="text-xl font-bold mb-4">Gespielte Sessions</h2>
 
         {#if data.sessions && data.sessions.length > 0}
-            <Table striped={true}>
+            <Table striped={true} aria-labelledby="sessions-heading">
+                <caption class="sr-only">Liste der gespielten Sessions von {data.player.firstname} {data.player.lastname}</caption>
                 <TableHead>
                     <TableHeadCell>Datum</TableHeadCell>
                     <TableHeadCell>Turnier</TableHeadCell>
@@ -214,7 +254,7 @@
                             <TableBodyCell>{session.holes}</TableBodyCell>
                             <TableBodyCell>{totalScore}</TableBodyCell>
                             <TableBodyCell>
-                                <a href="/session/{session.id}" class="text-blue-600 hover:underline">
+                                <a href="/session/{session.id}" class="text-blue-600 hover:underline" aria-label="Details zur Session #{session.id} anzeigen">
                                     Details
                                 </a>
                             </TableBodyCell>
@@ -223,7 +263,7 @@
                 </TableBody>
             </Table>
         {:else}
-            <Alert>
+            <Alert role="alert">
                 Der Spieler hat noch keine Löcher gespielt.
             </Alert>
         {/if}
@@ -231,14 +271,34 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<Modal title="Spieler löschen" bind:open={showDeleteModal} size="sm">
-    <p class="text-gray-700 dark:text-gray-400 mb-6">
+<Modal
+    title="Spieler löschen"
+    bind:open={showDeleteModal}
+    size="sm"
+    aria-labelledby="delete-player-modal-title"
+    aria-describedby="delete-player-modal-description"
+>
+    <h2 id="delete-player-modal-title" class="sr-only">Spieler löschen</h2>
+    <p id="delete-player-modal-description" class="text-gray-700 dark:text-gray-400 mb-6">
         Möchten Sie den Spieler "{data.player.firstname} {data.player.lastname}" wirklich löschen?
     </p>
     <div class="flex justify-end space-x-2">
-        <Button color="light" onclick={() => showDeleteModal = false}>Abbrechen</Button>
+        <Button
+            color="light"
+            onclick={() => showDeleteModal = false}
+            aria-label="Abbrechen und Modal schließen"
+        >
+            Abbrechen
+        </Button>
         <form method="POST" action="?/deletePlayer" bind:this={deleteForm}>
-            <Button type="button" color="red" onclick={() => { handleDelete(); showDeleteModal = false; }}>Löschen</Button>
+            <Button
+                type="button"
+                color="red"
+                onclick={() => { handleDelete(); showDeleteModal = false; }}
+                aria-label="Spieler endgültig löschen"
+            >
+                Löschen
+            </Button>
         </form>
     </div>
 </Modal>

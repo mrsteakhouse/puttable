@@ -9,7 +9,7 @@
         open = $bindable(false),
         ratingClasses = [],
         form,
-        onPlayerCreated = (_) => {}
+        onPlayerCreated = (_player) => {}
     }: {
         open: boolean,
         ratingClasses: RatingClassDto[],
@@ -17,19 +17,13 @@
         onPlayerCreated: (player: { id: number, firstName: string, lastName: string }) => void
     } = $props();
 
-    let selectItems = $derived(ratingClasses.map(ratingClass => {
-        return {
-            value: ratingClass.id,
-            name: ratingClass.name
-        }
-    }))
-
     // Form handling
     const { form: formData, errors, constraints, enhance, reset } = superForm<PlayerFormSchema>(form, {
         dataType: 'json',
         onResult: handleResult
     });
 
+    // Initialize rating class ID to default value
     $formData.ratingClassId = -1;
 
     // Close the modal
@@ -38,7 +32,7 @@
     }
 
     // Handle form submission result
-    function handleResult({ result }: { result: { type: string, data?: any } }) {
+    function handleResult({ result }: { result: { type: string, data?: { player?: { id: number, firstName: string, lastName: string } } } }) {
         if (result.type === 'success' && result.data?.player) {
             // Reset the form
             reset();
@@ -52,21 +46,37 @@
     }
 </script>
 
-<Modal title="Spieler anlegen" bind:open={open} size="md">
+<Modal title="Spieler anlegen" bind:open={open} size="md" autoclose={false}>
     <form method="POST" action="?/createPlayer" use:enhance class="space-y-4">
         <div>
             <Label for="firstName">Vorname</Label>
-            <Input id="firstName" name="firstName" bind:value={$formData.firstName} {...$constraints.firstName} />
+            <Input
+                id="firstName"
+                name="firstName"
+                bind:value={$formData.firstName}
+                {...$constraints.firstName}
+                aria-required="true"
+                aria-invalid={$errors.firstName ? 'true' : undefined}
+                aria-describedby={$errors.firstName ? 'firstName-error' : undefined}
+            />
             {#if $errors.firstName}
-                <Alert color="red" class="mt-1">{$errors.firstName}</Alert>
+                <Alert color="red" class="mt-1" id="firstName-error">{$errors.firstName}</Alert>
             {/if}
         </div>
 
         <div>
             <Label for="lastName">Nachname</Label>
-            <Input id="lastName" name="lastName" bind:value={$formData.lastName} {...$constraints.lastName} />
+            <Input
+                id="lastName"
+                name="lastName"
+                bind:value={$formData.lastName}
+                {...$constraints.lastName}
+                aria-required="true"
+                aria-invalid={$errors.lastName ? 'true' : undefined}
+                aria-describedby={$errors.lastName ? 'lastName-error' : undefined}
+            />
             {#if $errors.lastName}
-                <Alert color="red" class="mt-1">{$errors.lastName}</Alert>
+                <Alert color="red" class="mt-1" id="lastName-error">{$errors.lastName}</Alert>
             {/if}
         </div>
 
@@ -76,7 +86,9 @@
                 id="ratingClassId"
                 name="ratingClassId"
                 bind:value={$formData.ratingClassId}
-                placeholder=""
+                aria-required="true"
+                aria-invalid={$errors.ratingClassId ? 'true' : undefined}
+                aria-describedby={$errors.ratingClassId ? 'ratingClassId-error' : undefined}
             >
                 <option selected value={-1} disabled>Wertungsklasse auswählen</option>
                 {#each ratingClasses as ratingClass}
@@ -84,7 +96,7 @@
                 {/each}
             </Select>
             {#if $errors.ratingClassId}
-                <Alert color="red" class="mt-1">{$errors.ratingClassId}</Alert>
+                <Alert color="red" class="mt-1" id="ratingClassId-error">{$errors.ratingClassId}</Alert>
             {/if}
         </div>
 

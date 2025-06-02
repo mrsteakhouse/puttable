@@ -1,176 +1,311 @@
 <script lang="ts">
     import { Alert, Button, Input, Label, Modal, Textarea } from 'flowbite-svelte';
     import { ArrowLeft, PlusIcon } from "lucide-svelte";
-    import SuperDebug, { superForm, type SuperValidated } from 'sveltekit-superforms';
+    import { superForm, type SuperValidated } from 'sveltekit-superforms';
     import type { TournamentSchema } from '$lib/schemas';
     import type { RatingClassDto } from '$lib/dto';
-    import { undefined } from 'zod';
 
-    let { formData, tournamentId = 0, ratingClasses }: {
+    // Props with proper typing
+    let {
+        formData,
+        tournamentId = 0,
+        ratingClasses
+    }: {
         formData: SuperValidated<TournamentSchema>,
         tournamentId: number,
         ratingClasses: RatingClassDto[]
     } = $props();
+
+    // Derived and state values
     let isEdit = $derived(tournamentId > 0);
     let addRatingClassIsOpen = $state(false);
-    let newRatingClass: string = $state('');
+    let newRatingClass = $state('');
     let addRatingClassError = $state(false);
 
+    // Form handling
     const { form, errors, constraints, enhance } = superForm(formData, {
         dataType: 'json'
     });
 
-    const toggleRatingClass = (ratingClass: RatingClassDto) => {
-        if ($form.ratingClasses.findLast(c => c.name === ratingClass.name)) {
-            $form.ratingClasses = $form.ratingClasses.filter((c) => c.name !== ratingClass.name);
+    /**
+     * Toggle a rating class selection
+     */
+    function toggleRatingClass(ratingClass: RatingClassDto) {
+        const isSelected = $form.ratingClasses.some(c => c.name === ratingClass.name);
+
+        if (isSelected) {
+            $form.ratingClasses = $form.ratingClasses.filter(c => c.name !== ratingClass.name);
         } else {
             $form.ratingClasses = [...$form.ratingClasses, ratingClass];
         }
     }
 
-    const openAddRatingClassModal = () => {
+    /**
+     * Check if a rating class is selected
+     */
+    function isRatingClassSelected(ratingClass: RatingClassDto): boolean {
+        return $form.ratingClasses.some(c => c.name === ratingClass.name);
+    }
+
+    /**
+     * Open the modal to add a new rating class
+     */
+    function openAddRatingClassModal() {
         newRatingClass = '';
         addRatingClassError = false;
         addRatingClassIsOpen = true;
     }
 
-    const handleAddRatingClass = (event: SubmitEvent) => {
-        if (newRatingClass === ''
-            || ratingClasses.findLast(cls => cls.name.toLowerCase() === newRatingClass.toLowerCase())) {
+    /**
+     * Handle adding a new rating class
+     */
+    function handleAddRatingClass(event: SubmitEvent) {
+        // Validate the new rating class
+        const isEmpty = newRatingClass.trim() === '';
+        const alreadyExists = ratingClasses.some(
+            cls => cls.name.toLowerCase() === newRatingClass.toLowerCase()
+        );
+
+        if (isEmpty || alreadyExists) {
             addRatingClassError = true;
             event.preventDefault();
             return false;
-        } else {
-            addRatingClassError = false;
-            ratingClasses = [...ratingClasses, { id: -1, name: newRatingClass }];
-            addRatingClassIsOpen = false;
         }
+
+        // Add the new rating class
+        addRatingClassError = false;
+        ratingClasses = [...ratingClasses, { id: -1, name: newRatingClass.trim() }];
+        addRatingClassIsOpen = false;
     }
 </script>
 
-
-<form method="POST" use:enhance
-      class="max-w-xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-2xl shadow space-y-5">
-    <a href={isEdit ? `/tournament/${tournamentId}` : '/'}
-       class="text-blue-600 hover:underline flex items-center gap-1">
-        <ArrowLeft class="w-4 h-4"/>
+<form
+    method="POST"
+    use:enhance
+    class="max-w-xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-2xl shadow space-y-5"
+>
+    <a
+        href={isEdit ? `/tournament/${tournamentId}` : '/tournament'}
+        class="text-blue-600 hover:underline flex items-center gap-1"
+        aria-label={isEdit ? "Zurück zum Turnier" : "Zurück zur Übersicht"}
+    >
+        <ArrowLeft class="w-4 h-4" aria-hidden="true" />
         Zurück zur Ansicht
     </a>
 
     <div class="grid grid-cols-2 gap-4">
-
         <div class="grid col-span-2">
             <h2 class="text-2xl font-bold">
                 {#if isEdit}Turnier bearbeiten{:else}Turnier erstellen{/if}
             </h2>
         </div>
 
+        <!-- Tournament Name -->
         <div class="grid col-span-2">
             <Label for="name">Name</Label>
-            <Input id="name" name="name" bind:value={$form.name} {...$constraints.name}/>
+            <Input
+                id="name"
+                name="name"
+                bind:value={$form.name}
+                {...$constraints.name}
+                aria-required="true"
+                aria-invalid={$errors.name ? 'true' : undefined}
+                aria-describedby={$errors.name ? 'name-error' : undefined}
+            />
             {#if $errors.name}
-                <Alert color="red">{$errors.name}</Alert>
+                <Alert color="red" id="name-error">{$errors.name}</Alert>
             {/if}
         </div>
 
+        <!-- Start Date -->
         <div class="grid">
             <Label for="startDate">Startdatum</Label>
-            <Input id="startDate" name="startDate" type="date" bind:value={$form.startDate}
-                   {...$constraints.startDate}/>
+            <Input
+                id="startDate"
+                name="startDate"
+                type="date"
+                bind:value={$form.startDate}
+                {...$constraints.startDate}
+                aria-required="true"
+                aria-invalid={$errors.startDate ? 'true' : undefined}
+                aria-describedby={$errors.startDate ? 'startDate-error' : undefined}
+            />
             {#if $errors.startDate}
-                <Alert color="red">{$errors.startDate}</Alert>
+                <Alert color="red" id="startDate-error">{$errors.startDate}</Alert>
             {/if}
         </div>
 
+        <!-- Start Time -->
         <div class="grid">
             <Label for="startTime">Startzeit</Label>
-            <Input id="startTime" name="startTime" type="time" bind:value={$form.startTime}
-                   {...$constraints.startTime}/>
+            <Input
+                id="startTime"
+                name="startTime"
+                type="time"
+                bind:value={$form.startTime}
+                {...$constraints.startTime}
+                aria-required="true"
+                aria-invalid={$errors.startTime ? 'true' : undefined}
+                aria-describedby={$errors.startTime ? 'startTime-error' : undefined}
+            />
             {#if $errors.startTime}
-                <Alert color="red">{$errors.startTime}</Alert>
+                <Alert color="red" id="startTime-error">{$errors.startTime}</Alert>
             {/if}
         </div>
+
+        <!-- End Date -->
         <div>
             <Label for="endDate">Enddatum</Label>
-            <Input id="endDate" name="endDate" type="date" bind:value={$form.endDate} {...$constraints.endDate}/>
+            <Input
+                id="endDate"
+                name="endDate"
+                type="date"
+                bind:value={$form.endDate}
+                {...$constraints.endDate}
+                aria-required="true"
+                aria-invalid={$errors.endDate ? 'true' : undefined}
+                aria-describedby={$errors.endDate ? 'endDate-error' : undefined}
+            />
             {#if $errors.endDate}
-                <Alert color="red">{$errors.endDate}</Alert>
+                <Alert color="red" id="endDate-error">{$errors.endDate}</Alert>
             {/if}
         </div>
+
+        <!-- End Time -->
         <div>
             <Label for="endTime">Endzeit</Label>
-            <Input id="endTime" name="endTime" type="time" bind:value={$form.endTime} {...$constraints.endTime}/>
+            <Input
+                id="endTime"
+                name="endTime"
+                type="time"
+                bind:value={$form.endTime}
+                {...$constraints.endTime}
+                aria-required="true"
+                aria-invalid={$errors.endTime ? 'true' : undefined}
+                aria-describedby={$errors.endTime ? 'endTime-error' : undefined}
+            />
             {#if $errors.endTime}
-                <Alert color="red">{$errors.endTime}</Alert>
+                <Alert color="red" id="endTime-error">{$errors.endTime}</Alert>
             {/if}
         </div>
 
+        <!-- Minimum Participants -->
         <div>
             <Label for="minParticipants">Minimale Teilnehmer pro Runde</Label>
-            <Input id="minParticipants" name="minParticipants" type="number" bind:value={$form.minParticipants}
-                   {...$constraints.minParticipants}/>
+            <Input
+                id="minParticipants"
+                name="minParticipants"
+                type="number"
+                bind:value={$form.minParticipants}
+                {...$constraints.minParticipants}
+                aria-required="true"
+                aria-invalid={$errors.minParticipants ? 'true' : undefined}
+                aria-describedby={$errors.minParticipants ? 'minParticipants-error' : undefined}
+            />
             {#if $errors.minParticipants}
-                <Alert color="red">{$errors.minParticipants}</Alert>
-            {/if}
-        </div>
-        <div>
-            <Label for="holeCount">Lochanzahl</Label>
-            <Input id="holeCount" name="holeCount" type="number" bind:value={$form.holeCount}
-                   {...$constraints.holeCount}/>
-            {#if $errors.holeCount}
-                <Alert color="red">{$errors.holeCount}</Alert>
+                <Alert color="red" id="minParticipants-error">{$errors.minParticipants}</Alert>
             {/if}
         </div>
 
+        <!-- Hole Count -->
+        <div>
+            <Label for="holeCount">Lochanzahl</Label>
+            <Input
+                id="holeCount"
+                name="holeCount"
+                type="number"
+                bind:value={$form.holeCount}
+                {...$constraints.holeCount}
+                aria-required="true"
+                aria-invalid={$errors.holeCount ? 'true' : undefined}
+                aria-describedby={$errors.holeCount ? 'holeCount-error' : undefined}
+            />
+            {#if $errors.holeCount}
+                <Alert color="red" id="holeCount-error">{$errors.holeCount}</Alert>
+            {/if}
+        </div>
+
+        <!-- Rating Classes -->
         <div class="grid col-span-2">
-            <Label>Wertungsklassen</Label>
-            <div class="flex flex-wrap">
+            <Label id="rating-classes-label">Wertungsklassen</Label>
+            <div
+                class="flex flex-wrap"
+                role="group"
+                aria-labelledby="rating-classes-label"
+            >
                 {#each ratingClasses as ratingClass}
                     <button
-                            type="button"
-                            class={`mx-1 my-2 px-3 py-1 rounded-full border ${
-                            $form.ratingClasses.findLast(c => c.name === ratingClass.name)
+                        type="button"
+                        class={`mx-1 my-2 px-3 py-1 rounded-full border ${
+                            isRatingClassSelected(ratingClass)
                             ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600'
                         }`}
-                            onclick={() => toggleRatingClass(ratingClass)}
+                        onclick={() => toggleRatingClass(ratingClass)}
+                        aria-pressed={isRatingClassSelected(ratingClass)}
                     >
                         {ratingClass.name}
                     </button>
                 {/each}
-                <Button type="button" class="mx-1 my-2 px-3 py-1 rounded-full border"
-                        onclick={openAddRatingClassModal}>
-                    <PlusIcon size="20"/>
+                <Button
+                    type="button"
+                    class="mx-1 my-2 px-3 py-1 rounded-full border"
+                    onclick={openAddRatingClassModal}
+                    aria-label="Neue Wertungsklasse hinzufügen"
+                >
+                    <PlusIcon size="20" aria-hidden="true" />
                 </Button>
             </div>
         </div>
 
+        <!-- Description -->
         <div class="grid col-span-2">
             <Label for="description">Beschreibung</Label>
-            <Textarea id="description" name="description" rows={4} bind:value={$form.description}
-                      {...$constraints.description}/>
+            <Textarea
+                id="description"
+                name="description"
+                rows={4}
+                bind:value={$form.description}
+                {...$constraints.description}
+                aria-invalid={$errors.description ? 'true' : undefined}
+                aria-describedby={$errors.description ? 'description-error' : undefined}
+            />
             {#if $errors.description}
-                <Alert color="red">{$errors.description}</Alert>
+                <Alert color="red" id="description-error">{$errors.description}</Alert>
             {/if}
         </div>
 
+        <!-- Submit Button -->
         <div class="grid col-span-2">
             <Button type="submit" class="w-full">
-                Absenden
+                {isEdit ? 'Speichern' : 'Erstellen'}
             </Button>
         </div>
     </div>
 </form>
 
+<!-- Add Rating Class Modal -->
 <Modal
-        title="Wertungsklasse hinzufügen."
-        bind:open={addRatingClassIsOpen}
+    title="Wertungsklasse hinzufügen"
+    bind:open={addRatingClassIsOpen}
+    autoclose={false}
 >
-    <form method="dialog" class="flex flex-col space-y-6" onsubmit={handleAddRatingClass}>
+    <form
+        method="dialog"
+        class="flex flex-col space-y-6"
+        onsubmit={handleAddRatingClass}
+    >
         <Label for="ratingClassName">Name</Label>
-        <Input class="py-3" id="ratingClassName" bind:value={newRatingClass} required/>
+        <Input
+            class="py-3"
+            id="ratingClassName"
+            bind:value={newRatingClass}
+            required
+            aria-invalid={addRatingClassError ? 'true' : undefined}
+            aria-describedby={addRatingClassError ? 'rating-class-error' : undefined}
+        />
         {#if addRatingClassError}
-            <Alert color="red">Wertungsklasse existiert bereits.</Alert>
+            <Alert color="red" id="rating-class-error">Wertungsklasse existiert bereits oder ist leer.</Alert>
         {/if}
         <Button class="py-3" type="submit">
             Hinzufügen
