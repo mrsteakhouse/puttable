@@ -11,8 +11,8 @@ export const patchRatingClasses = async (supabase: SupabaseClient<Database>, rat
         .select();
 
     if (error || !data) {
-        console.error(error);
-        return [];
+        console.error('Error fetching rating classes:', error);
+        throw new Error('Failed to fetch rating classes: ' + (error?.message || 'Unknown error'));
     }
 
     if (ratingClasses.length === data.length) {
