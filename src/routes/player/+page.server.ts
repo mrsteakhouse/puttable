@@ -29,7 +29,8 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
                 id,
                 name
             )
-        `);
+        `)
+        .order('firstname', { 'ascending': true });
 
     if (playersError) {
         return fail(500, { message: playersError.message });
