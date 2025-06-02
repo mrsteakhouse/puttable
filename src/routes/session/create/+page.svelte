@@ -77,7 +77,7 @@
                         class={`border rounded p-2 text-center ${
                             isSelected(player.id)
                             ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white hover:bg-gray-100'
+                            : 'light:bg-white hover:bg-gray-100 dark:hover:bg-gray-700'
                         }`}
                         onclick={() => togglePlayer(player)}
                     >

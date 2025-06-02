@@ -25,7 +25,7 @@
     ));
     let createPlayerModalOpen = $state(false);
 
-    const togglePlayer = (player: {firstName: string, lastName: string, id: number}) => {
+    const togglePlayer = (player: { firstName: string, lastName: string, id: number }) => {
         if ($form.player.findLast(p => p.id === player.id)) {
             $form.player = $form.player.filter(p => p.id !== player.id);
         } else {
@@ -68,8 +68,8 @@
                         type="button"
                         class={`border rounded p-2 text-center ${
             isSelected(player.id)
-              ? 'bg-blue-600 text-white border-blue-600'
-              : 'bg-white hover:bg-gray-100'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'light:bg-white hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
                         onclick={() => togglePlayer(player)}
                 >
@@ -92,16 +92,16 @@
     <div class="border-t pt-4 text-sm text-gray-600 flex items-center justify-between">
         <span>Spieler nicht gefunden?</span>
         <Button size="sm" color="blue" onclick={openCreatePlayerModal}>
-            <PlusIcon class="mr-2 h-4 w-4" />
+            <PlusIcon class="mr-2 h-4 w-4"/>
             Neuen Spieler hinzufügen
         </Button>
     </div>
 
     <!-- Create Player Modal -->
     <CreatePlayerModal
-        bind:open={createPlayerModalOpen}
-        ratingClasses={data.ratingClasses ?? []}
-        form={playerForm}
-        onPlayerCreated={handlePlayerCreated}
+            bind:open={createPlayerModalOpen}
+            ratingClasses={data.ratingClasses ?? []}
+            form={playerForm}
+            onPlayerCreated={handlePlayerCreated}
     />
 </div>
