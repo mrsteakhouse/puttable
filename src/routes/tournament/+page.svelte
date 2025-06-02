@@ -86,7 +86,7 @@
         </section>
 
         <section aria-labelledby="upcoming-tournaments-heading">
-            <h2 id="upcoming-tournaments-heading" class="text-2xl font-semibold mb-4 dark:text-white">📅 Bevorstehende Turniere</h2>
+            <h2 id="upcoming-tournaments-heading" class="text-2xl font-semibold mt-12 mb-4 dark:text-white">📅 Bevorstehende Turniere</h2>
             {#if futureEvents.length === 0}
                 <p class="text-gray-500 dark:text-gray-400">Keine zukünftigen Turniere gefunden.</p>
             {:else}
