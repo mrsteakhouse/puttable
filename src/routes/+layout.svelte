@@ -51,7 +51,9 @@
         <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">Puttable</span>
     </NavBrand>
     <div class="flex items-center md:order-2">
-        <NavHamburger/>
+        {#if !(userLoggedIn ?? true)}
+            <NavHamburger/>
+        {/if}
         <DarkMode/>
     </div>
 
@@ -67,7 +69,9 @@
             <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Create}>
                 <NavLi href="/session/create">Freies Spiel</NavLi>
             </PermissionGuard>
+            <PermissionGuard supabase={data.supabase} resource={Resource.None} action={Action.None}>
                 <NavLi href="/admin">Admin</NavLi>
+            </PermissionGuard>
             <NavLi class="cursor-pointer">
                     {username}
                 <ChevronDownOutline class="text-primary-800 ms-2 inline h-6 w-6 dark:text-white"/>
