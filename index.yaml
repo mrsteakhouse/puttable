@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   puttable:
   - apiVersion: v2
+    appVersion: 12.3.1
+    created: "2025-06-02T14:56:48.710599191Z"
+    description: A Helm charts for Puttable application
+    digest: 3454154c22e3046af99855bc2f2abeac9eea040d17af246efe4250dd464d18b6
+    name: puttable
+    type: application
+    urls:
+    - https://github.com/mrsteakhouse/puttable/releases/download/puttable-0.0.42/puttable-0.0.42.tgz
+    version: 0.0.42
+  - apiVersion: v2
     appVersion: 6.2.0
     created: "2025-06-01T21:58:53.584395293Z"
     description: A Helm charts for Puttable application
@@ -121,4 +131,4 @@ entries:
     urls:
     - https://github.com/mrsteakhouse/puttable/releases/download/puttable-0.0.10/puttable-0.0.10.tgz
     version: 0.0.10
-generated: "2025-06-01T21:58:53.584449204Z"
+generated: "2025-06-02T14:56:48.710694569Z"
