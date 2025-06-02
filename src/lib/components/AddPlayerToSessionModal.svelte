@@ -1,7 +1,5 @@
 <script lang="ts">
     import { Alert, Button, Input, Modal } from 'flowbite-svelte';
-    import { superForm } from 'sveltekit-superforms/client';
-    import type { SuperValidated } from 'sveltekit-superforms';
     import fuzzysearch from 'fuzzysearch-ts';
     import { invalidateAll } from '$app/navigation';
     import type { SupabaseClient } from '@supabase/supabase-js';
