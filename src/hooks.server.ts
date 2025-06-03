@@ -3,7 +3,8 @@ import { type Handle, redirect } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
 
 import { env } from '$env/dynamic/public'
-import type {Database} from "$lib/database.types";
+import type { Database } from "$lib/database.types";
+import { paraglideMiddleware } from '$lib/paraglide/server';
 
 const supabase: Handle = async ({ event, resolve }) => {
     /**
@@ -74,4 +75,15 @@ const authGuard: Handle = async ({ event, resolve }) => {
     return resolve(event)
 }
 
-export const handle: Handle = sequence(supabase, authGuard)
+// creating a handle to use the paraglide middleware
+const paraglideHandle: Handle = ({ event, resolve }) =>
+    paraglideMiddleware(event.request, ({ request: localizedRequest, locale }) => {
+        event.request = localizedRequest;
+        return resolve(event, {
+            transformPageChunk: ({ html }) => {
+                return html.replace('%lang%', locale);
+            }
+        });
+    });
+
+export const handle: Handle = sequence(supabase, authGuard, paraglideHandle)

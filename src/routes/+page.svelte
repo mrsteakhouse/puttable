@@ -2,6 +2,7 @@
     import { Button, Card } from "flowbite-svelte";
     import type { PageProps } from './$types'
     import { env } from '$env/dynamic/public';
+    import { m } from "$lib/paraglide/messages"
 
     let { data }: PageProps = $props();
 
@@ -22,7 +23,7 @@
 
 <div class="max-w-md mx-auto px-4 py-16">
     <Card class="p-8" role="region" aria-labelledby="welcome-heading">
-        <h1 id="welcome-heading" class="text-3xl font-bold text-center dark:text-white mb-8">Willkommen bei Puttable</h1>
+        <h1 id="welcome-heading" class="text-3xl font-bold text-center dark:text-white mb-8">{m.landing_page_header()}</h1>
 
         <p class="text-center mb-8 text-gray-700 dark:text-gray-300">
             Bitte melden Sie sich an, um auf die Turniere und Funktionen zuzugreifen.
