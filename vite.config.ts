@@ -7,7 +7,7 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills';
 export default defineConfig({
   plugins: [
     paraglideVitePlugin({
-      project: './project.inlang',
+      project: './i18n.inlang',
       outdir: './src/lib/paraglide',
       strategy: ["cookie", "url", 'baseLocale'],
       urlPatterns: [
