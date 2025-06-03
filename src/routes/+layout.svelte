@@ -2,12 +2,13 @@
     import '../app.css';
     import { page } from "$app/state";
     import { DarkMode, Dropdown, DropdownItem, Navbar, NavBrand, NavHamburger, NavLi, NavUl } from "flowbite-svelte";
-    import { ChevronDownOutline } from 'flowbite-svelte-icons';
+    import { ChevronDownOutline, GlobeOutline } from 'flowbite-svelte-icons';
 
     import { onMount } from 'svelte'
     import { goto, invalidate } from '$app/navigation'
     import PermissionGuard from '$lib/components/PermissionGuard.svelte';
     import { Action, Resource } from '$lib/permissions';
+    import { getLocale, setLocale, locales } from '$lib/paraglide/runtime.js';
 
     let { data, children } = $props()
 
@@ -16,6 +17,7 @@
     let userLoggedIn = $derived(user?.is_anonymous);
     // Use user_metadata.name from the session user
     let username = $derived(user?.user_metadata.name || session?.user?.email);
+    let currentLocale = $state(getLocale());
 
     onMount(() => {
         const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
@@ -30,6 +32,10 @@
     const handleLogout = async () => {
         await supabase.auth.signOut();
         await goto('/', { invalidateAll: true });
+    }
+
+    const changeLocale = (locale) => {
+        setLocale(locale);
     }
 </script>
 
@@ -54,6 +60,20 @@
         {#if !(userLoggedIn ?? true)}
             <NavHamburger/>
         {/if}
+        <div class="flex items-center mr-2">
+            <div class="cursor-pointer flex items-center text-primary-800 dark:text-white">
+                <GlobeOutline class=" me-1 inline h-5 w-5"/>
+                {currentLocale.toUpperCase()}
+                <ChevronDownOutline class="ms-1 inline h-5 w-5"/>
+            </div>
+            <Dropdown simple>
+                {#each locales as locale}
+                    <DropdownItem onclick={() => changeLocale(locale)} class="cursor-pointer {locale === currentLocale ? 'font-bold' : ''}">
+                        {locale === 'de' ? 'Deutsch' : 'English'}
+                    </DropdownItem>
+                {/each}
+            </Dropdown>
+        </div>
         <DarkMode/>
     </div>
 
