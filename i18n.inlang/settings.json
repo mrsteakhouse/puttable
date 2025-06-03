@@ -16,5 +16,8 @@
   ],
   "plugin.inlang.messageFormat": {
     "pathPattern": "./messages/{locale}.json"
+  },
+  "messageLintRuleLevels": {
+    "messageLintRule.inlang.missingTranslation": "error"
   }
 }
