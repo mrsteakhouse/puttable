@@ -1,4 +1,6 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "example_message": "Hello world {username}"
+  "landing_page_header": "Welcome to Puttable",
+  "landing_page_text": "Please login to access the tournaments and functionality.",
+  "landing_page_login_button": "Login"
 }
