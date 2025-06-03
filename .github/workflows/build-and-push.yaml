@@ -70,10 +70,11 @@ jobs:
         id: appVersion
         with:
           tag_prefix: "v"
-          major_pattern: "feat"
-          minor_pattern: "fix"
+          major_pattern: "release"
+          minor_pattern: "feat"
           version_format: "${major}.${minor}.${patch}"
           bump_each_commit: 'true'
+          bump_each_commit_patch_pattern: "fix"
 
       - name: Set app version
         run: |
