@@ -8,14 +8,6 @@
     "it",
     "fr"
   ],
-  "sourceLanguageTag": "de",
-  "languageTags": [
-    "de",
-    "en",
-    "es",
-    "it",
-    "fr"
-  ],
   "modules": [
     "https://cdn.jsdelivr.net/npm/@inlang/plugin-message-format@4/dist/index.js",
     "https://cdn.jsdelivr.net/npm/@inlang/plugin-m-function-matcher@2/dist/index.js"
