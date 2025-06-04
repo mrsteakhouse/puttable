@@ -10,7 +10,7 @@ export default defineConfig({
     sentrySvelteKit({
       sourceMapsUploadOptions: {
         org: "ozma-org",
-        project: "javascript-sveltekit",
+        project: "puttable",
         authToken: process.env.SENTRY_AUTH_TOKEN,
       },
     }),
