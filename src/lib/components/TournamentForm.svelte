@@ -4,6 +4,7 @@
     import { superForm, type SuperValidated } from 'sveltekit-superforms';
     import type { TournamentSchema } from '$lib/schemas';
     import type { RatingClassDto } from '$lib/dto';
+    import { m } from "$lib/paraglide/messages";
 
     // Props with proper typing
     let {
@@ -87,22 +88,22 @@
     <a
         href={isEdit ? `/tournament/${tournamentId}` : '/tournament'}
         class="text-blue-600 hover:underline flex items-center gap-1"
-        aria-label={isEdit ? "Zurück zum Turnier" : "Zurück zur Übersicht"}
+        aria-label={isEdit ? m.tournament_form_back_to_tournament() : m.tournament_form_back_to_overview()}
     >
         <ArrowLeft class="w-4 h-4" aria-hidden="true" />
-        Zurück zur Ansicht
+        {m.tournament_form_back()}
     </a>
 
     <div class="grid grid-cols-2 gap-4">
         <div class="grid col-span-2">
             <h2 class="text-2xl font-bold">
-                {#if isEdit}Turnier bearbeiten{:else}Turnier erstellen{/if}
+                {#if isEdit}{m.tournament_form_edit()}{:else}{m.tournament_form_create()}{/if}
             </h2>
         </div>
 
         <!-- Tournament Name -->
         <div class="grid col-span-2">
-            <Label for="name">Name</Label>
+            <Label for="name">{m.tournament_form_name()}</Label>
             <Input
                 id="name"
                 name="name"
@@ -119,7 +120,7 @@
 
         <!-- Start Date -->
         <div class="grid">
-            <Label for="startDate">Startdatum</Label>
+            <Label for="startDate">{m.tournament_form_start_date()}</Label>
             <Input
                 id="startDate"
                 name="startDate"
@@ -137,7 +138,7 @@
 
         <!-- Start Time -->
         <div class="grid">
-            <Label for="startTime">Startzeit</Label>
+            <Label for="startTime">{m.tournament_form_start_time()}</Label>
             <Input
                 id="startTime"
                 name="startTime"
@@ -155,7 +156,7 @@
 
         <!-- End Date -->
         <div>
-            <Label for="endDate">Enddatum</Label>
+            <Label for="endDate">{m.tournament_form_end_date()}</Label>
             <Input
                 id="endDate"
                 name="endDate"
@@ -173,7 +174,7 @@
 
         <!-- End Time -->
         <div>
-            <Label for="endTime">Endzeit</Label>
+            <Label for="endTime">{m.tournament_form_end_time()}</Label>
             <Input
                 id="endTime"
                 name="endTime"
@@ -191,7 +192,7 @@
 
         <!-- Minimum Participants -->
         <div>
-            <Label for="minParticipants">Minimale Teilnehmer pro Runde</Label>
+            <Label for="minParticipants">{m.tournament_form_min_participants()}</Label>
             <Input
                 id="minParticipants"
                 name="minParticipants"
@@ -209,7 +210,7 @@
 
         <!-- Hole Count -->
         <div>
-            <Label for="holeCount">Lochanzahl</Label>
+            <Label for="holeCount">{m.tournament_form_hole_count()}</Label>
             <Input
                 id="holeCount"
                 name="holeCount"
@@ -227,7 +228,7 @@
 
         <!-- Rating Classes -->
         <div class="grid col-span-2">
-            <Label id="rating-classes-label">Wertungsklassen</Label>
+            <Label id="rating-classes-label">{m.tournament_form_rating_classes()}</Label>
             <div
                 class="flex flex-wrap"
                 role="group"
@@ -251,7 +252,7 @@
                     type="button"
                     class="mx-1 my-2 px-3 py-1 rounded-full border"
                     onclick={openAddRatingClassModal}
-                    aria-label="Neue Wertungsklasse hinzufügen"
+                    aria-label={m.tournament_form_add_rating_class_aria()}
                 >
                     <PlusIcon size="20" aria-hidden="true" />
                 </Button>
@@ -260,7 +261,7 @@
 
         <!-- Description -->
         <div class="grid col-span-2">
-            <Label for="description">Beschreibung</Label>
+            <Label for="description">{m.tournament_form_description()}</Label>
             <Textarea
                 id="description"
                 name="description"
@@ -278,7 +279,7 @@
         <!-- Submit Button -->
         <div class="grid col-span-2">
             <Button type="submit" class="w-full">
-                {isEdit ? 'Speichern' : 'Erstellen'}
+                {isEdit ? m.tournament_form_save() : m.tournament_form_create_button()}
             </Button>
         </div>
     </div>
@@ -286,7 +287,7 @@
 
 <!-- Add Rating Class Modal -->
 <Modal
-    title="Wertungsklasse hinzufügen"
+    title={m.tournament_form_add_rating_class_title()}
     bind:open={addRatingClassIsOpen}
     autoclose={false}
 >
@@ -295,7 +296,7 @@
         class="flex flex-col space-y-6"
         onsubmit={handleAddRatingClass}
     >
-        <Label for="ratingClassName">Name</Label>
+        <Label for="ratingClassName">{m.tournament_form_rating_class_name()}</Label>
         <Input
             class="py-3"
             id="ratingClassName"
@@ -305,10 +306,10 @@
             aria-describedby={addRatingClassError ? 'rating-class-error' : undefined}
         />
         {#if addRatingClassError}
-            <Alert color="red" id="rating-class-error">Wertungsklasse existiert bereits oder ist leer.</Alert>
+            <Alert color="red" id="rating-class-error">{m.tournament_form_rating_class_error()}</Alert>
         {/if}
         <Button class="py-3" type="submit">
-            Hinzufügen
+            {m.tournament_form_add_button()}
         </Button>
     </form>
 </Modal>

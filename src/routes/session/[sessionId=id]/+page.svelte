@@ -13,6 +13,7 @@
     import MovePlayerToSessionModal from '$lib/components/MovePlayerToSessionModal.svelte';
     import RemovePlayerFromSessionModal from '$lib/components/RemovePlayerFromSessionModal.svelte';
     import { ArrowRightIcon, PlusIcon, TrashIcon } from 'lucide-svelte';
+    import { m } from "$lib/paraglide/messages";
 
     let { data }: PageProps = $props();
     const supabase = $derived(data.supabase);
@@ -239,21 +240,21 @@
             {#if session.isFreeplay}
                 🎮 {session.tournamentName}
             {:else}
-                🎯 Session für {session.tournamentName}
+                🎯 {m.session_for({ tournamentName: session.tournamentName })}
             {/if}
         </h1>
     </div>
 
     <Tabs tabStyle="underline" ulClass="flex-wrap">
-        <TabItem open={true} title="Übersicht">
+        <TabItem open={true} title={m.session_overview()}>
             <!-- Responsive grid that adapts to screen size -->
             <div class="mt-4 dark:text-gray-300">
                 <!-- Header row - hidden on small screens, visible on md and up -->
                 <div class="hidden md:grid md:grid-cols-6 md:gap-2 font-medium dark:text-white mb-2">
-                    <div class="col-span-2">Spieler</div>
-                    <div>Punktestand</div>
-                    <div>Einsen</div>
-                    <div>Gespielte Löcher</div>
+                    <div class="col-span-2">{m.session_player()}</div>
+                    <div>{m.session_score()}</div>
+                    <div>{m.session_ones()}</div>
+                    <div>{m.session_played_holes()}</div>
                     <div></div>
                 </div>
 
@@ -266,13 +267,13 @@
                         </div>
                         <div class="grid grid-cols-3 gap-2 text-sm">
                             <div>
-                                <span class="font-medium dark:text-white">Punktestand:</span> {totalScore(() => sc.data)}
+                                <span class="font-medium dark:text-white">{m.session_score_label()}</span> {totalScore(() => sc.data)}
                             </div>
                             <div>
-                                <span class="font-medium dark:text-white">Einsen:</span> {onesCount(() => sc.data)}
+                                <span class="font-medium dark:text-white">{m.session_ones_label()}</span> {onesCount(() => sc.data)}
                             </div>
                             <div>
-                                <span class="font-medium dark:text-white">Löcher:</span> {playedHolesCount(() => sc.data)}
+                                <span class="font-medium dark:text-white">{m.session_holes_label()}</span> {playedHolesCount(() => sc.data)}
                             </div>
                         </div>
                     </div>
@@ -293,12 +294,11 @@
             {#if !session.submissionDateTime}
                 {#if canSubmit}
                     <Button onclick={submitScorecards} color="green">
-                        ✅ Scorecards einreichen
+                        ✅ {m.session_submit_scorecards()}
                     </Button>
                 {/if}
             {:else}
-                <div class="text-green-600 dark:text-green-400 font-medium">✅ Bereits eingereicht
-                    am {moment(session.submissionDateTime).format(DATETIME_DISPLAY)}</div>
+                <div class="text-green-600 dark:text-green-400 font-medium">✅ {m.session_already_submitted({ submissionDate: moment(session.submissionDateTime).format(DATETIME_DISPLAY) })}</div>
             {/if}
         </TabItem>
 
@@ -307,7 +307,7 @@
                 <div class="grid grid-cols-4 gap-2 mt-4 dark:text-gray-300">
                     {#each [...Array(session.holes).keys()] as index}
                         <div>
-                            Loch {index + 1}
+                            {m.session_hole({ holeNumber: index + 1 })}
                         </div>
                         <div>
                             <Input class="w-15" type="number" max="7" min="0" bind:value={sc.data[index]}
@@ -318,39 +318,39 @@
                 </div>
 
                 <div class="mt-4 text-gray-700 dark:text-gray-300">
-                    <span class="font-semibold dark:text-white">Gesamt:</span> {totalScore(() => sc.data)}
+                    <span class="font-semibold dark:text-white">{m.session_total()}</span> {totalScore(() => sc.data)}
                 </div>
                 <div class="mt-4 text-gray-700 dark:text-gray-300">
-                    <span class="font-semibold dark:text-white">Einsen:</span> {onesCount(() => sc.data)}
+                    <span class="font-semibold dark:text-white">{m.session_ones_label()}</span> {onesCount(() => sc.data)}
                 </div>
             </TabItem>
         {/each}
 
         {#if showActionsTab}
-            <TabItem title="Aktionen">
+            <TabItem title={m.session_actions()}>
                 <div class="space-y-4 mt-4">
-                    <h2 class="text-xl font-semibold dark:text-white">Verfügbare Aktionen</h2>
+                    <h2 class="text-xl font-semibold dark:text-white">{m.session_available_actions()}</h2>
 
                     {#if !session.submissionDateTime}
                         <div class="space-y-2">
-                            <h3 class="text-lg font-medium dark:text-white">Spielerverwaltung</h3>
+                            <h3 class="text-lg font-medium dark:text-white">{m.session_player_management()}</h3>
                             <div class="flex flex-wrap gap-2">
                                 <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Update}>
                                     <Button type="button" color="blue" onclick={() => showAddPlayerModal = true}>
                                         <PlusIcon class="h-4 w-4 mr-1" />
-                                        Spieler hinzufügen
+                                        {m.session_add_player()}
                                     </Button>
                                 </PermissionGuard>
                                 <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Update}>
                                     <Button type="button" color="blue" onclick={() => showMovePlayerModal = true}>
                                         <ArrowRightIcon class="h-4 w-4 mr-1" />
-                                        Spieler verschieben
+                                        {m.session_move_player()}
                                     </Button>
                                 </PermissionGuard>
                                 <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Update}>
                                     <Button type="button" color="red" onclick={() => showRemovePlayerModal = true}>
                                         <TrashIcon class="h-4 w-4 mr-1" />
-                                        Spieler entfernen
+                                        {m.session_remove_player()}
                                     </Button>
                                 </PermissionGuard>
                             </div>
@@ -358,12 +358,12 @@
                     {/if}
 
                     <div class="space-y-2">
-                        <h3 class="text-lg font-medium dark:text-white">Gefahrenzone</h3>
+                        <h3 class="text-lg font-medium dark:text-white">{m.session_danger_zone()}</h3>
                         <div class="flex flex-wrap gap-2">
                             <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Delete}>
                                 <form method="POST" action="?/deleteSession" bind:this={deleteForm}>
                                     <Button type="button" color="red" onclick={openDeleteModal}>
-                                        🗑️ Session löschen
+                                        🗑️ {m.session_delete()}
                                     </Button>
                                 </form>
                             </PermissionGuard>
@@ -377,27 +377,27 @@
     <!-- ⚠️ Modal -->
     <Modal bind:open={showModal} autoclose size="sm">
         <div class="p-4 dark:bg-gray-800">
-            <h2 class="text-lg font-bold mb-2 dark:text-white">⚠️ Unvollständige Scorecards</h2>
-            <p class="text-sm mb-2 dark:text-gray-300">Folgende Spieler haben noch nicht alle Löcher gespielt:</p>
+            <h2 class="text-lg font-bold mb-2 dark:text-white">⚠️ {m.session_incomplete_scorecards()}</h2>
+            <p class="text-sm mb-2 dark:text-gray-300">{m.session_incomplete_players()}</p>
             <ul class="list-disc ml-6 mb-4 text-sm dark:text-gray-300">
                 {#each incompletePlayers as name}
                     <li>{name}</li>
                 {/each}
             </ul>
             <div class="text-right">
-                <Button onclick={() => (showModal = false)}>Okay</Button>
+                <Button onclick={() => (showModal = false)}>{m.session_okay()}</Button>
             </div>
         </div>
     </Modal>
 
     <!-- Delete Confirmation Modal -->
-    <Modal title="Session löschen" bind:open={showDeleteModal} size="sm">
+    <Modal title={m.session_delete()} bind:open={showDeleteModal} size="sm">
         <p class="text-gray-700 dark:text-gray-400 mb-6">
-            Sind Sie sicher, dass Sie diese Session löschen möchten? Alle zugehörigen Scorecards werden ebenfalls gelöscht.
+            {m.session_delete_confirm()}
         </p>
         <div class="flex justify-end space-x-2">
-            <Button color="light" onclick={() => showDeleteModal = false}>Abbrechen</Button>
-            <Button type="button" color="red" onclick={() => { handleDelete(); showDeleteModal = false; }}>Löschen</Button>
+            <Button color="light" onclick={() => showDeleteModal = false}>{m.session_cancel()}</Button>
+            <Button type="button" color="red" onclick={() => { handleDelete(); showDeleteModal = false; }}>{m.session_delete_button()}</Button>
         </div>
     </Modal>
 

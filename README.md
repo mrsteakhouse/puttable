@@ -1,56 +1,75 @@
 # Puttable
 
-A website to host miniature golf tournaments.
+Eine Webseite zur Verwaltung von Minigolf-Turnieren.
 
-## Development
+## Über die Webseite
+
+Puttable ist eine Anwendung zur Organisation und Durchführung von Minigolf-Turnieren. Die Webseite bietet folgende Funktionen:
+
+- Verwaltung von Spielern und deren Bewertungsklassen
+- Erstellung und Konfiguration von Turnieren
+- Erfassung von Spielergebnissen in Echtzeit
+- Anzeige einer Rangliste mit Ergebnissen
+- Verwaltung von Scorecards für jeden Spieler
+
+## Lokale Entwicklungsumgebung
+
+### Voraussetzungen
+
+- Docker und Docker Compose installiert
+- Git zur Versionskontrolle
+- npm > v20.11
+
+### Entwicklungscontainer starten
+
+Um die lokale Entwicklungsumgebung zu starten, führe folgenden Befehl im Projektverzeichnis aus:
 
 ```shell
+# supabase starten
+npx supabase start
+
+# Starte die Container
 docker compose up -d
 ```
 
-## Terminology
+Nach dem Start sind folgende Dienste verfügbar:
 
-### Player
+- **Puttable Anwendung**: http://localhost:5173
+- **Keycloak Admin**: http://localhost:8080 (Zugangsdaten: admin/admin)
+- **Supabase Studio**: http://localhost:54323
 
-A player is a person who plays miniature golf. A person has a name and a rating class.
-A player is created by adding it to a tournament. For subsequent tournaments a player can be selected through a dropdown.
+### Entwicklung
 
-### Tournament
+Die Anwendung verwendet:
+- SvelteKit als Frontend-Framework
+- Supabase für Datenbank und Authentifizierung
+- Keycloak für die Benutzerverwaltung
+- Tailwind CSS für das Styling
+- Component Library Flowbite Svelte
 
-A tournament is an event where scores for each player are registered.
-The tournament has a score board to display achieved scores for each player sorted by given criteria.
-A tournament can be configured to enforce a minimum allowed number of player per session.
-The number of holes to be played is configurable.
+## Terminologie
 
-### Scorecard
+### Spieler (Player)
 
-A scorecard holds the achieved score for each hole for a single user. The scorecard can be altered during active session.
-### Score
+Ein Spieler ist eine Person, die Minigolf spielt. Ein Spieler hat einen Namen und eine Bewertungsklasse.
+Ein Spieler wird erstellt, indem er zu einem Turnier hinzugefügt wird. Für nachfolgende Turniere kann ein Spieler über ein Dropdown-Menü ausgewählt werden.
 
-A score is the amount of tries a player took to complete a hole.
+### Turnier (Tournament)
+
+Ein Turnier ist eine Veranstaltung, bei der die Ergebnisse für jeden Spieler registriert werden.
+Das Turnier verfügt über eine Rangliste, die die erzielten Ergebnisse für jeden Spieler nach bestimmten Kriterien sortiert anzeigt.
+Ein Turnier kann so konfiguriert werden, dass eine Mindestzahl von Spielern pro Session erforderlich ist.
+Die Anzahl der zu spielenden Bahnen ist konfigurierbar.
+
+### Scorekarte (Scorecard)
+
+Eine Scorekarte enthält die erzielten Ergebnisse für jede Bahn für einen einzelnen Benutzer. Die Scorekarte kann während einer aktiven Session geändert werden.
+
+### Ergebnis (Score)
+
+Ein Ergebnis ist die Anzahl der Versuche, die ein Spieler benötigt hat, um eine Bahn zu absolvieren.
 
 ### Session
 
-One or more player can play together in a session. Each player is assigned a scorecard for the particular session.
-The session stays active until it is submitted. Only submitted session will show up on the score board.
-
-## Todo
-
-- [x] Define API routes
-- [ ] Add development backend
-- [x] Add database migrations
-- [x] Decide on database schema
-- [x] Create tournament
-- [x] Add player to tournament
-- [x] Create player
-  - [x] Global with its own account
-  - [x] Temporary for tournaments only
-- [x] Tournament score board
-- [x] Different settings to sort the score board
-  - [x] lowest score
-  - [x] most hole-in-one
-  - [x] use the best score for a session
-- [x] Scorecard view
-- [x] View to start a game with selected players
-- [x] A view for playing a session with multiple player
-- [x] Build Helm chart
+Ein oder mehrere Spieler können gemeinsam in einer Session spielen. Jedem Spieler wird eine Scorekarte für die jeweilige Session zugewiesen.
+Die Session bleibt aktiv, bis sie eingereicht wird. Nur eingereichte Sessions werden auf der Rangliste angezeigt.

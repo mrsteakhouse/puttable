@@ -1,11 +1,10 @@
-import type { PageServerLoad, Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
-import { z } from 'zod';
 import { playerFormSchema, type PlayerFormSchema } from '$lib/schemas';
 import { SessionDto } from '$lib/dto';
-import { canAccessResource, hasPermission } from '$lib/rbac';
+import { canAccessResource } from '$lib/rbac';
 import { Action, Resource } from '$lib/permissions';
 
 export const load: PageServerLoad = async ({ params, locals: { supabase } }) => {

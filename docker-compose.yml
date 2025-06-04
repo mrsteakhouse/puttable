@@ -4,20 +4,22 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - PUBLIC_SUPABASE_URL=http://192.168.179.65:54321
+      - PUBLIC_SUPABASE_URL=http://supabase_studio_puttable:54321
       - PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
       - SUPABASE_AUTH_KEYCLOAK_CLIENT_ID=puttable-dev
       - SUPABASE_AUTH_KEYCLOAK_SECRET=puttable-secret
       - SUPABASE_AUTH_KEYCLOAK_URL=http://keycloak:8080/realms/puttable
-      - PUBLIC_SUPABASE_AUTH_KEYCLOAK_REDIRECT_URI=http://192.168.179.65:5173/auth/v1/callback
-      - PUBLIC_SITE_BASE_URL=http://192.168.179.65:5173
+      - PUBLIC_SUPABASE_AUTH_KEYCLOAK_REDIRECT_URI=http://supabase_studio_puttable:5173/auth/v1/callback
+      - PUBLIC_SITE_BASE_URL=http://localhost:5173
       - NODE_ENV=production
       - HOST=0.0.0.0
       - PORT=5173
-      - BASE_PATH=http://192.168.179.65:5173/
+      - BASE_PATH=http://localhost:5173/
       - CHECK_ORIGIN=false
     depends_on:
       - keycloak
+    networks:
+      - supabase_network_puttable
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
@@ -34,3 +36,9 @@ services:
     volumes:
       - ./keycloak/puttable-realm.json:/opt/keycloak/data/import/puttable-realm.json
       - ./keycloak/themes:/opt/keycloak/themes
+    networks:
+      - supabase_network_puttable
+
+networks:
+  supabase_network_puttable:
+    external: true

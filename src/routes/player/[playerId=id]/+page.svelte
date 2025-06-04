@@ -19,6 +19,7 @@
     import type { PlayerFormSchema } from '$lib/schemas';
     import PermissionGuard from '$lib/components/PermissionGuard.svelte';
     import { Action, Resource } from '$lib/permissions';
+    import { m } from "$lib/paraglide/messages";
 
     let { data }: PageProps = $props();
     let isEditing = $state(false);
@@ -65,9 +66,9 @@
 
 <div class="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-2xl shadow" role="main">
     <div class="mb-6">
-        <a href="/player" class="text-blue-600 hover:underline flex items-center gap-1" aria-label="Zurück zur Spielerliste">
+        <a href="/player" class="text-blue-600 hover:underline flex items-center gap-1" aria-label={m.player_detail_back_aria()}>
             <ArrowLeft class="w-4 h-4" aria-hidden="true"/>
-            Zurück zur Spielerliste
+            {m.player_detail_back()}
         </a>
     </div>
 
@@ -76,9 +77,9 @@
             <div class="flex-grow">
                 {#if isEditing}
                     <form method="POST" action="?/updatePlayer" use:enhance class="space-y-4" aria-labelledby="edit-player-heading">
-                        <h2 id="edit-player-heading" class="sr-only">Spieler bearbeiten</h2>
+                        <h2 id="edit-player-heading" class="sr-only">{m.player_detail_edit_heading()}</h2>
                         <div class="mb-4">
-                            <Label for="firstName">Vorname</Label>
+                            <Label for="firstName">{m.player_first_name()}</Label>
                             <Input
                                 id="firstName"
                                 name="firstName"
@@ -93,7 +94,7 @@
                         </div>
 
                         <div class="mb-4">
-                            <Label for="lastName">Nachname</Label>
+                            <Label for="lastName">{m.player_last_name()}</Label>
                             <Input
                                 id="lastName"
                                 name="lastName"
@@ -108,7 +109,7 @@
                         </div>
 
                         <div class="mb-4">
-                            <Label for="ratingClassId">Wertungsklasse</Label>
+                            <Label for="ratingClassId">{m.player_rating_class()}</Label>
                             <select
                                 id="ratingClassId"
                                 name="ratingClassId"
@@ -118,7 +119,7 @@
                                 aria-invalid={$errors.ratingClassId ? 'true' : undefined}
                                 aria-describedby={$errors.ratingClassId ? 'ratingClassId-error' : undefined}
                             >
-                                <option value="" disabled>Wertungsklasse auswählen</option>
+                                <option value="" disabled>{m.player_detail_select_rating()}</option>
                                 {#each data.ratingClasses as ratingClass}
                                     <option value={ratingClass.id}>{ratingClass.name}</option>
                                 {/each}
@@ -134,36 +135,36 @@
                                 color="green"
                                 disabled={$submitting}
                                 aria-disabled={$submitting}
-                                aria-label="Änderungen speichern"
+                                aria-label={m.player_detail_save_aria()}
                             >
                                 <Check class="w-4 h-4 mr-1" aria-hidden="true" />
-                                Speichern
+                                {m.player_detail_save()}
                             </Button>
                             <Button
                                 type="button"
                                 color="light"
                                 onclick={cancelEdit}
-                                aria-label="Bearbeitung abbrechen"
+                                aria-label={m.player_detail_cancel_aria()}
                             >
                                 <X class="w-4 h-4 mr-1" aria-hidden="true" />
-                                Abbrechen
+                                {m.player_detail_cancel()}
                             </Button>
                         </div>
                     </form>
                 {:else}
                     <h1 id="player-name" class="text-2xl font-bold">{data.player.firstname} {data.player.lastname}</h1>
-                    <p class="text-gray-600 dark:text-gray-400">Wertungsklasse: {data.player.rating_classes?.name || 'Keine'}</p>
+                    <p class="text-gray-600 dark:text-gray-400">{m.player_rating_class_mobile({ ratingClass: data.player.rating_classes?.name || m.player_none() })}</p>
                 {/if}
             </div>
 
             {#if !isEditing}
-                <div class="flex space-x-2" role="toolbar" aria-label="Spieler-Aktionen">
+                <div class="flex space-x-2" role="toolbar" aria-label={m.player_detail_actions()}>
                     <PermissionGuard supabase={data.supabase} resource={Resource.Players} action={Action.Update}>
                         <Button
                             color="light"
                             size="sm"
                             onclick={toggleEdit}
-                            aria-label="Spieler bearbeiten"
+                            aria-label={m.player_detail_edit_button()}
                         >
                             <Pencil class="w-4 h-4" aria-hidden="true"/>
                         </Button>
@@ -173,7 +174,7 @@
                             color="red"
                             size="sm"
                             onclick={openDeleteModal}
-                            aria-label="Spieler löschen"
+                            aria-label={m.player_detail_delete_button()}
                         >
                             <Trash class="w-4 h-4" aria-hidden="true"/>
                         </Button>
@@ -183,60 +184,60 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" role="region" aria-label="Spielerstatistiken">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" role="region" aria-label={m.player_detail_stats()}>
         <Card class="p-3">
             <h5 id="avg-score-heading" class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-                Durchschnittliche Punktzahl
+                {m.player_detail_avg_score()}
             </h5>
             <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight" aria-labelledby="avg-score-heading">
                 <span class="text-4xl font-bold text-blue-600">{data.statistics.averageScore}</span>
                 <br>
-                <span class="text-sm">basierend auf {data.statistics.totalHolesPlayed} gespielten Löchern</span>
+                <span class="text-sm">{m.player_detail_based_on_holes({ holeCount: data.statistics.totalHolesPlayed })}</span>
             </p>
         </Card>
 
         <Card class="p-3">
             <h5 id="ones-rate-heading" class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-                Einsen Rate
+                {m.player_detail_ones_rate()}
             </h5>
             <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight" aria-labelledby="ones-rate-heading">
                 <span class="text-4xl font-bold text-green-600">{data.statistics.onesRate}%</span>
                 <br>
-                <span class="text-sm">{data.statistics.totalOnes} Einsen in {data.statistics.totalHolesPlayed} Löchern</span>
+                <span class="text-sm">{m.player_detail_ones_count({ onesCount: data.statistics.totalOnes, holeCount: data.statistics.totalHolesPlayed })}</span>
             </p>
         </Card>
 
         <Card class="p-3">
             <h5 id="avg-scorecard-heading" class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-                Durchschnitt pro Scorecard
+                {m.player_detail_avg_scorecard()}
             </h5>
             <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight" aria-labelledby="avg-scorecard-heading">
                 <span class="text-4xl font-bold text-purple-600">{data.statistics.averageScorePerScorecard}</span>
                 <br>
-                <span class="text-sm">basierend auf {data.statistics.validScorecards} Scorecards</span>
+                <span class="text-sm">{m.player_detail_based_on_scorecards({ scorecardCount: data.statistics.validScorecards })}</span>
             </p>
         </Card>
     </div>
 
     {#if data.statistics.totalHolesPlayed === 0}
         <Alert class="mt-6" role="alert">
-            Keine Spielstatistiken verfügbar. Der Spieler hat noch keine Scorecards.
+            {m.player_detail_no_stats()}
         </Alert>
     {/if}
 
     <!-- Sessions Overview -->
     <div class="mt-8" role="region" aria-labelledby="sessions-heading">
-        <h2 id="sessions-heading" class="text-xl font-bold mb-4">Gespielte Sessions</h2>
+        <h2 id="sessions-heading" class="text-xl font-bold mb-4">{m.player_detail_sessions()}</h2>
 
         {#if data.sessions && data.sessions.length > 0}
             <Table striped={true} aria-labelledby="sessions-heading">
-                <caption class="sr-only">Liste der gespielten Sessions von {data.player.firstname} {data.player.lastname}</caption>
+                <caption class="sr-only">{m.player_detail_sessions_list({ firstName: data.player.firstname, lastName: data.player.lastname })}</caption>
                 <TableHead>
-                    <TableHeadCell>Datum</TableHeadCell>
-                    <TableHeadCell>Turnier</TableHeadCell>
-                    <TableHeadCell>Löcher</TableHeadCell>
-                    <TableHeadCell>Ergebnis</TableHeadCell>
-                    <TableHeadCell>Aktionen</TableHeadCell>
+                    <TableHeadCell>{m.player_detail_date()}</TableHeadCell>
+                    <TableHeadCell>{m.player_detail_tournament()}</TableHeadCell>
+                    <TableHeadCell>{m.player_detail_holes()}</TableHeadCell>
+                    <TableHeadCell>{m.player_detail_result()}</TableHeadCell>
+                    <TableHeadCell>{m.admin_actions()}</TableHeadCell>
                 </TableHead>
                 <TableBody>
                     {#each data.sessions as session}
@@ -254,8 +255,8 @@
                             <TableBodyCell>{session.holes}</TableBodyCell>
                             <TableBodyCell>{totalScore}</TableBodyCell>
                             <TableBodyCell>
-                                <a href="/session/{session.id}" class="text-blue-600 hover:underline" aria-label="Details zur Session #{session.id} anzeigen">
-                                    Details
+                                <a href="/session/{session.id}" class="text-blue-600 hover:underline" aria-label={m.player_detail_session_details({ sessionId: session.id })}>
+                                    {m.player_detail_details()}
                                 </a>
                             </TableBodyCell>
                         </TableBodyRow>
@@ -264,7 +265,7 @@
             </Table>
         {:else}
             <Alert role="alert">
-                Der Spieler hat noch keine Löcher gespielt.
+                {m.player_detail_no_sessions()}
             </Alert>
         {/if}
     </div>
@@ -272,32 +273,32 @@
 
 <!-- Delete Confirmation Modal -->
 <Modal
-    title="Spieler löschen"
+    title={m.player_detail_delete_title()}
     bind:open={showDeleteModal}
     size="sm"
     aria-labelledby="delete-player-modal-title"
     aria-describedby="delete-player-modal-description"
 >
-    <h2 id="delete-player-modal-title" class="sr-only">Spieler löschen</h2>
+    <h2 id="delete-player-modal-title" class="sr-only">{m.player_detail_delete_title()}</h2>
     <p id="delete-player-modal-description" class="text-gray-700 dark:text-gray-400 mb-6">
-        Möchten Sie den Spieler "{data.player.firstname} {data.player.lastname}" wirklich löschen?
+        {m.player_detail_delete_confirm({ firstName: data.player.firstname, lastName: data.player.lastname })}
     </p>
     <div class="flex justify-end space-x-2">
         <Button
             color="light"
             onclick={() => showDeleteModal = false}
-            aria-label="Abbrechen und Modal schließen"
+            aria-label={m.player_detail_delete_cancel()}
         >
-            Abbrechen
+            {m.player_detail_cancel()}
         </Button>
         <form method="POST" action="?/deletePlayer" bind:this={deleteForm}>
             <Button
                 type="button"
                 color="red"
                 onclick={() => { handleDelete(); showDeleteModal = false; }}
-                aria-label="Spieler endgültig löschen"
+                aria-label={m.player_detail_delete_confirm_button()}
             >
-                Löschen
+                {m.player_detail_delete_button_text()}
             </Button>
         </form>
     </div>

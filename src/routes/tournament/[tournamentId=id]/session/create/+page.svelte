@@ -8,6 +8,7 @@
     import fuzzysearch from 'fuzzysearch-ts';
     import CreatePlayerModal from '$lib/components/CreatePlayerModal.svelte';
     import { PlusIcon } from 'lucide-svelte';
+    import { m } from "$lib/paraglide/messages";
 
     // Define player type for better type safety
     type Player = {
@@ -78,7 +79,7 @@
 </script>
 
 <div class="max-w-2xl mx-auto p-6 space-y-6">
-    <h1 class="text-2xl font-bold">➕ Neue Runde für {tournamentName}</h1>
+    <h1 class="text-2xl font-bold">➕ {m.tournament_session_create_title({ tournamentName: tournamentName })}</h1>
 
     <form
         use:enhance
@@ -87,12 +88,12 @@
         action="?/createSession"
     >
         <div>
-            <label for="player-search" class="sr-only">Spieler suchen</label>
+            <label for="player-search" class="sr-only">{m.tournament_session_create_search_label()}</label>
             <Input
                 id="player-search"
                 type="text"
                 name="search"
-                placeholder="🔍 Spieler suchen..."
+                placeholder={m.tournament_session_create_search_players()}
                 bind:value={search}
                 class="w-full"
                 aria-controls="player-list"
@@ -103,7 +104,7 @@
             id="player-list"
             class="grid grid-cols-2 sm:grid-cols-3 gap-2"
             role="group"
-            aria-label="Verfügbare Spieler"
+            aria-label={m.tournament_session_create_available_players()}
         >
             {#each filteredPlayers as player}
                 <button
@@ -115,7 +116,9 @@
                     }`}
                     onclick={() => togglePlayer(player)}
                     aria-pressed={isSelected(player.id)}
-                    aria-label={`${player.firstName} ${player.lastName} ${isSelected(player.id) ? 'auswählen' : 'abwählen'}`}
+                    aria-label={isSelected(player.id)
+                        ? m.tournament_session_create_deselect_player({ firstName: player.firstName, lastName: player.lastName })
+                        : m.tournament_session_create_select_player({ firstName: player.firstName, lastName: player.lastName })}
                 >
                     {player.firstName} {player.lastName}
                 </button>
@@ -123,14 +126,14 @@
 
             {#if filteredPlayers.length === 0}
                 <p class="col-span-full text-center text-gray-500 dark:text-gray-400 py-4">
-                    Keine Spieler gefunden
+                    {m.tournament_session_create_no_players()}
                 </p>
             {/if}
         </div>
 
         {#if !isFormValid}
             <p class="text-red-500 text-sm" role="alert">
-                Mindestens {minParticipants} Spieler erforderlich
+                {m.tournament_session_create_min_players({ minPlayerCount: minParticipants })}
             </p>
         {/if}
 
@@ -142,20 +145,20 @@
             disabled={!isFormValid}
             aria-disabled={!isFormValid}
         >
-            🏌️ Runde starten
+            {m.tournament_session_create_start()}
         </Button>
     </form>
 
     <div class="border-t pt-4 text-sm text-gray-600 dark:text-gray-400 flex items-center justify-between">
-        <span>Spieler nicht gefunden?</span>
+        <span>{m.tournament_session_create_player_not_found()}</span>
         <Button
             size="sm"
             color="blue"
             onclick={openCreatePlayerModal}
-            aria-label="Neuen Spieler hinzufügen"
+            aria-label={m.tournament_session_create_add_player()}
         >
             <PlusIcon class="mr-2 h-4 w-4" aria-hidden="true" />
-            Neuen Spieler hinzufügen
+            {m.tournament_session_create_add_player()}
         </Button>
     </div>
 

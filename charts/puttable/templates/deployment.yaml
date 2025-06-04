@@ -59,6 +59,13 @@ spec:
               {{- end }}
             - name: SUPABASE_AUTH_KEYCLOAK_URL
               value: {{ .Values.puttable.keycloak.realmUrl }}
+            {{- with .Values.puttable.sentry }}
+            - name: SENTRY_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .authToken.secretName }}
+                  key: {{ .authToken.secretKey }}
+            {{- end }}
             - name: PORT
               value: {{ .Values.service.targetPort | quote }}
 

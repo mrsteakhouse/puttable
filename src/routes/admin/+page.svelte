@@ -3,6 +3,7 @@
     import type { PageProps } from './$types';
     import { Button, Card, Input, Label, Modal, Select, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
     import { PlusIcon, TrashIcon, PencilIcon } from 'lucide-svelte';
+    import { m } from "$lib/paraglide/messages";
 
     let { data }: PageProps = $props();
 
@@ -153,28 +154,28 @@
 </script>
 
 <div class="container mx-auto p-4">
-    <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
+    <h1 class="text-3xl font-bold mb-6">{m.admin_dashboard()}</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- Users Section -->
         <Card>
-            <h2 class="text-2xl font-bold mb-4">Users</h2>
+            <h2 class="text-2xl font-bold mb-4">{m.admin_users()}</h2>
             <Table>
                 <TableHead>
-                    <TableHeadCell>Name</TableHeadCell>
-                    <TableHeadCell>Email</TableHeadCell>
-                    <TableHeadCell>Roles</TableHeadCell>
-                    <TableHeadCell>Actions</TableHeadCell>
+                    <TableHeadCell>{m.admin_name()}</TableHeadCell>
+                    <TableHeadCell>{m.admin_email()}</TableHeadCell>
+                    <TableHeadCell>{m.admin_roles_column()}</TableHeadCell>
+                    <TableHeadCell>{m.admin_actions()}</TableHeadCell>
                 </TableHead>
                 <TableBody>
                     {#each data.users as user}
                         <TableBodyRow>
-                            <TableBodyCell>{user.user_name || 'N/A'}</TableBodyCell>
+                            <TableBodyCell>{user.user_name || m.admin_na()}</TableBodyCell>
                             <TableBodyCell>{user.email}</TableBodyCell>
-                            <TableBodyCell>{user.roles?.join(', ') || 'None'}</TableBodyCell>
+                            <TableBodyCell>{user.roles?.join(', ') || m.admin_none()}</TableBodyCell>
                             <TableBodyCell>
                                 <Button size="xs" color="blue" onclick={() => openUserRoleModal(user)}>
-                                    Manage Roles
+                                    {m.admin_manage_roles()}
                                 </Button>
                             </TableBodyCell>
                         </TableBodyRow>
@@ -186,35 +187,35 @@
         <!-- Roles Section -->
         <Card>
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">Roles</h2>
+                <h2 class="text-2xl font-bold">{m.admin_roles()}</h2>
                 <Button size="sm" color="blue" onclick={openCreateRoleModal}>
                     <PlusIcon class="mr-2 h-4 w-4" />
-                    New Role
+                    {m.admin_new_role()}
                 </Button>
             </div>
             <Table>
                 <TableHead>
-                    <TableHeadCell>Name</TableHeadCell>
-                    <TableHeadCell>Description</TableHeadCell>
-                    <TableHeadCell>Permissions</TableHeadCell>
-                    <TableHeadCell>Actions</TableHeadCell>
+                    <TableHeadCell>{m.admin_name()}</TableHeadCell>
+                    <TableHeadCell>{m.admin_description()}</TableHeadCell>
+                    <TableHeadCell>{m.admin_permissions()}</TableHeadCell>
+                    <TableHeadCell>{m.admin_actions()}</TableHeadCell>
                 </TableHead>
                 <TableBody>
                     {#each data.roles as role}
                         <TableBodyRow>
                             <TableBodyCell>{role.role_name}</TableBodyCell>
-                            <TableBodyCell>{role.role_description || 'N/A'}</TableBodyCell>
+                            <TableBodyCell>{role.role_description || m.admin_na()}</TableBodyCell>
                             <TableBodyCell>
                                 {#if role.permissions}
-                                    <span class="text-xs">{role.permissions.length} permissions</span>
+                                    <span class="text-xs">{m.admin_permissions_count({ count: role.permissions.length })}</span>
                                 {:else}
-                                    <span class="text-xs">No permissions</span>
+                                    <span class="text-xs">{m.admin_no_permissions()}</span>
                                 {/if}
                             </TableBodyCell>
                             <TableBodyCell>
                                 <div class="flex space-x-2">
                                     <Button size="xs" color="blue" onclick={() => openPermissionModal(role)}>
-                                        Permissions
+                                        {m.admin_permissions()}
                                     </Button>
                                     <Button size="xs" color="light" onclick={() => openEditRoleModal(role)}>
                                         <PencilIcon class="h-4 w-4" />
@@ -237,27 +238,27 @@
     </div>
 
     <!-- User Role Modal -->
-    <Modal bind:open={userRoleModalOpen} title="Manage User Roles">
+    <Modal bind:open={userRoleModalOpen} title={m.admin_manage_user_roles()}>
         {#if selectedUser}
             <div class="space-y-4">
-                <p>Assign a role to <strong>{selectedUser.user_name || selectedUser.email}</strong></p>
+                <p>{m.admin_assign_role_to()} <strong>{selectedUser.user_name || selectedUser.email}</strong></p>
 
                 <form method="POST" action="?/assignRole" use:assignRoleForm.enhance class="space-y-4">
                     <div>
-                        <Label for="roleName">Role</Label>
+                        <Label for="roleName">{m.admin_role()}</Label>
                         <Select id="roleName" bind:value={selectedRole}>
-                            <option value="" disabled selected>Select a role</option>
+                            <option value="" disabled selected>{m.admin_select_role()}</option>
                             {#each data.roles as role}
                                 <option value={role.role_name}>{role.role_name}</option>
                             {/each}
                         </Select>
                     </div>
-                    <Button type="submit" color="blue">Assign Role</Button>
+                    <Button type="submit" color="blue">{m.admin_assign_role()}</Button>
                 </form>
 
                 <hr class="my-4" />
 
-                <h3 class="font-bold">Current Roles</h3>
+                <h3 class="font-bold">{m.admin_current_roles()}</h3>
                 {#if selectedUser.roles && selectedUser.roles.length > 0}
                     <ul class="space-y-2">
                         {#each selectedUser.roles as roleName}
@@ -267,48 +268,48 @@
                                     <form method="POST" action="?/removeRole" use:removeRoleForm.enhance>
                                         <input type="hidden" name="userId" value={selectedUser.user_id} />
                                         <input type="hidden" name="roleName" value={roleName} />
-                                        <Button size="xs" color="red" type="submit">Remove</Button>
+                                        <Button size="xs" color="red" type="submit">{m.admin_remove()}</Button>
                                     </form>
                                 {/if}
                             </li>
                         {/each}
                     </ul>
                 {:else}
-                    <p class="text-gray-500">No roles assigned</p>
+                    <p class="text-gray-500">{m.admin_no_roles_assigned()}</p>
                 {/if}
             </div>
         {/if}
     </Modal>
 
     <!-- Role Modal -->
-    <Modal bind:open={roleModalOpen} title={editingRole ? 'Edit Role' : 'Create Role'}>
+    <Modal bind:open={roleModalOpen} title={editingRole ? m.admin_edit_role() : m.admin_create_role()}>
         <form method="POST" action={editingRole ? '?/updateRole' : '?/createRole'} use:roleForm.enhance class="space-y-4">
             {#if editingRole}
                 <input type="hidden" name="roleId" value={editingRole.role_id} />
             {/if}
             <div>
-                <Label for="name">Role Name</Label>
+                <Label for="name">{m.admin_role_name()}</Label>
                 <Input id="name" name="name" bind:value={roleName} required />
             </div>
             <div>
-                <Label for="description">Description</Label>
+                <Label for="description">{m.admin_description()}</Label>
                 <Input id="description" name="description" bind:value={roleDescription} />
             </div>
-            <Button type="submit" color="blue">{editingRole ? 'Update' : 'Create'}</Button>
+            <Button type="submit" color="blue">{editingRole ? m.admin_update() : m.admin_create()}</Button>
         </form>
     </Modal>
 
     <!-- Permission Modal -->
-    <Modal bind:open={permissionModalOpen} title="Manage Permissions" size="lg">
+    <Modal bind:open={permissionModalOpen} title={m.admin_manage_permissions()} size="lg">
         {#if selectedRoleForPermissions}
             <div class="space-y-4">
-                <p>Manage permissions for role: <strong>{selectedRoleForPermissions.role_name}</strong></p>
+                <p>{m.admin_manage_permissions_for_role()} <strong>{selectedRoleForPermissions.role_name}</strong></p>
 
                 <form method="POST" action="?/assignPermission" use:assignPermissionForm.enhance class="space-y-4">
                     <div>
-                        <Label for="permissionId">Add Permission</Label>
+                        <Label for="permissionId">{m.admin_add_permission()}</Label>
                         <Select id="permissionId" bind:value={selectedPermission}>
-                            <option value="" disabled selected>Select a permission</option>
+                            <option value="" disabled selected>{m.admin_select_permission()}</option>
                             {#each data.permissions as permission}
                                 {#if !hasPermission(selectedRoleForPermissions, permission.id)}
                                     <option value={permission.id}>
@@ -318,20 +319,20 @@
                             {/each}
                         </Select>
                     </div>
-                    <Button type="submit" color="blue">Add Permission</Button>
+                    <Button type="submit" color="blue">{m.admin_add_permission()}</Button>
                 </form>
 
                 <hr class="my-4" />
 
-                <h3 class="font-bold">Current Permissions</h3>
+                <h3 class="font-bold">{m.admin_current_permissions()}</h3>
                 {#if selectedRoleForPermissions.permissions && selectedRoleForPermissions.permissions.length > 0}
                     <div class="max-h-96 overflow-y-auto">
                         <Table>
                             <TableHead>
-                                <TableHeadCell>Name</TableHeadCell>
-                                <TableHeadCell>Resource</TableHeadCell>
-                                <TableHeadCell>Action</TableHeadCell>
-                                <TableHeadCell>Actions</TableHeadCell>
+                                <TableHeadCell>{m.admin_name()}</TableHeadCell>
+                                <TableHeadCell>{m.admin_resource()}</TableHeadCell>
+                                <TableHeadCell>{m.admin_action()}</TableHeadCell>
+                                <TableHeadCell>{m.admin_actions()}</TableHeadCell>
                             </TableHead>
                             <TableBody>
                                 {#each selectedRoleForPermissions.permissions as permission}
@@ -344,7 +345,7 @@
                                                 <form method="POST" action="?/removePermission" use:removePermissionForm.enhance>
                                                     <input type="hidden" name="roleId" value={selectedRoleForPermissions.role_id} />
                                                     <input type="hidden" name="permissionId" value={permission.id} />
-                                                    <Button size="xs" color="red" type="submit">Remove</Button>
+                                                    <Button size="xs" color="red" type="submit">{m.admin_remove()}</Button>
                                                 </form>
                                             {/if}
                                         </TableBodyCell>
@@ -354,7 +355,7 @@
                         </Table>
                     </div>
                 {:else}
-                    <p class="text-gray-500">No permissions assigned</p>
+                    <p class="text-gray-500">{m.admin_no_permissions_assigned()}</p>
                 {/if}
             </div>
         {/if}

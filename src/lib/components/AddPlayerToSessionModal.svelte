@@ -4,6 +4,7 @@
     import { invalidateAll } from '$app/navigation';
     import type { SupabaseClient } from '@supabase/supabase-js';
     import type { Database } from '$lib/database.types';
+    import { m } from "$lib/paraglide/messages";
 
     // Props
     let {
@@ -68,7 +69,7 @@
     // Add players to session
     async function addPlayersToSession() {
         if (selectedPlayers.length === 0) {
-            error = 'Bitte wählen Sie mindestens einen Spieler aus.';
+            error = m.add_player_to_session_error();
             return;
         }
 
@@ -116,12 +117,12 @@
     }
 </script>
 
-<Modal title="Spieler zur Session hinzufügen" bind:open={open} size="md" autoclose={false}>
+<Modal title={m.add_player_to_session_title()} bind:open={open} size="md" autoclose={false}>
     <div class="space-y-4">
         <Input
             type="text"
             name="search"
-            placeholder="🔍 Spieler suchen..."
+            placeholder={m.add_player_to_session_search()}
             bind:value={search}
             class="w-full"
         />
@@ -134,8 +135,8 @@
             {#if filteredPlayers.length === 0}
                 <p class="text-center text-gray-500 dark:text-gray-400 py-4">
                     {availablePlayers.length === 0
-                        ? 'Alle Spieler sind bereits in dieser Session'
-                        : 'Keine Spieler gefunden'}
+                        ? m.add_player_to_session_all_players()
+                        : m.add_player_to_session_no_players()}
                 </p>
             {:else}
                 <div class="grid grid-cols-2 gap-2">
@@ -157,14 +158,14 @@
         </div>
 
         <div class="flex justify-end space-x-2 pt-4">
-            <Button type="button" color="light" onclick={closeModal}>Abbrechen</Button>
+            <Button type="button" color="light" onclick={closeModal}>{m.add_player_to_session_cancel()}</Button>
             <Button
                 type="button"
                 color="blue"
                 onclick={addPlayersToSession}
                 disabled={selectedPlayers.length === 0 || isSubmitting}
             >
-                {isSubmitting ? 'Wird hinzugefügt...' : 'Hinzufügen'}
+                {isSubmitting ? m.add_player_to_session_adding() : m.add_player_to_session_add()}
             </Button>
         </div>
     </div>

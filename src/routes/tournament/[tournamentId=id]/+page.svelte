@@ -11,6 +11,7 @@
     import { Action, Resource } from '$lib/permissions';
     import { onDestroy, onMount } from 'svelte';
     import { isManager } from '$lib/rbac';
+    import { m } from "$lib/paraglide/messages";
 
     const tournamentId = Number(page.params.tournamentId);
 
@@ -161,9 +162,10 @@
 </script>
 
 <div class="max-w-xl mx-auto p-6 py-8 space-y-6 dark:bg-gray-800 dark:rounded-lg" role="main">
-    <a href="/" class="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1" aria-label="Zurück zur Übersicht">
+    <a href="/" class="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+       aria-label={m.tournament_detail_back_aria()}>
         <ArrowLeft class="w-4 h-4" aria-hidden="true"/>
-        Zurück zur Übersicht
+        {m.tournament_detail_back()}
     </a>
 
     <h1 class="text-3xl font-bold dark:text-white" id="tournament-title">{tournament.name}</h1>
@@ -172,7 +174,7 @@
         <div class="flex items-start gap-2">
             <Calendar class="w-5 h-5 text-gray-600 dark:text-gray-400 mt-1" aria-hidden="true"/>
             <div>
-                <p class="font-medium dark:text-white">Start:</p>
+                <p class="font-medium dark:text-white">{m.tournament_detail_start()}</p>
                 <p>
                     {moment(tournament.startDateTime).format('LLLL')}
                     <br/>
@@ -187,7 +189,7 @@
         <div class="flex items-start gap-2">
             <Calendar class="w-5 h-5 text-gray-600 dark:text-gray-400 mt-1" aria-hidden="true"/>
             <div>
-                <p class="font-medium dark:text-white">Ende:</p>
+                <p class="font-medium dark:text-white">{m.tournament_detail_end()}</p>
                 <p>{moment(tournament.endDateTime).format('LLLL')}</p>
                 {#if moment(tournament.endDateTime).isAfter(moment())}
                     <span class="text-xs text-gray-500 dark:text-gray-400 italic">({moment(tournament.endDateTime).fromNow()})</span>
@@ -197,17 +199,17 @@
 
         <div class="flex items-center gap-2">
             <Users class="w-5 h-5 text-gray-600 dark:text-gray-400" aria-hidden="true"/>
-            <p class="dark:text-white">Mindestteilnehmer:</p> {tournament.minimumCompetitorsPerSession}
+            <p class="dark:text-white">{m.tournament_detail_min_participants()} {tournament.minimumCompetitorsPerSession}</p>
         </div>
 
         <div class="flex items-center gap-2">
             <Flag class="w-5 h-5 text-gray-600 dark:text-gray-400" aria-hidden="true"/>
-            <p class="dark:text-white">Lochanzahl:</p> {tournament.numberOfHoles}
+            <p class="dark:text-white">{m.tournament_detail_hole_count()} {tournament.numberOfHoles}</p>
         </div>
 
         <div class="flex items-center gap-2">
             <Award class="w-5 h-5 text-gray-600 dark:text-gray-400" aria-hidden="true"/>
-            <p class="dark:text-white">Wertungsklassen:</p>
+            <p class="dark:text-white">{m.tournament_detail_rating_classes()}</p>
             {#each tournament.ratingClasses as ratingClass}
                 <Badge large class="mx-2">{ratingClass.name}</Badge>
             {/each}
@@ -220,16 +222,18 @@
     </div>
 
 
-    <div class="flex items-center gap-2" role="toolbar" aria-label="Turnier-Aktionen">
+    <div class="flex items-center gap-2" role="toolbar" aria-label={m.tournament_detail_actions()}>
         <PermissionGuard supabase={data.supabase} resource={Resource.Tournaments} action={Action.Update}>
-            <Button color="blue" class="text-sm" href={`/tournament/${tournament.id}/edit`} aria-label="Turnier bearbeiten">
-                <span aria-hidden="true">✏️</span> Event bearbeiten
+            <Button color="blue" class="text-sm" href={`/tournament/${tournament.id}/edit`}
+                    aria-label={m.tournament_detail_edit_aria()}>
+                <span aria-hidden="true">✏️</span> {m.tournament_detail_edit()}
             </Button>
         </PermissionGuard>
         <PermissionGuard supabase={data.supabase} resource={Resource.Tournaments} action={Action.Delete}>
             <form method="POST" action="?/deleteTournament" bind:this={deleteForm}>
-                <Button type="button" color="red" class="text-sm" onclick={openDeleteModal} aria-label="Turnier löschen">
-                    <span aria-hidden="true">🗑️</span> Turnier löschen
+                <Button type="button" color="red" class="text-sm" onclick={openDeleteModal}
+                        aria-label={m.tournament_detail_delete_aria()}>
+                    <span aria-hidden="true">🗑️</span> {m.tournament_detail_delete()}
                 </Button>
             </form>
         </PermissionGuard>
@@ -240,11 +244,11 @@
     <div class="pt-10 space-y-4" role="region" aria-labelledby="rankings-heading">
         <h2 id="rankings-heading" class="text-xl font-bold flex items-center gap-2 dark:text-white">
             <Medal class="w-5 h-5 dark:text-gray-400" aria-hidden="true"/>
-            Rangliste
+            {m.tournament_detail_rankings()}
         </h2>
         {#if managerRole || moment().isAfter(tournament.endDateTime)}
             {#if playerRankingsByClass.size === 0}
-                <p class="text-gray-500 dark:text-gray-400 italic">Keine Ergebnisse verfügbar.</p>
+                <p class="text-gray-500 dark:text-gray-400 italic">{m.tournament_detail_no_results()}</p>
             {:else}
                 {#each Array.from(playerRankingsByClass.entries()) as [ratingClass, players]}
                     <div class="mb-8">
@@ -253,13 +257,14 @@
                         </h3>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left text-gray-700 dark:text-gray-300" aria-labelledby="rating-class-{ratingClass}">
-                                <caption class="sr-only">Rangliste für Wertungsklasse {ratingClass}</caption>
+                                <caption
+                                        class="sr-only">{m.tournament_detail_ranking_for_class({ ratingClass })}</caption>
                                 <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th scope="col" class="px-4 py-3">Rang</th>
-                                        <th scope="col" class="px-4 py-3">Spieler</th>
-                                        <th scope="col" class="px-4 py-3">Punkte</th>
-                                        <th scope="col" class="px-4 py-3">Einsen</th>
+                                        <th scope="col" class="px-4 py-3">{m.tournament_detail_rank()}</th>
+                                        <th scope="col" class="px-4 py-3">{m.tournament_detail_player()}</th>
+                                        <th scope="col" class="px-4 py-3">{m.tournament_detail_points()}</th>
+                                        <th scope="col" class="px-4 py-3">{m.tournament_detail_ones()}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -268,11 +273,14 @@
                                             <td class="px-4 py-2 font-medium dark:text-white">
                                                 {index + 1}.
                                                 {#if index === 0}
-                                                    <span aria-label="Gold-Medaille" role="img">🥇</span>
+                                                    <span aria-label={m.tournament_detail_gold_medal()}
+                                                          role="img">🥇</span>
                                                 {:else if index === 1}
-                                                    <span aria-label="Silber-Medaille" role="img">🥈</span>
+                                                    <span aria-label={m.tournament_detail_silver_medal()}
+                                                          role="img">🥈</span>
                                                 {:else if index === 2}
-                                                    <span aria-label="Bronze-Medaille" role="img">🥉</span>
+                                                    <span aria-label={m.tournament_detail_bronze_medal()}
+                                                          role="img">🥉</span>
                                                 {/if}
                                             </td>
                                             <td class="px-4 py-2">
@@ -291,8 +299,7 @@
                 {/each}
             {/if}
         {:else}
-            <p class="text-gray-500 dark:text-gray-400 italic">Die Rangliste wird nach Abschluss des Turniers verfügbar
-                sein.</p>
+            <p class="text-gray-500 dark:text-gray-400 italic">{m.tournament_detail_rankings_after_tournament()}</p>
         {/if}
     </div>
 
@@ -302,11 +309,11 @@
     <div class="pt-10 space-y-4" role="region" aria-labelledby="active-sessions-heading">
         <h2 id="active-sessions-heading" class="text-xl font-bold flex items-center gap-2 dark:text-white">
             <BarChart class="w-5 h-5 dark:text-gray-400" aria-hidden="true"/>
-            Aktive Runden
+            {m.tournament_detail_active_rounds()}
         </h2>
 
         {#if sessions.filter(session => !session.submissionDateTime).length === 0}
-            <p class="text-gray-500 dark:text-gray-400 italic">Keine aktiven Runden vorhanden.</p>
+            <p class="text-gray-500 dark:text-gray-400 italic">{m.tournament_detail_no_active_rounds()}</p>
         {:else}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4" role="list">
                 {#each sessions.filter(session => !session.submissionDateTime) as session}
@@ -315,19 +322,19 @@
                             <div class="flex justify-between items-start mb-2">
                                 <h3 id="session-{session.id}-heading" class="font-semibold text-lg dark:text-white">
                                     <a href={`/session/${session.id}`} class="text-blue-600 dark:text-blue-400 hover:underline">
-                                        Runde #{session.id}
+                                        {m.tournament_detail_round({ roundNumber: session.id })}
                                     </a>
                                 </h3>
                                 <Badge color="yellow" class="flex items-center gap-1">
                                     <Clock class="w-3 h-3" aria-hidden="true"/>
-                                    Aktiv
+                                    {m.tournament_detail_active()}
                                 </Badge>
                             </div>
 
                             <div class="grid grid-cols-2 gap-2 text-sm dark:text-gray-300">
                                 <div class="flex items-center gap-1">
                                     <User class="w-4 h-4 text-gray-600 dark:text-gray-400" aria-hidden="true"/>
-                                    <span>{session.scorecard.length} Spieler</span>
+                                    <span>{m.tournament_detail_players({ playerCount: session.scorecard.length })}</span>
                                 </div>
                             </div>
 
@@ -344,7 +351,7 @@
                                         {/if}
                                     {/each}
                                     {#if session.scorecard.length > 3}
-                                        <div class="text-gray-500 dark:text-gray-400">+{session.scorecard.length - 3} weitere</div>
+                                        <div class="text-gray-500 dark:text-gray-400">{m.tournament_detail_more_players({ additionalPlayerCount: session.scorecard.length - 3 })}</div>
                                     {/if}
                                 </div>
                             </div>
@@ -363,16 +370,16 @@
                 onclick={() => goto(`/tournament/${tournamentId}/session/create`)}
                 disabled={!allowStartSession}
                 aria-disabled={!allowStartSession}
-                aria-label="Neue Runde für dieses Turnier erstellen"
+                aria-label={m.tournament_detail_create_round_aria()}
             >
-                Neue Runde erstellen
+                {m.tournament_detail_create_round()}
             </Button>
             {#if !allowStartSession}
                 <Tooltip triggeredBy="#start-new-session-button" placement="bottom">
                     {#if moment().isBefore(tournament.startDateTime)}
-                        Das Turnier hat noch nicht begonnen.
+                        {m.tournament_detail_tournament_not_started()}
                     {:else if moment().isAfter(tournament.endDateTime)}
-                        Das Turnier ist bereits beendet.
+                        {m.tournament_detail_tournament_ended()}
                     {/if}
                 </Tooltip>
             {/if}
@@ -381,31 +388,31 @@
 
     <!-- Delete Confirmation Modal -->
     <Modal
-        title="Turnier löschen"
+        title={m.tournament_detail_delete_title()}
         bind:open={showDeleteModal}
         size="sm"
         aria-labelledby="delete-modal-title"
         aria-describedby="delete-modal-description"
     >
-        <h2 id="delete-modal-title" class="sr-only">Turnier löschen</h2>
+        <h2 id="delete-modal-title" class="sr-only">{m.tournament_detail_delete()}</h2>
         <p id="delete-modal-description" class="text-gray-700 dark:text-gray-400 mb-6">
-            Sind Sie sicher, dass Sie dieses Event löschen möchten? Alle zugehörigen Sessions werden ebenfalls gelöscht.
+            {m.tournament_detail_delete_confirm()}
         </p>
         <div class="flex justify-end space-x-2">
             <Button
                 color="light"
                 onclick={() => showDeleteModal = false}
-                aria-label="Abbrechen und Modal schließen"
+                aria-label={m.tournament_detail_delete_cancel()}
             >
-                Abbrechen
+                {m.tournament_detail_delete_cancel()}
             </Button>
             <Button
                 type="button"
                 color="red"
                 onclick={() => { handleDelete(); showDeleteModal = false; }}
-                aria-label="Turnier und alle zugehörigen Sessions löschen"
+                aria-label={m.tournament_detail_delete_confirm_button()}
             >
-                Löschen
+                {m.tournament_detail_delete_button()}
             </Button>
         </div>
     </Modal>

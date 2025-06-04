@@ -4,6 +4,7 @@
     import { goto } from "$app/navigation";
     import moment from "moment";
     import { marked } from "marked";
+    import { m } from "$lib/paraglide/messages";
 
     // Define tournament type for better type safety
     type Tournament = {
@@ -48,7 +49,7 @@
         <div class="flex items-start gap-2">
             <Calendar class="w-5 h-5 text-gray-600 dark:text-gray-400 mt-1" aria-hidden="true" />
             <div>
-                <p class="text-sm font-medium dark:text-white">Start:</p>
+                <p class="text-sm font-medium dark:text-white">{m.tournament_card_start()}</p>
                 <p class="text-sm text-gray-700 dark:text-gray-400">
                     {formatDate(tournament.startDateTime)}<br/>
                     {#if isInFuture(tournament.startDateTime)}
@@ -61,7 +62,7 @@
         <div class="flex items-start gap-2">
             <Calendar class="w-5 h-5 text-gray-600 dark:text-gray-400 mt-1" aria-hidden="true" />
             <div>
-                <p class="text-sm font-medium dark:text-white">Ende:</p>
+                <p class="text-sm font-medium dark:text-white">{m.tournament_card_end()}</p>
                 <p class="text-sm text-gray-700 dark:text-gray-400">
                     {formatDate(tournament.endDateTime)}
                     {#if isInPast(tournament.endDateTime)}
@@ -73,12 +74,12 @@
 
         <div class="flex items-center gap-2">
             <Users class="w-5 h-5 text-gray-600 dark:text-gray-400" aria-hidden="true" />
-            <p class="text-sm dark:text-white">Min. Teilnehmer: {tournament.minimumCompetitorsPerSession}</p>
+            <p class="text-sm dark:text-white">{m.tournament_card_min_participants({ minParticipantCount: tournament.minimumCompetitorsPerSession })}</p>
         </div>
 
         <div class="flex items-center gap-2">
             <Flag class="w-5 h-5 text-gray-600 dark:text-gray-400" aria-hidden="true" />
-            <p class="text-sm dark:text-white">Lochanzahl: {tournament.numberOfHoles}</p>
+            <p class="text-sm dark:text-white">{m.tournament_card_hole_count({ holeCount: tournament.numberOfHoles })}</p>
         </div>
 
         <div class="flex items-start gap-2">

@@ -7,6 +7,7 @@
     import CreatePlayerModal from '$lib/components/CreatePlayerModal.svelte';
     import { PlusIcon } from 'lucide-svelte';
     import type { PlayerFormSchema, SessionSchema } from '$lib/schemas';
+    import { m } from "$lib/paraglide/messages";
 
     // Define player type for better type safety
     type Player = {
@@ -76,8 +77,8 @@
 </script>
 
 <div class="max-w-2xl mx-auto p-6 space-y-6">
-    <h1 class="text-2xl font-bold">🎮 Freies Spiel erstellen</h1>
-    <p class="text-gray-600 dark:text-gray-400">Erstelle eine Session ohne Turnier und Wertungsklasse.</p>
+    <h1 class="text-2xl font-bold">🎮 {m.session_create_title()}</h1>
+    <p class="text-gray-600 dark:text-gray-400">{m.session_create_description()}</p>
 
     <form
         use:enhance
@@ -87,7 +88,7 @@
     >
         <!-- Hole Count Selection -->
         <div class="space-y-4">
-            <Label for="holeCount">Anzahl der Löcher</Label>
+            <Label for="holeCount">{m.session_create_hole_count()}</Label>
             <div class="flex items-center space-x-4">
                 <Range
                     id="holeCount"
@@ -99,7 +100,7 @@
                     aria-valuemin={1}
                     aria-valuemax={36}
                     aria-valuenow={$form.holeCount}
-                    aria-valuetext={`${$form.holeCount} Löcher`}
+                    aria-valuetext={m.session_create_hole_count_text({ holeCount: $form.holeCount ?? 0 })}
                 />
                 <span class="text-lg font-medium" aria-hidden="true">{$form.holeCount}</span>
             </div>
@@ -107,12 +108,12 @@
 
         <!-- Player Selection -->
         <div class="space-y-4">
-            <Label for="player-search">Spieler auswählen</Label>
+            <Label for="player-search">{m.session_create_select_players()}</Label>
             <Input
                 id="player-search"
                 type="text"
                 name="search"
-                placeholder="🔍 Spieler suchen..."
+                placeholder={m.session_create_search_players()}
                 bind:value={search}
                 class="w-full"
                 aria-controls="player-list"
@@ -122,7 +123,7 @@
                 id="player-list"
                 class="grid grid-cols-2 sm:grid-cols-3 gap-2"
                 role="group"
-                aria-label="Verfügbare Spieler"
+                aria-label={m.session_create_available_players()}
             >
                 {#each filteredPlayers as player}
                     <button
@@ -134,7 +135,9 @@
                         }`}
                         onclick={() => togglePlayer(player)}
                         aria-pressed={isSelected(player.id)}
-                        aria-label={`${player.firstName} ${player.lastName} ${isSelected(player.id) ? 'auswählen' : 'abwählen'}`}
+                        aria-label={isSelected(player.id)
+                            ? m.session_create_deselect_player({ firstName: player.firstName, lastName: player.lastName })
+                            : m.session_create_select_player({ firstName: player.firstName, lastName: player.lastName })}
                     >
                         {player.firstName} {player.lastName}
                     </button>
@@ -142,7 +145,7 @@
 
                 {#if filteredPlayers.length === 0}
                     <p class="col-span-full text-center text-gray-500 dark:text-gray-400 py-4">
-                        Keine Spieler gefunden
+                        {m.session_create_no_players()}
                     </p>
                 {/if}
             </div>
@@ -150,7 +153,7 @@
 
         {#if !isFormValid}
             <p class="text-red-500 text-sm" role="alert">
-                Mindestens {minParticipants} Spieler erforderlich
+                {m.session_create_min_players({ minPlayerCount: minParticipants })}
             </p>
         {/if}
 
@@ -160,20 +163,20 @@
             disabled={!isFormValid}
             aria-disabled={!isFormValid}
         >
-            🏌️ Freies Spiel starten
+            {m.session_create_start()}
         </Button>
     </form>
 
     <div class="border-t pt-4 text-sm text-gray-600 dark:text-gray-400 flex items-center justify-between">
-        <span>Spieler nicht gefunden?</span>
+        <span>{m.session_create_player_not_found()}</span>
         <Button
             size="sm"
             color="blue"
             onclick={openCreatePlayerModal}
-            aria-label="Neuen Spieler hinzufügen"
+            aria-label={m.session_create_add_player()}
         >
             <PlusIcon class="mr-2 h-4 w-4" aria-hidden="true" />
-            Neuen Spieler hinzufügen
+            {m.session_create_add_player()}
         </Button>
     </div>
 
