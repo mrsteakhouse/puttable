@@ -3,6 +3,7 @@
     import { invalidateAll } from '$app/navigation';
     import type { SupabaseClient } from '@supabase/supabase-js';
     import type { Database } from '$lib/database.types';
+    import { m } from "$lib/paraglide/messages";
 
     // Props
     let {
@@ -36,7 +37,7 @@
     // Remove player from session
     async function removePlayerFromSession() {
         if (!selectedPlayerId) {
-            error = 'Bitte wählen Sie einen Spieler aus.';
+            error = m.remove_player_from_session_error_player();
             return;
         }
 
@@ -47,7 +48,7 @@
             // Get the player's scorecard ID
             const playerToRemove = players.find(p => p.playerId === selectedPlayerId);
             if (!playerToRemove) {
-                throw new Error('Spieler nicht gefunden');
+                throw new Error(m.remove_player_from_session_error_not_found());
             }
 
             // Delete the scorecard
@@ -64,14 +65,14 @@
             // Close the modal
             closeModal();
         } catch (e) {
-            error = e instanceof Error ? e.message : 'Ein Fehler ist aufgetreten';
+            error = e instanceof Error ? e.message : m.remove_player_from_session_error_generic();
         } finally {
             isSubmitting = false;
         }
     }
 </script>
 
-<Modal title="Spieler aus Session entfernen" bind:open={open} size="md" autoclose={false}>
+<Modal title={m.remove_player_from_session_title()} bind:open={open} size="md" autoclose={false}>
     <div class="space-y-4">
         {#if error}
             <Alert color="red" class="mt-1">{error}</Alert>
@@ -79,10 +80,10 @@
 
         <div>
             <label for="player-select" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Spieler auswählen
+                {m.remove_player_from_session_select_player()}
             </label>
             <Select id="player-select" bind:value={selectedPlayerId} class="w-full" placeholder="">
-                <option value={null} disabled selected>Bitte wählen Sie einen Spieler</option>
+                <option value={null} disabled selected>{m.remove_player_from_session_select_player_placeholder()}</option>
                 {#each players as player}
                     <option value={player.playerId}>{player.playerName}</option>
                 {/each}
@@ -90,18 +91,18 @@
         </div>
 
         <p class="text-sm text-red-500">
-            Achtung: Diese Aktion kann nicht rückgängig gemacht werden. Alle Daten des Spielers in dieser Session werden gelöscht.
+            {m.remove_player_from_session_warning()}
         </p>
 
         <div class="flex justify-end space-x-2 pt-4">
-            <Button type="button" color="light" onclick={closeModal}>Abbrechen</Button>
+            <Button type="button" color="light" onclick={closeModal}>{m.remove_player_from_session_cancel()}</Button>
             <Button
                 type="button"
                 color="red"
                 onclick={removePlayerFromSession}
                 disabled={!selectedPlayerId || isSubmitting}
             >
-                {isSubmitting ? 'Wird entfernt...' : 'Entfernen'}
+                {isSubmitting ? m.remove_player_from_session_removing() : m.remove_player_from_session_remove()}
             </Button>
         </div>
     </div>

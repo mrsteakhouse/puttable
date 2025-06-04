@@ -11,6 +11,7 @@
     import { onMount } from 'svelte';
     import type { TournamentDto } from '$lib/dto';
     import { goto } from '$app/navigation';
+    import { m } from "$lib/paraglide/messages";
 
     let { data }: PageProps = $props();
 
@@ -57,25 +58,25 @@
 
 <div class="max-w-6xl mx-auto px-4 py-8 space-y-8" role="main">
     <h1 class="text-3xl font-bold text-center dark:text-white">
-        <span aria-hidden="true">📋</span> Geplante Turniere
+        <span aria-hidden="true">📋</span> {m.tournament_title()}
     </h1>
 
     <!-- 🔍 Filter -->
     <div class="max-w-md mx-auto">
-        <label for="tournament-search" class="sr-only">Turniere durchsuchen</label>
+        <label for="tournament-search" class="sr-only">{m.tournament_search_label()}</label>
         <Input
                 id="tournament-search"
-                placeholder="Name oder Beschreibung durchsuchen..."
+                placeholder={m.tournament_search_placeholder()}
                 bind:value={searchTerm}
-                aria-label="Turniere nach Name oder Beschreibung durchsuchen"
+                aria-label={m.tournament_search_aria()}
                 aria-controls="tournament-sections"/>
     </div>
 
     <div id="tournament-sections">
         <section aria-labelledby="active-tournaments-heading">
-            <h2 id="active-tournaments-heading" class="text-2xl font-semibold mb-4 dark:text-white">✅ Aktive Turniere</h2>
+            <h2 id="active-tournaments-heading" class="text-2xl font-semibold mb-4 dark:text-white">✅ {m.tournament_active()}</h2>
             {#if activeEvents.length === 0}
-                <p class="text-gray-500 dark:text-gray-400">Keine aktiven Turniere gefunden.</p>
+                <p class="text-gray-500 dark:text-gray-400">{m.tournament_active_empty()}</p>
             {:else}
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="list">
                     {#each activeEvents as event}
@@ -86,9 +87,9 @@
         </section>
 
         <section aria-labelledby="upcoming-tournaments-heading">
-            <h2 id="upcoming-tournaments-heading" class="text-2xl font-semibold mt-12 mb-4 dark:text-white">📅 Bevorstehende Turniere</h2>
+            <h2 id="upcoming-tournaments-heading" class="text-2xl font-semibold mt-12 mb-4 dark:text-white">📅 {m.tournament_upcoming()}</h2>
             {#if futureEvents.length === 0}
-                <p class="text-gray-500 dark:text-gray-400">Keine zukünftigen Turniere gefunden.</p>
+                <p class="text-gray-500 dark:text-gray-400">{m.tournament_upcoming_empty()}</p>
             {:else}
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="list">
                     {#each futureEvents as event}
@@ -99,9 +100,9 @@
         </section>
 
         <section aria-labelledby="past-tournaments-heading">
-            <h2 id="past-tournaments-heading" class="text-2xl font-semibold mt-12 mb-4 dark:text-white">⌛ Vergangene Turniere</h2>
+            <h2 id="past-tournaments-heading" class="text-2xl font-semibold mt-12 mb-4 dark:text-white">⌛ {m.tournament_past()}</h2>
             {#if pastEvents.length === 0}
-                <p class="text-gray-500 dark:text-gray-400">Keine vergangenen Turniere gefunden.</p>
+                <p class="text-gray-500 dark:text-gray-400">{m.tournament_past_empty()}</p>
             {:else}
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 opacity-80" role="list">
                     {#each pastEvents as event}
@@ -119,10 +120,10 @@
                     outline
                     class="me-2 w-70 h-12"
                     size="lg"
-                    aria-label="Neues Turnier erstellen"
+                    aria-label={m.tournament_create_aria()}
             >
                 <CirclePlusSolid class="me-2" aria-hidden="true"/>
-                Turnier erstellen
+                {m.tournament_create()}
             </Button>
         </PermissionGuard>
     </div>

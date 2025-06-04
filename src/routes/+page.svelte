@@ -34,7 +34,7 @@
                     onclick={handleLogin}
                     size="lg"
                     class="w-full cursor-pointer"
-                    aria-label="Bei Puttable anmelden"
+                    aria-label={m.landing_page_login_button_aria()}
             >
                 {m.landing_page_login_button()}
             </Button>

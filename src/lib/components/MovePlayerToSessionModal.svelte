@@ -3,6 +3,7 @@
     import { invalidateAll } from '$app/navigation';
     import type { SupabaseClient } from '@supabase/supabase-js';
     import type { Database } from '$lib/database.types';
+    import { m } from "$lib/paraglide/messages";
 
     // Props
     let {
@@ -50,10 +51,10 @@
 
             availableSessions = data.map(session => ({
                 id: session.id,
-                name: session.tournament ? session.tournament.name : 'Freies Spiel'
+                name: session.tournament ? session.tournament.name : m.move_player_to_session_free_play()
             }));
         } catch (e) {
-            error = e instanceof Error ? e.message : 'Fehler beim Laden der Sessions';
+            error = e instanceof Error ? e.message : m.move_player_to_session_error_loading();
         } finally {
             isLoading = false;
         }
@@ -67,12 +68,12 @@
     // Move player to another session
     async function movePlayerToSession() {
         if (!selectedPlayerId) {
-            error = 'Bitte wählen Sie einen Spieler aus.';
+            error = m.move_player_to_session_error_player();
             return;
         }
 
         if (!selectedSessionId) {
-            error = 'Bitte wählen Sie eine Ziel-Session aus.';
+            error = m.move_player_to_session_error_session();
             return;
         }
 
@@ -83,7 +84,7 @@
             // Get the player's scorecard ID
             const playerToMove = players.find(p => p.playerId === selectedPlayerId);
             if (!playerToMove) {
-                throw new Error('Spieler nicht gefunden');
+                throw new Error(m.move_player_to_session_error_not_found());
             }
 
             // Get the number of holes in the target session
@@ -125,14 +126,14 @@
             // Close the modal
             closeModal();
         } catch (e) {
-            error = e instanceof Error ? e.message : 'Ein Fehler ist aufgetreten';
+            error = e instanceof Error ? e.message : m.move_player_to_session_error_generic();
         } finally {
             isSubmitting = false;
         }
     }
 </script>
 
-<Modal title="Spieler zu anderer Session verschieben" bind:open={open} size="md" autoclose={false}>
+<Modal title={m.move_player_to_session_title()} bind:open={open} size="md" autoclose={false}>
     <div class="space-y-4">
         {#if error}
             <Alert color="red" class="mt-1">{error}</Alert>
@@ -140,10 +141,10 @@
 
         <div>
             <label for="player-select" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Spieler auswählen
+                {m.move_player_to_session_select_player()}
             </label>
             <Select id="player-select" bind:value={selectedPlayerId} class="w-full">
-                <option value={null} disabled selected>Bitte wählen Sie einen Spieler</option>
+                <option value={null} disabled selected>{m.move_player_to_session_select_player_placeholder()}</option>
                 {#each players as player}
                     <option value={player.playerId}>{player.playerName}</option>
                 {/each}
@@ -152,15 +153,15 @@
 
         <div>
             <label for="session-select" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Ziel-Session auswählen
+                {m.move_player_to_session_select_session()}
             </label>
             {#if isLoading}
-                <p class="text-sm text-gray-500">Lade Sessions...</p>
+                <p class="text-sm text-gray-500">{m.move_player_to_session_loading()}</p>
             {:else if availableSessions.length === 0}
-                <p class="text-sm text-gray-500">Keine anderen Sessions verfügbar</p>
+                <p class="text-sm text-gray-500">{m.move_player_to_session_no_sessions()}</p>
             {:else}
                 <Select id="session-select" bind:value={selectedSessionId} class="w-full" placeholder="">
-                    <option value={null} disabled selected>Bitte wählen Sie eine Session</option>
+                    <option value={null} disabled selected>{m.move_player_to_session_select_session_placeholder()}</option>
                     {#each availableSessions as session}
                         <option value={session.id}>{session.name} (ID: {session.id})</option>
                     {/each}
@@ -169,14 +170,14 @@
         </div>
 
         <div class="flex justify-end space-x-2 pt-4">
-            <Button type="button" color="light" onclick={closeModal}>Abbrechen</Button>
+            <Button type="button" color="light" onclick={closeModal}>{m.move_player_to_session_cancel()}</Button>
             <Button
                 type="button"
                 color="blue"
                 onclick={movePlayerToSession}
                 disabled={!selectedPlayerId || !selectedSessionId || isSubmitting || availableSessions.length === 0}
             >
-                {isSubmitting ? 'Wird verschoben...' : 'Verschieben'}
+                {isSubmitting ? m.move_player_to_session_moving() : m.move_player_to_session_move()}
             </Button>
         </div>
     </div>

@@ -3,6 +3,7 @@
     import { superForm, type SuperValidated } from 'sveltekit-superforms';
     import type { RatingClassDto } from '$lib/dto';
     import type { PlayerFormSchema } from '$lib/schemas';
+    import { m } from "$lib/paraglide/messages";
 
     // Props
     let {
@@ -46,10 +47,10 @@
     }
 </script>
 
-<Modal title="Spieler anlegen" bind:open={open} size="md" autoclose={false}>
+<Modal title={m.create_player_modal_title()} bind:open={open} size="md" autoclose={false}>
     <form method="POST" action="?/createPlayer" use:enhance class="space-y-4">
         <div>
-            <Label for="firstName">Vorname</Label>
+            <Label for="firstName">{m.create_player_modal_first_name()}</Label>
             <Input
                 id="firstName"
                 name="firstName"
@@ -65,7 +66,7 @@
         </div>
 
         <div>
-            <Label for="lastName">Nachname</Label>
+            <Label for="lastName">{m.create_player_modal_last_name()}</Label>
             <Input
                 id="lastName"
                 name="lastName"
@@ -81,7 +82,7 @@
         </div>
 
         <div>
-            <Label for="ratingClassId">Wertungsklasse</Label>
+            <Label for="ratingClassId">{m.create_player_modal_rating_class()}</Label>
             <Select
                 id="ratingClassId"
                 name="ratingClassId"
@@ -91,7 +92,7 @@
                 aria-describedby={$errors.ratingClassId ? 'ratingClassId-error' : undefined}
                 placeholder=""
             >
-                <option selected value={-1} disabled>Wertungsklasse auswählen</option>
+                <option selected value={-1} disabled>{m.create_player_modal_select_rating_class()}</option>
                 {#each ratingClasses as ratingClass}
                     <option value={ratingClass.id}>{ratingClass.name}</option>
                 {/each}
@@ -102,8 +103,8 @@
         </div>
 
         <div class="flex justify-end space-x-2 pt-4">
-            <Button type="button" color="light" onclick={closeModal}>Abbrechen</Button>
-            <Button type="submit" color="blue">Speichern</Button>
+            <Button type="button" color="light" onclick={closeModal}>{m.create_player_modal_cancel()}</Button>
+            <Button type="submit" color="blue">{m.create_player_modal_save()}</Button>
         </div>
     </form>
 </Modal>
