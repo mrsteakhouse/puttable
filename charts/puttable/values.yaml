@@ -30,6 +30,10 @@ ingress:
 # Environment variables for the application
 puttable:
   baseUrl:
+#  sentry:
+#    authToken:
+#      secretName: sentry
+#      secretKey: orgToken
   supabase:
     url: 'supabase-url'
     apiKey:
