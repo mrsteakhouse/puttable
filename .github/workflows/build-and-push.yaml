@@ -89,7 +89,7 @@ jobs:
       - name: Set package version
         if: steps.appVersion.outputs.changed == 'true'
         run: |
-          npm version ${{ steps.appVersion.outputs.version }}
+          npm version ${{ steps.appVersion.outputs.version }} --no-git-tag-version
 
       - name: Commit app version
         if: steps.appVersion.outputs.changed == 'true'
