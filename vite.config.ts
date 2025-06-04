@@ -1,15 +1,23 @@
-import { paraglideVitePlugin } from '@inlang/paraglide-js'
+import { sentrySvelteKit } from "@sentry/sveltekit";
+import { paraglideVitePlugin } from "@inlang/paraglide-js";
 import tailwindcss from "@tailwindcss/vite";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 export default defineConfig({
   plugins: [
+    sentrySvelteKit({
+      sourceMapsUploadOptions: {
+        org: "ozma-org",
+        project: "javascript-sveltekit",
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+      },
+    }),
     paraglideVitePlugin({
-      project: './i18n.inlang',
-      outdir: './src/lib/paraglide',
-      strategy: ["cookie", "url", 'baseLocale'],
+      project: "./i18n.inlang",
+      outdir: "./src/lib/paraglide",
+      strategy: ["cookie", "url", "baseLocale"],
       urlPatterns: [
         {
           pattern: "/:path(.*)?",
@@ -23,9 +31,9 @@ export default defineConfig({
           ],
         },
       ],
-
     }),
     tailwindcss(),
     sveltekit(),
-    nodePolyfills()],
+    nodePolyfills(),
+  ],
 });
