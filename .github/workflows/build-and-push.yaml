@@ -127,6 +127,7 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           push: true
+          build-args: "PUTTABLE_APP_VERSION=v${{ needs.version.outputs.version }}"
           tags: |
             ghcr.io/mrsteakhouse/puttable:latest
             ghcr.io/mrsteakhouse/puttable:${{ needs.version.outputs.version }}

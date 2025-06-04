@@ -11,6 +11,11 @@ RUN npm ci
 # Copy the rest of the application
 COPY . .
 
+ARG PUTTABLE_APP_VERSION
+ENV PUTTABLE_APP_VERSION=${PUTTABLE_APP_VERSION:-devenv}
+
+ENV NODE_ENV=production
+
 # Build the application
 RUN npm run build
 RUN npm prune --omit=dev
@@ -29,7 +34,6 @@ ENV HOST=0.0.0.0
 ENV PORT=3000
 ENV BASE_PATH=http://localhost:$PORT
 ENV CHECK_ORIGIN=true
-ENV NODE_ENV=production
 
 # Set default environment variables (can be overridden at runtime)
 ENV PUBLIC_SUPABASE_URL=public-supabase-url

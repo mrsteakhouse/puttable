@@ -1,6 +1,9 @@
 services:
   puttable:
-    build: .
+    build:
+      context: .
+      args:
+        PUTTABLE_APP_VERSION: "local"
     ports:
       - "5173:5173"
     environment:
