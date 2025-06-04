@@ -13,7 +13,7 @@ COPY . .
 
 # Build the application
 RUN npm run build
-RUN npm prune --production
+RUN npm prune --omit=dev
 
 # Production stage
 FROM node:20-alpine AS production
