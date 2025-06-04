@@ -14,9 +14,12 @@ export default defineConfig({
         {
           pattern: "/:path(.*)?",
           localized: [
-            ["de", "/de/:path(.*)?"],
-            // ✅ make sure to match the least specific path last
             ["en", "/en/:path(.*)?"],
+            ["fr", "/fr/:path(.*)?"],
+            ["es", "/es/:path(.*)?"],
+            ["it", "/it/:path(.*)?"],
+            // ✅ make sure to match the least specific path last
+            ["de", "/:path(.*)?"],
           ],
         },
       ],
