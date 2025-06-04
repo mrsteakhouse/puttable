@@ -16,6 +16,9 @@
   "nav_logout": "Logout",
   "language_german": "German",
   "language_english": "English",
+  "language_spanish": "Spanish",
+  "language_italian": "Italian",
+  "language_french": "French",
 
   "admin_dashboard": "Admin Dashboard",
   "admin_users": "Users",

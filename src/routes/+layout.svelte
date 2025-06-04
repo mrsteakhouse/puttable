@@ -70,7 +70,17 @@
             <Dropdown simple>
                 {#each locales as locale}
                     <DropdownItem onclick={() => changeLocale(locale)} class="cursor-pointer {locale === currentLocale ? 'font-bold' : ''}">
-                        {locale === 'de' ? m.language_german() : m.language_english()}
+                        {#if locale === 'de'}
+                            {m.language_german()}
+                        {:else if locale === 'en'}
+                            {m.language_english()}
+                        {:else if locale === 'es'}
+                            {m.language_spanish()}
+                        {:else if locale === 'it'}
+                            {m.language_italian()}
+                        {:else if locale === 'fr'}
+                            {m.language_french()}
+                        {/if}
                     </DropdownItem>
                 {/each}
             </Dropdown>
