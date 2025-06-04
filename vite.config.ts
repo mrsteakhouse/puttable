@@ -13,6 +13,7 @@ export default defineConfig({
         project: "puttable",
         authToken: process.env.SENTRY_AUTH_TOKEN,
       },
+      autoUploadSourceMaps: true,
     }),
     paraglideVitePlugin({
       project: "./i18n.inlang",

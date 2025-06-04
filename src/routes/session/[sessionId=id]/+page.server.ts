@@ -6,6 +6,7 @@ import type { QueryData } from '@supabase/supabase-js';
 import type { Actions } from './$types';
 import { hasPermission } from '$lib/rbac';
 import { Action, Resource } from '$lib/permissions';
+import * as Sentry from '@sentry/sveltekit'
 
 export const load: PageServerLoad = async ({ locals: { supabase }, params }) => {
     if (!await hasPermission(supabase, Resource.Sessions, Action.Read)) {
@@ -21,7 +22,9 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
     type ScoreCardQuery = QueryData<typeof scoreCardQuery>;
 
     const { data, error: sErr } = await scoreCardQuery;
-    if (sErr || !data || data.length === 0) throw fail(404, { message: 'Session nicht gefunden' });
+    if (sErr || !data || data.length === 0) {
+        return fail(404, { message: 'Session nicht gefunden' });
+    }
 
     const typedData: ScoreCardQuery = data;
 
@@ -92,6 +95,7 @@ export const actions: Actions = {
 
         if (sessionError) {
             console.error('Error getting session:', sessionError);
+            Sentry.captureException(sessionError);
             return { success: false, error: sessionError.message };
         }
 
@@ -116,6 +120,7 @@ export const actions: Actions = {
 
         if (sessionDeleteError) {
             console.error('Error deleting session:', sessionDeleteError);
+            Sentry.captureException(sessionDeleteError);
             return { success: false, error: sessionDeleteError.message };
         }
 
