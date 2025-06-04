@@ -6,11 +6,12 @@ import { sequence } from "@sveltejs/kit/hooks";
 import { env } from "$env/dynamic/public";
 import type { Database } from "$lib/database.types";
 import { paraglideMiddleware } from "$lib/paraglide/server";
+import packageJson from '../package.json';
 
 Sentry.init({
   dsn: "https://7f56af0e95599f25c04183a3cdb320d3@o4509439160156160.ingest.de.sentry.io/4509439161335888",
   tracesSampleRate: 1,
-  release: 'v' + process.env.npm_package_version,
+  release: 'v' + packageJson.version,
 });
 
 const supabase: Handle = async ({ event, resolve }) => {

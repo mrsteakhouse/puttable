@@ -1,5 +1,7 @@
 import { handleErrorWithSentry, replayIntegration } from "@sentry/sveltekit";
 import * as Sentry from "@sentry/sveltekit";
+import packageJson from '../package.json';
+
 
 Sentry.init({
   dsn: "https://7f56af0e95599f25c04183a3cdb320d3@o4509439160156160.ingest.de.sentry.io/4509439161335888",
@@ -17,7 +19,7 @@ Sentry.init({
   // If you don't want to use Session Replay, just remove the line below:
   integrations: [replayIntegration()],
 
-  release: 'v' + process.env.npm_package_version,
+  release: 'v' + packageJson.version,
 });
 
 // If you have a custom error handler, pass it to `handleErrorWithSentry`
