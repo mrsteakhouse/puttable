@@ -19,7 +19,7 @@ services:
     depends_on:
       - keycloak
     networks:
-      - supabase_studio_puttable
+      - supabase_network_puttable
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
@@ -37,8 +37,8 @@ services:
       - ./keycloak/puttable-realm.json:/opt/keycloak/data/import/puttable-realm.json
       - ./keycloak/themes:/opt/keycloak/themes
     networks:
-      - supabase_studio_puttable
+      - supabase_network_puttable
 
 networks:
-  supabase_studio_puttable:
+  supabase_network_puttable:
     external: true
