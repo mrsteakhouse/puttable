@@ -3,6 +3,8 @@
     import type { PageProps } from './$types'
     import { env } from '$env/dynamic/public';
     import { m } from "$lib/paraglide/messages"
+    import * as Sentry from "@sentry/sveltekit";
+
 
     let { data }: PageProps = $props();
 
@@ -17,6 +19,7 @@
 
         if (error) {
             console.error('Login error:', error);
+            Sentry.captureMessage(error.message);
         }
     }
 </script>

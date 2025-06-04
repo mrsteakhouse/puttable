@@ -10,7 +10,7 @@ import { paraglideMiddleware } from "$lib/paraglide/server";
 Sentry.init({
   dsn: "https://7f56af0e95599f25c04183a3cdb320d3@o4509439160156160.ingest.de.sentry.io/4509439161335888",
   tracesSampleRate: 1,
-  release: process.env.npm_package_version,
+  release: 'v' + process.env.npm_package_version,
 });
 
 const supabase: Handle = async ({ event, resolve }) => {

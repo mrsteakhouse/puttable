@@ -2,6 +2,8 @@ import { PlayerDto, RatingClassDto, SessionDto, type TournamentDto } from '$lib/
 import type { LayoutServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
 import { TOURNAMENT_VIEW } from '$lib/dependables';
+import * as Sentry from "@sentry/sveltekit";
+
 
 export const load: LayoutServerLoad = async ({params, locals: {supabase}}) => {
     let {data, error} = await supabase
@@ -10,9 +12,9 @@ export const load: LayoutServerLoad = async ({params, locals: {supabase}}) => {
         .eq('id', params.tournamentId)
         .single();
 
-    if (error && !data) {
-        fail(500, {message: error.message})
-        return;
+    if (error || !data) {
+        Sentry.captureException(error);
+        throw fail(500, {message: error?.message})
     }
 
     const ratingClassesResult = await supabase

@@ -9,6 +9,7 @@ import { z } from 'zod';
 import type { RatingClassDto } from '$lib/dto';
 import { hasPermission } from '$lib/rbac';
 import { Action, Resource } from '$lib/permissions';
+import * as Sentry from "@sentry/sveltekit";
 
 // Create a schema for the player creation form
 const playerFormSchema = z.object({
@@ -36,9 +37,9 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params, paren
         .select()
         .in('rating_class_id', ratingClassIds);
 
-    if (error && !data) {
-        fail(500, { message: error.message });
-        return;
+    if (error || !data) {
+        Sentry.captureException(error);
+        throw fail(500, { message: error?.message });
     }
 
     const players = data.map(player => {

@@ -1,7 +1,8 @@
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { canAccessResource, hasPermission } from '$lib/rbac';
+import { hasPermission } from '$lib/rbac';
 import { Action, Resource } from '$lib/permissions';
+import * as Sentry from "@sentry/sveltekit";
 
 export const load: PageServerLoad = async ({ locals: {supabase} }) => {
     if (!await hasPermission(supabase, Resource.Tournaments, Action.Read)) {
@@ -22,6 +23,7 @@ export const actions: Actions = {
 
         if (sessionsError) {
             console.error('Error deleting sessions:', sessionsError);
+            Sentry.captureException(sessionsError);
             return { success: false, error: sessionsError.message };
         }
 
@@ -33,6 +35,7 @@ export const actions: Actions = {
 
         if (ratingClassesError) {
             console.error('Error deleting rating classes associations:', ratingClassesError);
+            Sentry.captureException(ratingClassesError);
             return { success: false, error: ratingClassesError.message };
         }
 
@@ -44,6 +47,7 @@ export const actions: Actions = {
 
         if (tournamentError) {
             console.error('Error deleting tournament:', tournamentError);
+            Sentry.captureException(tournamentError);
             return { success: false, error: tournamentError.message };
         }
 

@@ -6,6 +6,7 @@ import type { RatingClassDto } from '$lib/dto';
 import { type PlayerFormSchema, playerFormSchema } from '$lib/schemas';
 import { hasPermission } from '$lib/rbac';
 import { Action, Resource } from '$lib/permissions';
+import * as Sentry from "@sentry/sveltekit";
 
 export const load: PageServerLoad = async ({ locals: { supabase } }) => {
     // Check if user is authenticated
@@ -33,6 +34,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
         .order('lastname', { 'ascending': true });
 
     if (playersError) {
+        Sentry.captureException(playersError);
         return fail(500, { message: playersError.message });
     }
 
@@ -42,6 +44,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
         .select();
 
     if (ratingClassesError) {
+        Sentry.captureException(ratingClassesError);
         return fail(500, { message: ratingClassesError.message });
     }
 
@@ -83,6 +86,7 @@ export const actions: Actions = {
             .single();
 
         if (error) {
+            Sentry.captureException(error);
             return fail(500, {
                 form,
                 message: error.message

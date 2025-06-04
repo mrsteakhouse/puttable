@@ -17,7 +17,7 @@ Sentry.init({
   // If you don't want to use Session Replay, just remove the line below:
   integrations: [replayIntegration()],
 
-  release: "v17.3.0",
+  release: 'v' + process.env.npm_package_version,
 });
 
 // If you have a custom error handler, pass it to `handleErrorWithSentry`

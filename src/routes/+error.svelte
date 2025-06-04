@@ -1,5 +1,8 @@
 <script>
     import { page } from '$app/state';
+    import * as Sentry from "@sentry/sveltekit";
+
+    Sentry.captureMessage(page.error?.message ?? 'unexpected error');
 </script>
 
 <div class="error-container">

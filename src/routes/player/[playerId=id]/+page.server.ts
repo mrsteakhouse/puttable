@@ -6,6 +6,7 @@ import { playerFormSchema, type PlayerFormSchema } from '$lib/schemas';
 import { SessionDto } from '$lib/dto';
 import { canAccessResource } from '$lib/rbac';
 import { Action, Resource } from '$lib/permissions';
+import * as Sentry from "@sentry/sveltekit";
 
 export const load: PageServerLoad = async ({ params, locals: { supabase } }) => {
     // Check if user is authenticated
@@ -190,7 +191,7 @@ export const actions: Actions = {
         const playerId = parseInt(params.playerId);
 
         if (isNaN(playerId)) {
-            return fail(400, { message: 'Invalid player ID' });
+            return fail(404, { message: 'Invalid player ID' });
         }
 
         // Validate form data
@@ -211,6 +212,7 @@ export const actions: Actions = {
             .eq('id', playerId);
 
         if (updateError) {
+            Sentry.captureException(updateError);
             return fail(500, {
                 form,
                 message: updateError.message
@@ -235,6 +237,7 @@ export const actions: Actions = {
             .eq('id', playerId);
 
         if (deleteError) {
+            Sentry.captureException(deleteError);
             return fail(500, { message: deleteError.message });
         }
 

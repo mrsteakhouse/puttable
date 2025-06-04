@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import * as Sentry from "@sentry/sveltekit";
 
 export const load: PageServerLoad = async ({ locals: { session, supabase } }) => {
     // Redirect if not logged in
@@ -52,6 +53,10 @@ export const actions: Actions = {
             p_role_name: roleName
         });
 
+        if (error) {
+            Sentry.captureException(error);
+        }
+
         return { success: !error, error: error?.message };
     },
 
@@ -68,6 +73,10 @@ export const actions: Actions = {
             p_user_id: userId,
             p_role_name: roleName
         });
+
+        if (error) {
+            Sentry.captureException(error);
+        }
 
         return { success: !error, error: error?.message };
     },
@@ -86,6 +95,10 @@ export const actions: Actions = {
             p_name: name,
             p_description: description || ''
         });
+
+        if (error) {
+            Sentry.captureException(error);
+        }
 
         return { success: !error, error: error?.message };
     },
@@ -107,6 +120,10 @@ export const actions: Actions = {
             p_description: description || ''
         });
 
+        if (error) {
+            Sentry.captureException(error);
+        }
+
         return { success: !error, error: error?.message };
     },
 
@@ -122,6 +139,10 @@ export const actions: Actions = {
         const { error } = await supabase.rpc('delete_role', {
             p_role_id: roleId
         });
+
+        if (error) {
+            Sentry.captureException(error);
+        }
 
         return { success: !error, error: error?.message };
     },
@@ -141,6 +162,10 @@ export const actions: Actions = {
             p_permission_id: permissionId
         });
 
+        if (error) {
+            Sentry.captureException(error);
+        }
+
         return { success: !error, error: error?.message };
     },
 
@@ -158,6 +183,10 @@ export const actions: Actions = {
             p_role_id: roleId,
             p_permission_id: permissionId
         });
+
+        if (error) {
+            Sentry.captureException(error);
+        }
 
         return { success: !error, error: error?.message };
     }

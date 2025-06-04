@@ -14,6 +14,7 @@
     import RemovePlayerFromSessionModal from '$lib/components/RemovePlayerFromSessionModal.svelte';
     import { ArrowRightIcon, PlusIcon, TrashIcon } from 'lucide-svelte';
     import { m } from "$lib/paraglide/messages";
+    import * as Sentry from "@sentry/sveltekit";
 
     let { data }: PageProps = $props();
     const supabase = $derived(data.supabase);
@@ -142,10 +143,14 @@
             return;
         }
 
-        await supabase
+        const { error } = await supabase
             .from('sessions')
             .update({ submitted_at: moment().toISOString() })
             .eq('id', session.id);
+
+        if (error) {
+            Sentry.captureException(error);
+        }
 
         await invalidateAll();
     }

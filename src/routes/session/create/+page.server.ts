@@ -7,10 +7,11 @@ import { playerFormSchema, type SessionSchema, sessionSchema } from "$lib/schema
 import type { RatingClassDto } from '$lib/dto';
 import { hasPermission } from '$lib/rbac';
 import { Action, Resource } from '$lib/permissions';
+import * as Sentry from "@sentry/sveltekit";
 
 export const load: PageServerLoad = async ({ locals: { supabase } }) => {
     if (!await hasPermission(supabase, Resource.Sessions, Action.Create)) {
-        throw redirect(303, '/');
+        return redirect(303, '/');
     }
 
     // Fetch all players
@@ -18,8 +19,8 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
         .select();
 
     if (playersError) {
-        fail(500, { message: playersError.message });
-        return;
+        Sentry.captureException(playersError);
+        return fail(500, { message: playersError.message });
     }
 
     const players = playersData.map(player => {
@@ -36,8 +37,8 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
         .select();
 
     if (ratingClassesError) {
-        fail(500, { message: ratingClassesError.message });
-        return;
+        Sentry.captureException(ratingClassesError);
+        return fail(500, { message: ratingClassesError.message });
     }
 
     // Format rating classes for the dropdown in the player creation modal
@@ -80,6 +81,7 @@ export const actions: Actions = {
             .single();
 
         if (sErr || !session) {
+            Sentry.captureException(sErr);
             return fail(500, { message: sErr?.message, form });
         }
 
@@ -93,6 +95,7 @@ export const actions: Actions = {
         const { error } = await supabase.from('scorecards').insert(scorecardInserts);
 
         if (error) {
+            Sentry.captureException(error);
             return fail(500, { message: error.message, form });
         }
 
@@ -120,6 +123,7 @@ export const actions: Actions = {
             .single();
 
         if (error) {
+            Sentry.captureException(error);
             return fail(500, {
                 form,
                 message: error.message

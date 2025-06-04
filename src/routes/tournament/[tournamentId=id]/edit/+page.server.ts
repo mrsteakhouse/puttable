@@ -4,11 +4,11 @@ import { superValidate, type SuperValidated } from 'sveltekit-superforms';
 import { type TournamentSchema, tournamentSchema } from '$lib/schemas';
 import { zod } from 'sveltekit-superforms/adapters';
 import moment from 'moment/moment';
-import { DATETIME_WITH_TIMEZONE } from '$lib/constants';
 import type { TournamentDto } from '$lib/dto';
 import { patchRatingClasses } from '$lib/server/RatingClassesPatcher';
 import { hasPermission } from '$lib/rbac';
 import { Action, Resource } from '$lib/permissions';
+import * as Sentry from "@sentry/sveltekit";
 
 export const load: PageServerLoad = async ({ parent, locals: { supabase } }) => {
     if (!await hasPermission(supabase, Resource.Tournaments, Action.Update)) {
@@ -60,6 +60,7 @@ export const actions = {
 
         if (error) {
             console.error(error);
+            Sentry.captureException(error);
             return fail(400, { form });
         }
 
@@ -71,6 +72,7 @@ export const actions = {
 
         if (deleteError) {
             console.error('Error deleting rating class associations:', deleteError);
+            Sentry.captureException(deleteError);
             return fail(400, { form });
         }
 
@@ -97,6 +99,7 @@ export const actions = {
 
             if (insertError) {
                 console.error('Error creating rating class associations:', insertError);
+                Sentry.captureException(insertError);
                 return fail(400, { form });
             }
         }

@@ -4,9 +4,9 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { tournamentSchema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms';
 import moment from 'moment';
-import { DATETIME_WITH_TIMEZONE } from '$lib/constants';
 import { RatingClassDto } from '$lib/dto';
 import { patchRatingClasses } from '$lib/server/RatingClassesPatcher';
+import * as Sentry from "@sentry/sveltekit";
 
 export const load: PageServerLoad = async ({ locals: { supabase }, parent }) => {
     const form = await superValidate(zod(tournamentSchema));
@@ -54,6 +54,7 @@ export const actions = {
 
         if (error || !data) {
             console.error(error);
+            Sentry.captureException(error);
             return fail(400, { form });
         }
 
@@ -80,6 +81,7 @@ export const actions = {
 
             if (insertError) {
                 console.error('Error creating rating class associations:', insertError);
+                Sentry.captureException(insertError);
                 return fail(400, { form });
             }
         }
