@@ -15,7 +15,8 @@ const config = {
 		adapter: adapter(),
 
 		version: {
-			name: process.env.PUTTABLE_APP_VERSION || "test"
+			name: process.env.PUTTABLE_APP_VERSION || "test",
+			pollInterval: 60000
 		},
 
 		// Configuration for reverse proxy support
