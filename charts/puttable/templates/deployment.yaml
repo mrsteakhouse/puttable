@@ -44,6 +44,8 @@ spec:
               {{- end }}
             - name: PUBLIC_SITE_BASE_URL
               value: {{ .Values.puttable.baseUrl }}
+            - name: BASE_PATH
+              value: {{ .Values.puttable.baseUrl }}
             - name: PUBLIC_SUPABASE_AUTH_KEYCLOAK_REDIRECT_URI
               value: {{ .Values.puttable.keycloak.redirectUri }}
             - name: SUPABASE_AUTH_KEYCLOAK_CLIENT_ID
