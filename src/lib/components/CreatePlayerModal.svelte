@@ -47,7 +47,7 @@
     }
 </script>
 
-<Modal title={m.create_player_modal_title()} bind:open={open} size="md" autoclose={false}>
+<Modal title={m.create_player_modal_title()} bind:open={open} size="md" class="overflow-hidden" autoclose={false}>
     <form method="POST" action="?/createPlayer" use:enhance class="space-y-4">
         <div>
             <Label for="firstName">{m.create_player_modal_first_name()}</Label>
