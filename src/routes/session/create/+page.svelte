@@ -20,7 +20,7 @@
     let { data }: PageProps = $props();
 
     // Form handling
-    const { form, enhance } = superForm<SessionSchema>(data.form as SuperValidated<SessionSchema>, {
+    const { form, enhance, submitting } = superForm<SessionSchema>(data.form as SuperValidated<SessionSchema>, {
         dataType: 'json'
     });
 
@@ -160,8 +160,8 @@
         <Button
             type="submit"
             class="w-full"
-            disabled={!isFormValid}
-            aria-disabled={!isFormValid}
+            disabled={!isFormValid || $submitting}
+            aria-disabled={!isFormValid || $submitting}
         >
             {m.session_create_start()}
         </Button>
