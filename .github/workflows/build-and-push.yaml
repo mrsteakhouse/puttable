@@ -234,6 +234,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: sourcemaps
+          path: ./build
       - name: Create Sentry release
         uses: getsentry/action-release@v3
         env:
