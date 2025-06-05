@@ -3,4 +3,4 @@ name: puttable
 description: A Helm charts for Puttable application
 type: application
 version: 1.0.6
-appVersion: 18.5.0
+appVersion: 18.8.0
