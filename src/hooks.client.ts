@@ -1,6 +1,5 @@
-import { handleErrorWithSentry, replayIntegration } from "@sentry/sveltekit";
+import { feedbackIntegration, handleErrorWithSentry, replayIntegration } from "@sentry/sveltekit";
 import * as Sentry from "@sentry/sveltekit";
-import packageJson from '../package.json';
 import { version } from '$app/environment';
 
 
@@ -18,7 +17,14 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0,
 
   // If you don't want to use Session Replay, just remove the line below:
-  integrations: [replayIntegration()],
+  integrations: [
+      replayIntegration(),
+      feedbackIntegration({
+        // Additional SDK configuration goes in here, for example:
+        colorScheme: "system",
+        autoInject: false,
+      }),
+  ],
 
   release: version,
 });

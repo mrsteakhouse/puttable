@@ -1,15 +1,27 @@
 <script lang="ts">
     import '../app.css';
     import { page } from "$app/state";
-    import { DarkMode, Dropdown, DropdownItem, Navbar, NavBrand, NavHamburger, NavLi, NavUl } from "flowbite-svelte";
+    import {
+        Button,
+        DarkMode,
+        Dropdown,
+        DropdownItem,
+        Navbar,
+        NavBrand,
+        NavHamburger,
+        NavLi,
+        NavUl
+    } from "flowbite-svelte";
     import { ChevronDownOutline, GlobeOutline } from 'flowbite-svelte-icons';
 
     import { onMount } from 'svelte'
     import { goto, invalidate } from '$app/navigation'
     import PermissionGuard from '$lib/components/PermissionGuard.svelte';
     import { Action, Resource } from '$lib/permissions';
-    import { getLocale, setLocale, locales } from '$lib/paraglide/runtime.js';
+    import { getLocale, locales, setLocale } from '$lib/paraglide/runtime.js';
     import { m } from "$lib/paraglide/messages";
+    import * as Sentry from '@sentry/sveltekit';
+    import { MessageCircleHeartIcon } from 'lucide-svelte';
 
     let { data, children } = $props()
 
@@ -37,6 +49,15 @@
 
     const changeLocale = (locale: any) => {
         setLocale(locale);
+    }
+
+    async function showFeedbackModal() {
+        const feedback = Sentry.getFeedback();
+        const form = await feedback?.createForm();
+        if (form) {
+            form.appendToDom();
+            form.open();
+        }
     }
 </script>
 
@@ -116,3 +137,10 @@
 <div class="text-gray-900 dark:text-white text-base font-medium tracking-tight p-8">
     {@render children()}
 </div>
+{#if !(userLoggedIn ?? true)}
+    <div class="fixed right-2 bottom-2">
+        <Button class="shadow-2xl rounded-4xl mr-4" onclick={showFeedbackModal} color="gray" aria-label="Feedback">
+            <MessageCircleHeartIcon aria-hidden="true"/>
+        </Button>
+    </div>
+{/if}
