@@ -7,14 +7,7 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 export default defineConfig({
   plugins: [
-    sentrySvelteKit({
-      sourceMapsUploadOptions: {
-        org: "ozma-org",
-        project: "puttable",
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-      },
-      autoUploadSourceMaps: true,
-    }),
+    sentrySvelteKit(),
     paraglideVitePlugin({
       project: "./i18n.inlang",
       outdir: "./src/lib/paraglide",
