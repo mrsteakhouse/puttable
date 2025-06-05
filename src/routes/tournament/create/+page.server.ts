@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from "./$types";
-import { fail, redirect } from "@sveltejs/kit";
+import { error, fail, redirect } from "@sveltejs/kit";
 import { zod } from 'sveltekit-superforms/adapters';
 import { tournamentSchema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms';
@@ -11,12 +11,12 @@ import * as Sentry from "@sentry/sveltekit";
 export const load: PageServerLoad = async ({ locals: { supabase }, parent }) => {
     const form = await superValidate(zod(tournamentSchema));
 
-    const { data, error } = await supabase
+    const { data, error: err } = await supabase
         .from('rating_classes')
         .select();
 
-    if (error) {
-        throw fail(404, {message: "Keine Wertungsklassen gefunden"})
+    if (err) {
+        error(404, { message: "Keine Wertungsklassen gefunden" })
     }
 
     const ratingClasses: RatingClassDto[] = data?.map(ratingClass => {

@@ -1,7 +1,6 @@
-// src/routes/tournaments/[id]/sessions/create/+page.server.ts
 import { superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail, redirect, error } from '@sveltejs/kit';
 import { zod } from "sveltekit-superforms/adapters";
 import type { SuperValidated } from "sveltekit-superforms";
 import { type SessionSchema, sessionSchema } from "$lib/schemas";
@@ -27,19 +26,19 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params, paren
     const tournament = layoutData.tournament;
 
     if (tournament == null) {
-        return fail(404, { message: "Turnier nicht gefunden" })
+        error(404, { message: "Turnier nicht gefunden" })
     }
 
     const ratingClassIds = tournament.ratingClasses.map(rc => rc.id);
 
     // Fetch players for the tournament's rating classes
-    const { data, error } = await supabase.from('players')
+    const { data, error: err } = await supabase.from('players')
         .select()
         .in('rating_class_id', ratingClassIds);
 
-    if (error || !data) {
+    if (err || !data) {
         Sentry.captureException(error);
-        throw fail(500, { message: error?.message });
+        throw fail(500, { message: err?.message });
     }
 
     const players = data.map(player => {

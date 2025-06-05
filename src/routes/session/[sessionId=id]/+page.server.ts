@@ -1,6 +1,6 @@
 // src/routes/sessions/[id]/+page.server.ts
 import type { PageServerLoad } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { type SessionDto } from '$lib/dto';
 import type { QueryData } from '@supabase/supabase-js';
 import type { Actions } from './$types';
@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
 
     const { data, error: sErr } = await scoreCardQuery;
     if (sErr || !data || data.length === 0) {
-        return fail(404, { message: 'Session nicht gefunden' });
+        error(404, { message: 'Session nicht gefunden' });
     }
 
     const typedData: ScoreCardQuery = data;
@@ -34,7 +34,7 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
         .select('id, firstname, lastname');
 
     if (playersError) {
-        console.error('Error fetching players:', playersError);
+        error(500, playersError?.message);
     }
 
     // Format players for the add player modal

@@ -191,7 +191,7 @@ export const actions: Actions = {
         const playerId = parseInt(params.playerId);
 
         if (isNaN(playerId)) {
-            return fail(404, { message: 'Invalid player ID' });
+            error(404, { message: 'Invalid player ID' });
         }
 
         // Validate form data
@@ -227,7 +227,7 @@ export const actions: Actions = {
         const playerId = parseInt(params.playerId);
 
         if (isNaN(playerId)) {
-            return fail(400, { message: 'Invalid player ID' });
+            error(400, { message: 'Invalid player ID' });
         }
 
         // Delete player
@@ -238,7 +238,7 @@ export const actions: Actions = {
 
         if (deleteError) {
             Sentry.captureException(deleteError);
-            return fail(500, { message: deleteError.message });
+            error(500, { message: deleteError.message });
         }
 
         // Redirect to player list

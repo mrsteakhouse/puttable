@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { RatingClassDto } from '$lib/dto';
@@ -35,7 +35,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 
     if (playersError) {
         Sentry.captureException(playersError);
-        return fail(500, { message: playersError.message });
+        error(500, { message: playersError.message });
     }
 
     // Fetch all rating classes for the dropdown
@@ -45,7 +45,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 
     if (ratingClassesError) {
         Sentry.captureException(ratingClassesError);
-        return fail(500, { message: ratingClassesError.message });
+        error(500, { message: ratingClassesError.message });
     }
 
     // Format rating classes for the dropdown

@@ -1,6 +1,6 @@
 import { superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { zod } from "sveltekit-superforms/adapters";
 import type { SuperValidated } from "sveltekit-superforms";
 import { playerFormSchema, type SessionSchema, sessionSchema } from "$lib/schemas";
@@ -20,7 +20,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 
     if (playersError) {
         Sentry.captureException(playersError);
-        return fail(500, { message: playersError.message });
+        error(500, { message: playersError.message });
     }
 
     const players = playersData.map(player => {
@@ -38,7 +38,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 
     if (ratingClassesError) {
         Sentry.captureException(ratingClassesError);
-        return fail(500, { message: ratingClassesError.message });
+        error(500, { message: ratingClassesError.message });
     }
 
     // Format rating classes for the dropdown in the player creation modal

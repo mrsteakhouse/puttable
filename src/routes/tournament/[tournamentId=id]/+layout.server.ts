@@ -1,18 +1,16 @@
 import { PlayerDto, RatingClassDto, SessionDto, type TournamentDto } from '$lib/dto';
+import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import { fail } from '@sveltejs/kit';
-import * as Sentry from "@sentry/sveltekit";
-
 
 export const load: LayoutServerLoad = async ({params, locals: {supabase}}) => {
-    let {data, error} = await supabase
+    let {data, error: err} = await supabase
         .from('tournaments')
         .select()
         .eq('id', params.tournamentId)
         .single();
 
-    if (error || !data) {
-        return fail(404, {message: "Not Found"})
+    if (err || !data) {
+        error(404, {message: "Not Found"})
     }
 
     const ratingClassesResult = await supabase

@@ -1,4 +1,4 @@
-import { type Actions, fail, redirect } from '@sveltejs/kit';
+import { type Actions, error, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { superValidate, type SuperValidated } from 'sveltekit-superforms';
 import { type TournamentSchema, tournamentSchema } from '$lib/schemas';
@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ parent, locals: { supabase } }) => 
     const { tournament: data } = await parent();
     const tournament = data as TournamentDto
     if (!tournament) {
-        return fail(404, { message: "Not found" });
+        error(404, { message: "Not found" });
     }
 
     const form: SuperValidated<TournamentSchema> = await superValidate({
