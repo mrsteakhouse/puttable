@@ -1,7 +1,6 @@
 import { PlayerDto, RatingClassDto, SessionDto, type TournamentDto } from '$lib/dto';
 import type { LayoutServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
-import { TOURNAMENT_VIEW } from '$lib/dependables';
 import * as Sentry from "@sentry/sveltekit";
 
 
@@ -13,8 +12,7 @@ export const load: LayoutServerLoad = async ({params, locals: {supabase}}) => {
         .single();
 
     if (error || !data) {
-        Sentry.captureException(error);
-        throw fail(500, {message: error?.message})
+        return fail(404, {message: "Not Found"})
     }
 
     const ratingClassesResult = await supabase

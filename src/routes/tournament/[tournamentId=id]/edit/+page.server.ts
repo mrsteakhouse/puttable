@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ parent, locals: { supabase } }) => 
     const { tournament: data } = await parent();
     const tournament = data as TournamentDto
     if (!tournament) {
-        fail(404, { message: "Turnier nicht gefunden" });
+        return fail(404, { message: "Not found" });
     }
 
     const form: SuperValidated<TournamentSchema> = await superValidate({

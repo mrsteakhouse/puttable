@@ -24,9 +24,11 @@
     let addRatingClassError = $state(false);
 
     // Form handling
-    const { form, errors, constraints, enhance } = superForm(formData, {
+    const { form, errors, constraints, enhance, submitting, allErrors } = superForm(formData, {
         dataType: 'json'
     });
+
+    let isFormValid = $derived($allErrors.length === 0)
 
     /**
      * Toggle a rating class selection
@@ -278,7 +280,9 @@
 
         <!-- Submit Button -->
         <div class="grid col-span-2">
-            <Button type="submit" class="w-full">
+            <Button type="submit" class="w-full"
+                disabled={!isFormValid || $submitting}
+                aria-disabled={!isFormValid || $submitting}>
                 {isEdit ? m.tournament_form_save() : m.tournament_form_create_button()}
             </Button>
         </div>
@@ -290,6 +294,7 @@
     title={m.tournament_form_add_rating_class_title()}
     bind:open={addRatingClassIsOpen}
     autoclose={false}
+    class="overflow-hidden"
 >
     <form
         method="dialog"
