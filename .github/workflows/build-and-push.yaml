@@ -244,4 +244,4 @@ jobs:
         with:
           environment: production
           release: "v${{ needs.version.outputs.version }}"
-          sourcemaps: ~/build/**/*.js.map ~/build/**/*.js
+          sourcemaps: '~/build'
