@@ -243,5 +243,5 @@ jobs:
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
           environment: production
-          version: "v${{ needs.version.outputs.version }}"
+          release: "v${{ needs.version.outputs.version }}"
           sourcemaps: "./build/**/*.js.map"
