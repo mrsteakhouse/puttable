@@ -7,10 +7,20 @@ import { env } from "$env/dynamic/public";
 import type { Database } from "$lib/database.types";
 import { paraglideMiddleware } from "$lib/paraglide/server";
 import { version } from '$app/environment';
+import { nodeProfilingIntegration } from '@sentry/profiling-node';
 
 Sentry.init({
   dsn: "https://7f56af0e95599f25c04183a3cdb320d3@o4509439160156160.ingest.de.sentry.io/4509439161335888",
-  tracesSampleRate: 1,
+  integrations: [
+    nodeProfilingIntegration(),
+  ],
+  // Tracing must be enabled for profiling to work
+  tracesSampleRate: 1.0, //  Capture 100% of the transactions
+  // Set sampling rate for profiling - this is evaluated only once per SDK.init call
+  profileSessionSampleRate: 1.0,
+  // Trace lifecycle automatically enables profiling during active traces
+  profileLifecycle: 'trace',
+
   release: version,
 });
 

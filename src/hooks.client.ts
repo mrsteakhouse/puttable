@@ -1,5 +1,5 @@
-import { feedbackIntegration, handleErrorWithSentry, replayIntegration } from "@sentry/sveltekit";
 import * as Sentry from "@sentry/sveltekit";
+import { feedbackIntegration, handleErrorWithSentry, replayIntegration } from "@sentry/sveltekit";
 import { version } from '$app/environment';
 
 

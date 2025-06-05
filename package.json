@@ -30,7 +30,8 @@
     "zod": "^3.25.20"
   },
   "dependencies": {
-    "@sentry/sveltekit": "^9.25.1",
+    "@sentry/profiling-node": "^9.26.0",
+    "@sentry/sveltekit": "^9.26.0",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.7",
     "@svelte-plugins/datepicker": "^1.0.11",
