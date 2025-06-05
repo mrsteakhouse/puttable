@@ -15,7 +15,7 @@ const config = {
 		adapter: adapter(),
 
 		version: {
-			name: process.env.PUTTABLE_APP_VERSION
+			name: process.env.PUTTABLE_APP_VERSION || "test"
 		},
 
 		// Configuration for reverse proxy support
