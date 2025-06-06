@@ -19,7 +19,6 @@
   "language_spanish": "Spanisch",
   "language_italian": "Italienisch",
   "language_french": "Französisch",
-
   "admin_dashboard": "Admin-Dashboard",
   "admin_users": "Benutzer",
   "admin_roles": "Rollen",
@@ -56,9 +55,7 @@
   "admin_resource": "Ressource",
   "admin_action": "Aktion",
   "admin_no_permissions_assigned": "Keine Berechtigungen zugewiesen",
-
   "auth_login_error": "Anmeldefehler",
-
   "player_title": "Spieler",
   "player_create_button_aria": "Neuen Spieler anlegen",
   "player_create_button": "Spieler anlegen",
@@ -69,7 +66,6 @@
   "player_rating_class_mobile": "Wertungsklasse: {ratingClass}",
   "player_none": "Keine",
   "player_not_found": "Keine Spieler gefunden.",
-
   "tournament_title": "Geplante Turniere",
   "tournament_search_label": "Turniere durchsuchen",
   "tournament_search_placeholder": "Name oder Beschreibung durchsuchen...",
@@ -82,7 +78,6 @@
   "tournament_past_empty": "Keine vergangenen Turniere gefunden.",
   "tournament_create_aria": "Neues Turnier erstellen",
   "tournament_create": "Turnier erstellen",
-
   "player_detail_back": "Zurück zur Spielerliste",
   "player_detail_back_aria": "Zurück zur Spielerliste",
   "player_detail_edit_heading": "Spieler bearbeiten",
@@ -116,7 +111,6 @@
   "player_detail_delete_cancel": "Abbrechen und Modal schließen",
   "player_detail_delete_confirm_button": "Spieler endgültig löschen",
   "player_detail_delete_button_text": "Löschen",
-
   "session_for": "Session für {tournamentName}",
   "session_overview": "Übersicht",
   "session_player": "Spieler",
@@ -144,7 +138,6 @@
   "session_delete_confirm": "Sind Sie sicher, dass Sie diese Session löschen möchten? Alle zugehörigen Scorecards werden ebenfalls gelöscht.",
   "session_cancel": "Abbrechen",
   "session_delete_button": "Löschen",
-
   "session_create_title": "Freies Spiel erstellen",
   "session_create_description": "Erstelle eine Session ohne Turnier und Wertungsklasse.",
   "session_create_hole_count": "Anzahl der Löcher",
@@ -159,7 +152,6 @@
   "session_create_start": "🏌️ Freies Spiel starten",
   "session_create_player_not_found": "Spieler nicht gefunden?",
   "session_create_add_player": "Neuen Spieler hinzufügen",
-
   "tournament_session_create_title": "Neue Runde für {tournamentName}",
   "tournament_session_create_search_label": "Spieler suchen",
   "tournament_session_create_search_players": "🔍 Spieler suchen...",
@@ -171,7 +163,6 @@
   "tournament_session_create_start": "🏌️ Runde starten",
   "tournament_session_create_player_not_found": "Spieler nicht gefunden?",
   "tournament_session_create_add_player": "Neuen Spieler hinzufügen",
-
   "add_player_to_session_title": "Spieler zur Session hinzufügen",
   "add_player_to_session_search": "🔍 Spieler suchen...",
   "add_player_to_session_error": "Bitte wählen Sie mindestens einen Spieler aus.",
@@ -180,7 +171,6 @@
   "add_player_to_session_cancel": "Abbrechen",
   "add_player_to_session_adding": "Wird hinzugefügt...",
   "add_player_to_session_add": "Hinzufügen",
-
   "move_player_to_session_title": "Spieler zu anderer Session verschieben",
   "move_player_to_session_error_player": "Bitte wählen Sie einen Spieler aus.",
   "move_player_to_session_error_session": "Bitte wählen Sie eine Ziel-Session aus.",
@@ -197,7 +187,6 @@
   "move_player_to_session_cancel": "Abbrechen",
   "move_player_to_session_moving": "Wird verschoben...",
   "move_player_to_session_move": "Verschieben",
-
   "remove_player_from_session_title": "Spieler aus Session entfernen",
   "remove_player_from_session_error_player": "Bitte wählen Sie einen Spieler aus.",
   "remove_player_from_session_error_not_found": "Spieler nicht gefunden",
@@ -208,7 +197,6 @@
   "remove_player_from_session_cancel": "Abbrechen",
   "remove_player_from_session_removing": "Wird entfernt...",
   "remove_player_from_session_remove": "Entfernen",
-
   "tournament_detail_back": "Zurück zur Übersicht",
   "tournament_detail_back_aria": "Zurück zur Übersicht",
   "tournament_detail_start": "Start:",
@@ -247,7 +235,6 @@
   "tournament_detail_delete_cancel": "Abbrechen und Modal schließen",
   "tournament_detail_delete_confirm_button": "Turnier und alle zugehörigen Sessions löschen",
   "tournament_detail_delete_button": "Löschen",
-
   "tournament_form_back": "Zurück zur Ansicht",
   "tournament_form_back_to_tournament": "Zurück zum Turnier",
   "tournament_form_back_to_overview": "Zurück zur Übersicht",
@@ -269,12 +256,10 @@
   "tournament_form_rating_class_name": "Name",
   "tournament_form_rating_class_error": "Wertungsklasse existiert bereits oder ist leer.",
   "tournament_form_add_button": "Hinzufügen",
-
   "tournament_card_start": "Start:",
   "tournament_card_end": "Ende:",
   "tournament_card_min_participants": "Min. Teilnehmer: {minParticipantCount}",
   "tournament_card_hole_count": "Lochanzahl: {holeCount}",
-
   "create_player_modal_title": "Spieler anlegen",
   "create_player_modal_first_name": "Vorname",
   "create_player_modal_last_name": "Nachname",
