@@ -4,6 +4,8 @@ services:
       context: .
       args:
         PUTTABLE_APP_VERSION: "local"
+    ports:
+      - "5173:5173"
     env_file:
       - .env.local
     environment:
@@ -15,7 +17,6 @@ services:
       - PORT=5173
       - BASE_PATH=http://localhost:5173/
       - CHECK_ORIGIN=false
-    network_mode: host
     depends_on:
       - keycloak
 

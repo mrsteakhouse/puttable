@@ -16,12 +16,15 @@ jobs:
       - run: |
           npm install
           npm run build --if-present
-      - name: 'Upload sourcemaps'
+      - name: Upload application files
         uses: actions/upload-artifact@v4
         with:
-          name: sourcemaps
-          path: ./build
-          retention-days: 1
+          name: application
+          path: |
+            ./build
+            ./.svelte-kit
+            ./node_modules
+          retention-days: 3
 
   chartLint:
     runs-on: ubuntu-latest
@@ -107,6 +110,33 @@ jobs:
           git commit -am "update app version"
           git push
 
+#  build:
+#    needs:
+#      - version
+#    runs-on: ubuntu-latest
+#    environment: docker
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Use Node.js
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: '24.x'
+#      - name: build app
+#        env:
+#          PUTTABLE_APP_VERSION: v${{ needs.version.outputs.version }}
+#        run: |
+#          npm install
+#          npm run build --if-present
+#      - name: Upload application files
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: application
+#          path: |
+#            ./build
+#            ./.svelte-kit
+#            ./node_modules
+#          retention-days: 3
+
   docker:
     needs:
       - version
@@ -129,6 +159,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+#      - name: Download application artifact
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: application
+#          path: .
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -136,6 +172,7 @@ jobs:
           push: true
           build-args: |
             PUTTABLE_APP_VERSION=v${{ needs.version.outputs.version }}
+#          file: ./ci.Dockerfile
           tags: |
             ghcr.io/mrsteakhouse/puttable:latest
             ghcr.io/mrsteakhouse/puttable:${{ needs.version.outputs.version }}
@@ -233,8 +270,8 @@ jobs:
       - name: Download sourcemap artifact
         uses: actions/download-artifact@v4
         with:
-          name: sourcemaps
-          path: ./build
+          name: application
+          path: .
       - name: Create Sentry release
         uses: getsentry/action-release@v3
         env:
