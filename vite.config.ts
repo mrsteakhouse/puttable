@@ -7,7 +7,9 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 export default defineConfig({
   plugins: [
-    sentrySvelteKit(),
+    sentrySvelteKit({
+      autoUploadSourceMaps: false
+    }),
     paraglideVitePlugin({
       project: "./i18n.inlang",
       outdir: "./src/lib/paraglide",
