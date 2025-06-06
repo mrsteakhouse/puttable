@@ -17,6 +17,7 @@ ENV PUTTABLE_APP_VERSION=${PUTTABLE_APP_VERSION:-devenv}
 ENV NODE_ENV=production
 
 # Build the application
+RUN npm run check
 RUN npm run build
 RUN npm prune --omit=dev
 
