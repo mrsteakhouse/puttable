@@ -163,6 +163,8 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.chartVersion.outputs.changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -182,6 +184,7 @@ jobs:
           bump_each_commit: 'true'
 
       - name: Set charts version
+        if: steps.chartVersion.outputs.changed == 'true'
         run: |
           sed -i 's/^\(version: \).*$/\1${{ steps.chartVersion.outputs.version }}/gm' charts/puttable/Chart.yaml
 
