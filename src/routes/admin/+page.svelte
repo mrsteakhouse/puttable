@@ -1,9 +1,23 @@
 <script lang="ts">
     import { superForm } from 'sveltekit-superforms/client';
     import type { PageProps } from './$types';
-    import { Button, Card, Input, Label, Modal, Select, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
-    import { PlusIcon, TrashIcon, PencilIcon } from 'lucide-svelte';
+    import {
+        Button,
+        Card,
+        Input,
+        Label,
+        Modal,
+        Select,
+        Table,
+        TableBody,
+        TableBodyCell,
+        TableBodyRow,
+        TableHead,
+        TableHeadCell
+    } from 'flowbite-svelte';
+    import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-svelte';
     import { m } from "$lib/paraglide/messages";
+    import { undefined } from 'zod';
 
     let { data }: PageProps = $props();
 
@@ -58,12 +72,14 @@
         id: 'assignRole',
         dataType: 'json',
         resetForm: true,
-        onSubmit: ({ form, data, cancel }) => {
+        onSubmit: ({ jsonData, cancel }) => {
             if (!selectedUser || !selectedRole) {
                 cancel();
             }
-            form.userId = selectedUser.user_id;
-            form.roleName = selectedRole;
+            jsonData({
+                userId: selectedUser.user_id,
+                roleName: selectedRole
+            });
         },
         onResult: ({ result }) => {
             if (result.type === 'success') {
@@ -90,15 +106,19 @@
         id: 'roleForm',
         dataType: 'json',
         resetForm: true,
-        onSubmit: ({ form, cancel }) => {
+        onSubmit: ({ jsonData, cancel }) => {
             if (!roleName) {
                 cancel();
             }
-            form.name = roleName;
-            form.description = roleDescription;
-            if (editingRole) {
-                form.roleId = editingRole.role_id;
+            let postData = {
+                name: roleName,
+                description: roleDescription,
+                roleId: undefined
             }
+            if (editingRole) {
+                postData.roleId = editingRole.role_id;
+            }
+            jsonData(postData);
         },
         onResult: ({ result }) => {
             if (result.type === 'success') {
@@ -125,12 +145,14 @@
         id: 'assignPermission',
         dataType: 'json',
         resetForm: true,
-        onSubmit: ({ form, data, cancel }) => {
+        onSubmit: ({ jsonData, cancel }) => {
             if (!selectedRoleForPermissions || !selectedPermission) {
                 cancel();
             }
-            form.roleId = selectedRoleForPermissions.role_id;
-            form.permissionId = parseInt(selectedPermission);
+            jsonData({
+                roleId: selectedRoleForPermissions.role_id,
+                permissionId: parseInt(selectedPermission)
+            });
         },
         onResult: ({ result }) => {
             if (result.type === 'success') {

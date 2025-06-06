@@ -92,7 +92,8 @@
                 .from('sessions')
                 .select('id, tournament:tournaments(number_of_holes), scorecards(data)')
                 .eq('id', selectedSessionId)
-                .single();
+                .single()
+                .overrideTypes<{ scorecards: { data: number[] }[] }>();
 
             if (sessionError) throw new Error(sessionError.message);
 
