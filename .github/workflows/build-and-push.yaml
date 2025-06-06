@@ -58,6 +58,7 @@ jobs:
 
   version:
     needs:
+      - testApp
       - chartLint
     permissions:
       contents: write
