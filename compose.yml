@@ -9,6 +9,7 @@ services:
     env_file:
       - .env.supabase-anon-key # This file is supposed to contain the supabase anon as PUBLIC_SUPABASE_ANON_KEY
     environment:
+      - PUBLIC_SITE_BASE_URL=http://localhost:5173
       - PUBLIC_SUPABASE_URL=http://api.supabase.internal:8000
       - BASE_PATH=http://localhost:5173/
     depends_on:
