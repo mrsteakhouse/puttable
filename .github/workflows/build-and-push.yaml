@@ -114,6 +114,7 @@ jobs:
     permissions:
       packages: write
       contents: read
+    if: ${{ needs.version.outputs.changed == 'true' }}
     steps:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -146,6 +147,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    if: ${{ needs.version.outputs.changed == 'true' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -201,6 +203,7 @@ jobs:
     permissions:
       pages: write
       contents: write
+    if: ${{ needs.chartVersion.outputs.changed == 'true' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -221,10 +224,10 @@ jobs:
 
   sentry-release:
     needs:
-      - chart
+      - docker
       - version
-      - tag
     runs-on: ubuntu-latest
+    if: ${{ needs.version.outputs.changed == 'true' }}
     steps:
       - uses: actions/checkout@v4
         with:
