@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
 
     const scoreCardQuery = supabase
         .from('sessions')
-        .select("id, submitted_at, tournament:tournaments(id, name, number_of_holes), scorecards(id, data, player:players(id, firstname, lastname))")
+        .select("id, submitted_at, tournament:tournaments(id, name, number_of_holes, end_date), scorecards(id, data, player:players(id, firstname, lastname))")
         .eq('id', params.sessionId)
         .single();
 
@@ -56,6 +56,7 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
         id: typedData.id,
         tournamentId: isFreeplay ? null : typedData.tournament.id,
         tournamentName: isFreeplay ? "Freies Spiel" : typedData.tournament.name,
+        tournamentEndDateTime: isFreeplay ? '' : typedData.tournament.end_date,
         holes: holes,
         submissionDateTime: typedData.submitted_at,
         isFreeplay: isFreeplay,

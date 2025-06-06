@@ -235,6 +235,8 @@
   "tournament_detail_delete_cancel": "Annuler et fermer la fenêtre",
   "tournament_detail_delete_confirm_button": "Supprimer le tournoi et toutes les sessions associées",
   "tournament_detail_delete_button": "Supprimer",
+  "tournament_detail_warning": "Attention !",
+  "tournament_detail_minutes_remaining": "Seulement {minutes} minutes restantes jusqu'à la fin du tournoi.",
   "tournament_form_back": "Retour à la vue",
   "tournament_form_back_to_tournament": "Retour au tournoi",
   "tournament_form_back_to_overview": "Retour à l'aperçu",

@@ -280,9 +280,7 @@
 
         <!-- Submit Button -->
         <div class="grid col-span-2">
-            <Button type="submit" class="w-full"
-                disabled={!isFormValid || $submitting}
-                aria-disabled={!isFormValid || $submitting}>
+            <Button type="submit" class="w-full">
                 {isEdit ? m.tournament_form_save() : m.tournament_form_create_button()}
             </Button>
         </div>

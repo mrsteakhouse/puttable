@@ -30,15 +30,17 @@ export class SessionDto {
     scorecard: ScoreCardDto[];
     submissionDateTime: string | null;
     tournamentName: string;
+    tournamentEndDateTime: string | null;
     holes: number;
     isFreeplay: boolean;
 
-    constructor(id: number, tournamentId: number | null, scorecard: ScoreCardDto[], submissionDateTime: string | null, tournamentName: string, holes: number, isFreeplay: boolean = false) {
+    constructor(id: number, tournamentId: number | null, scorecard: ScoreCardDto[], submissionDateTime: string | null, tournamentName: string, tournamentEndDateTime: string | null, holes: number, isFreeplay: boolean = false) {
         this.id = id;
         this.tournamentId = tournamentId;
         this.scorecard = scorecard;
         this.submissionDateTime = submissionDateTime;
         this.tournamentName = tournamentName;
+        this.tournamentEndDateTime = tournamentEndDateTime;
         this.holes = holes;
         this.isFreeplay = isFreeplay;
     }

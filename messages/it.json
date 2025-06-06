@@ -235,6 +235,8 @@
   "tournament_detail_delete_cancel": "Annulla e chiudi modale",
   "tournament_detail_delete_confirm_button": "Elimina torneo e tutte le sessioni associate",
   "tournament_detail_delete_button": "Elimina",
+  "tournament_detail_warning": "Attenzione!",
+  "tournament_detail_minutes_remaining": "Solo {minutes} minuti rimanenti alla fine del torneo.",
   "tournament_form_back": "Torna alla vista",
   "tournament_form_back_to_tournament": "Torna al torneo",
   "tournament_form_back_to_overview": "Torna alla panoramica",

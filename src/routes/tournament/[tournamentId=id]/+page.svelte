@@ -306,61 +306,73 @@
     <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Read}>
 
         <!-- Sessions Overview Section -->
-    <div class="pt-10 space-y-4" role="region" aria-labelledby="active-sessions-heading">
-        <h2 id="active-sessions-heading" class="text-xl font-bold flex items-center gap-2 dark:text-white">
-            <BarChart class="w-5 h-5 dark:text-gray-400" aria-hidden="true"/>
-            {m.tournament_detail_active_rounds()}
-        </h2>
+        <div class="pt-10 space-y-4" role="region" aria-labelledby="active-sessions-heading">
+            <h2 id="active-sessions-heading" class="text-xl font-bold flex items-center gap-2 dark:text-white">
+                <BarChart class="w-5 h-5 dark:text-gray-400" aria-hidden="true"/>
+                {m.tournament_detail_active_rounds()}
+            </h2>
 
-        {#if sessions.filter(session => !session.submissionDateTime).length === 0}
-            <p class="text-gray-500 dark:text-gray-400 italic">{m.tournament_detail_no_active_rounds()}</p>
-        {:else}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" role="list">
-                {#each sessions.filter(session => !session.submissionDateTime) as session}
-                    <Card class="hover:shadow-lg transition-shadow dark:bg-gray-800" role="listitem">
-                        <div class="p-2">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 id="session-{session.id}-heading" class="font-semibold text-lg dark:text-white">
-                                    <a href={`/session/${session.id}`} class="text-blue-600 dark:text-blue-400 hover:underline">
-                                        {m.tournament_detail_round({ roundNumber: session.id })}
-                                    </a>
-                                </h3>
-                                <Badge color="yellow" class="flex items-center gap-1">
-                                    <Clock class="w-3 h-3" aria-hidden="true"/>
-                                    {m.tournament_detail_active()}
-                                </Badge>
-                            </div>
+            <!-- Tournament end warning -->
+            {#if moment().isBetween(tournament.startDateTime, tournament.endDateTime)}
+                {#if moment(tournament.endDateTime).diff(moment(), 'minutes') <= 30}
+                    <div class="mt-4 p-3 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg flex items-center">
+                        <Clock class="w-5 h-5 mr-2" aria-hidden="true"/>
+                        <p>
+                            <strong>{m.tournament_detail_warning()}</strong> {m.tournament_detail_minutes_remaining({ minutes: moment(tournament.endDateTime).diff(moment(), 'minutes') })}
+                        </p>
+                    </div>
+                {/if}
+            {/if}
 
-                            <div class="grid grid-cols-2 gap-2 text-sm dark:text-gray-300">
-                                <div class="flex items-center gap-1">
-                                    <User class="w-4 h-4 text-gray-600 dark:text-gray-400" aria-hidden="true"/>
-                                    <span>{m.tournament_detail_players({ playerCount: session.scorecard.length })}</span>
+            {#if sessions.filter(session => !session.submissionDateTime).length === 0}
+                <p class="text-gray-500 dark:text-gray-400 italic">{m.tournament_detail_no_active_rounds()}</p>
+            {:else}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" role="list">
+                    {#each sessions.filter(session => !session.submissionDateTime) as session}
+                        <Card class="hover:shadow-lg transition-shadow dark:bg-gray-800" role="listitem">
+                            <div class="p-2">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 id="session-{session.id}-heading" class="font-semibold text-lg dark:text-white">
+                                        <a href={`/session/${session.id}`} class="text-blue-600 dark:text-blue-400 hover:underline">
+                                            {m.tournament_detail_round({ roundNumber: session.id })}
+                                        </a>
+                                    </h3>
+                                    <Badge color="yellow" class="flex items-center gap-1">
+                                        <Clock class="w-3 h-3" aria-hidden="true"/>
+                                        {m.tournament_detail_active()}
+                                    </Badge>
                                 </div>
-                            </div>
 
-                            <div class="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-                                <div class="grid grid-cols-3 gap-1 text-xs" aria-labelledby="session-{session.id}-heading">
-                                    {#each session.scorecard.sort() as card, i}
-                                        {#if i < 3}
-                                            <div class="truncate">
-                                                <a href={`/player/${card.player.id}`}
-                                                   class="text-blue-600 dark:text-blue-400 hover:underline">
-                                                    {card.player.firstName} {card.player.lastName}
-                                                </a>
-                                            </div>
+                                <div class="grid grid-cols-2 gap-2 text-sm dark:text-gray-300">
+                                    <div class="flex items-center gap-1">
+                                        <User class="w-4 h-4 text-gray-600 dark:text-gray-400" aria-hidden="true"/>
+                                        <span>{m.tournament_detail_players({ playerCount: session.scorecard.length })}</span>
+                                    </div>
+                                </div>
+
+                                <div class="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                                    <div class="grid grid-cols-3 gap-1 text-xs" aria-labelledby="session-{session.id}-heading">
+                                        {#each session.scorecard.sort() as card, i}
+                                            {#if i < 3}
+                                                <div class="truncate">
+                                                    <a href={`/player/${card.player.id}`}
+                                                       class="text-blue-600 dark:text-blue-400 hover:underline">
+                                                        {card.player.firstName} {card.player.lastName}
+                                                    </a>
+                                                </div>
+                                            {/if}
+                                        {/each}
+                                        {#if session.scorecard.length > 3}
+                                            <div class="text-gray-500 dark:text-gray-400">{m.tournament_detail_more_players({ additionalPlayerCount: session.scorecard.length - 3 })}</div>
                                         {/if}
-                                    {/each}
-                                    {#if session.scorecard.length > 3}
-                                        <div class="text-gray-500 dark:text-gray-400">{m.tournament_detail_more_players({ additionalPlayerCount: session.scorecard.length - 3 })}</div>
-                                    {/if}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </Card>
-                {/each}
-            </div>
-        {/if}
-    </div>
+                        </Card>
+                    {/each}
+                </div>
+            {/if}
+        </div>
     </PermissionGuard>
 
     <PermissionGuard supabase={data.supabase} resource={Resource.Sessions} action={Action.Create}>

@@ -12,7 +12,7 @@
     import AddPlayerToSessionModal from '$lib/components/AddPlayerToSessionModal.svelte';
     import MovePlayerToSessionModal from '$lib/components/MovePlayerToSessionModal.svelte';
     import RemovePlayerFromSessionModal from '$lib/components/RemovePlayerFromSessionModal.svelte';
-    import { ArrowRightIcon, PlusIcon, TrashIcon } from 'lucide-svelte';
+    import { ArrowRightIcon, Clock, PlusIcon, TrashIcon } from 'lucide-svelte';
     import { m } from "$lib/paraglide/messages";
     import * as Sentry from "@sentry/sveltekit";
 
@@ -298,6 +298,16 @@
 
             {#if !session.submissionDateTime}
                 {#if canSubmit}
+                    {#if !session.isFreeplay && moment().isBetween(moment(session.tournamentEndDateTime).subtract(31, 'minutes'), moment(session.tournamentEndDateTime))}
+                        <!-- Tournament end warning -->
+                        <div class="my-4 p-3 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg flex items-center">
+                            <Clock class="w-5 h-5 mr-2" aria-hidden="true"/>
+                            <p>
+                                <strong>{m.tournament_detail_warning()}</strong> {m.tournament_detail_minutes_remaining({ minutes: moment(session.tournamentEndDateTime).diff(moment(), 'minutes') })}
+                            </p>
+                        </div>
+                    {/if}
+
                     <Button onclick={submitScorecards} color="green">
                         ✅ {m.session_submit_scorecards()}
                     </Button>

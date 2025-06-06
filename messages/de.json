@@ -235,6 +235,8 @@
   "tournament_detail_delete_cancel": "Abbrechen und Modal schließen",
   "tournament_detail_delete_confirm_button": "Turnier und alle zugehörigen Sessions löschen",
   "tournament_detail_delete_button": "Löschen",
+  "tournament_detail_warning": "Achtung!",
+  "tournament_detail_minutes_remaining": "Nur noch {minutes} Minuten bis zum Turnierende.",
   "tournament_form_back": "Zurück zur Ansicht",
   "tournament_form_back_to_tournament": "Zurück zum Turnier",
   "tournament_form_back_to_overview": "Zurück zur Übersicht",
