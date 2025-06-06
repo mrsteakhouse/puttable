@@ -5,18 +5,12 @@ services:
       args:
         PUTTABLE_APP_VERSION: "local"
     ports:
-      - "5173:5173"
+      - "5173:3000"
     env_file:
-      - .env.supabase-anon-key
+      - .env.supabase-anon-key # This file is supposed to contain the supabase anon as PUBLIC_SUPABASE_ANON_KEY
     environment:
-      - PUBLIC_SUPABASE_URL=http://supabase_kong_puttable:54321
-      - SUPABASE_AUTH_KEYCLOAK_CLIENT_ID=puttable-dev
-      - SUPABASE_AUTH_KEYCLOAK_SECRET=puttable-secret
-      - SUPABASE_AUTH_KEYCLOAK_URL=http://keycloak:8080/realms/puttable
-      - PUBLIC_SUPABASE_AUTH_KEYCLOAK_REDIRECT_URI=http://supabase_kong_puttable:54321/auth/v1/callback
-      - PORT=5173
+      - PUBLIC_SUPABASE_URL=http://api.supabase.internal:8000
       - BASE_PATH=http://localhost:5173/
-      - CHECK_ORIGIN=false
     depends_on:
       - keycloak
     networks:
@@ -24,8 +18,6 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
-    ports:
-      - "8080:8080"
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
