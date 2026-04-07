@@ -17,16 +17,18 @@ ENV PUTTABLE_APP_VERSION=${PUTTABLE_APP_VERSION:-devenv}
 ENV NODE_ENV=production
 
 # Build the application
-RUN npm run prepare
-RUN npm run build
-RUN npm prune --omit=dev
+RUN npm run prepare && \
+    npm run build && \
+    npm prune --omit=dev
 
 # Production stage
 FROM node:24-alpine AS production
 
-RUN adduser -D puttable
-RUN mkdir -p /app
-RUN chown puttable:puttable /app
+RUN addgroup -S -g 6543 puttable 2>/dev/null && \
+    adduser -S -u 6543 -D -H -h /var/empty -s /sbin/nologin -G puttable -g puttable puttable 2>/dev/null && \
+    mkdir -p /app && \
+    chown puttable:puttable /app
+
 USER puttable
 
 WORKDIR /app
