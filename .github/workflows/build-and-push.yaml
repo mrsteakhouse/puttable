@@ -1,9 +1,6 @@
 name: Build and publish
 
 on:
-  push:
-    branches:
-      - main
 
 concurrency:
   group: build-and-publish
