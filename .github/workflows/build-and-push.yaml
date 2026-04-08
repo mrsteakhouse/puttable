@@ -9,7 +9,7 @@ jobs:
   testApp:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - run: git pull
@@ -65,7 +65,7 @@ jobs:
       changed: ${{ steps.appVersion.outputs.changed }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -147,7 +147,7 @@ jobs:
     if: ${{ needs.version.outputs.changed == 'true' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Create App Tag
         run: |
@@ -165,7 +165,7 @@ jobs:
       changed: ${{ steps.chartVersion.outputs.changed }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - run: git pull
@@ -206,7 +206,7 @@ jobs:
     if: ${{ needs.chartVersion.outputs.changed == 'true' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - run: git pull
@@ -229,7 +229,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.version.outputs.changed == 'true' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Use Node.js
