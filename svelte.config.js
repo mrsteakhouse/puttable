@@ -25,7 +25,9 @@ const config = {
 		},
 		// Allow the server to be accessed through a proxy
 		csrf: {
-			checkOrigin: process.env.CHECK_ORIGIN !== 'false'
+			trustedOrigins:
+				// Comma separated list of trusted origins
+				process.env.TRUSTED_ORIGINS ? process.env.TRUSTED_ORIGINS.split(',') : []
 		}
 	}
 };
