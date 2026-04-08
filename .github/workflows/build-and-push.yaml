@@ -69,7 +69,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: paulhatch/semantic-version@v5.4.0
+      - uses: paulhatch/semantic-version@v6.0.2
         name: Application Version
         id: appVersion
         with:
@@ -170,7 +170,7 @@ jobs:
           fetch-depth: 0
       - run: git pull
 
-      - uses: paulhatch/semantic-version@v5.4.0
+      - uses: paulhatch/semantic-version@v6.0.2
         name: Chart Version
         id: chartVersion
         with:
