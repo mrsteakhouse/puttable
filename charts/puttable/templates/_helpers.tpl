@@ -73,3 +73,10 @@ Create image name that is used in the deployment
 {{- printf "%s:%s" .Values.image.repository .Chart.AppVersion -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Join trusted origins into comma separated string
+*/}}
+{{- define "puttable.trustedOrigins" -}}
+{{- join "," .Values.puttable.trustedOrigins | quote -}}
+{{- end -}}

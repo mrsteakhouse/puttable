@@ -29,68 +29,68 @@ helm delete my-puttable
 
 The following table lists the configurable parameters of the Puttable chart and their default values.
 
-| Parameter                                  | Description                                      | Default                                                 |
-|-------------------------------------------|--------------------------------------------------|--------------------------------------------------------|
-| `replicaCount`                            | Number of replicas                               | `1`                                                     |
-| `image.repository`                        | Image repository                                 | `puttable`                                              |
-| `image.tag`                               | Image tag                                        | `latest`                                                |
-| `image.pullPolicy`                        | Image pull policy                                | `IfNotPresent`                                          |
-| `service.type`                            | Kubernetes Service type                          | `ClusterIP`                                             |
-| `service.port`                            | Service HTTP port                                | `80`                                                    |
-| `service.targetPort`                      | Port in container to expose                      | `3000`                                                  |
-| `ingress.enabled`                         | Enable ingress controller resource               | `false`                                                 |
-| `ingress.className`                       | IngressClass that will be be used                | `""`                                                    |
-| `ingress.annotations`                     | Ingress annotations                              | `{}`                                                    |
-| `ingress.hosts[0].host`                   | Hostname to your Puttable installation           | `chart-example.local`                                   |
-| `ingress.hosts[0].paths[0].path`          | Path within the host                             | `/`                                                     |
-| `ingress.hosts[0].paths[0].pathType`      | Ingress path type                                | `ImplementationSpecific`                                |
-| `ingress.tls`                             | TLS configuration for ingress                    | `[]`                                                    |
-| `puttable.baseUrl`                        | Base URL for the Puttable application            | `""`                                                    |
-| `puttable.supabase.url`                   | Supabase URL                                     | `"supabase-url"`                                        |
-| `puttable.supabase.apiKey.value`          | Supabase API key value (plain text)              | `""`                                                    |
-| `puttable.supabase.apiKey.secret.secretName` | Name of the secret containing the Supabase API key | `""`                                                |
-| `puttable.supabase.apiKey.secret.secretKey` | Key in the secret for the Supabase API key     | `""`                                                    |
-| `puttable.keycloak.clientId`              | Keycloak client ID                               | `""`                                                    |
-| `puttable.keycloak.clientSecret.value`    | Keycloak client secret value (plain text)        | `""`                                                    |
-| `puttable.keycloak.clientSecret.secret.secretName` | Name of the secret containing the Keycloak client secret | `""`                                  |
-| `puttable.keycloak.clientSecret.secret.secretKey` | Key in the secret for the Keycloak client secret | `""`                                           |
-| `puttable.keycloak.redirectUri`           | Keycloak redirect URI                            | `""`                                                    |
-| `puttable.keycloak.realmUrl`              | Keycloak realm URL                               | `""`                                                    |
-| `env.HOST`                                | Host to bind to                                  | `"0.0.0.0"`                                             |
-| `env.CHECK_ORIGIN`                        | Whether to check origin                          | `"true"`                                                |
-| `env.NODE_ENV`                            | Node environment                                 | `"production"`                                          |
-| `resources.limits.cpu`                    | CPU resource limits                              | `500m`                                                  |
-| `resources.limits.memory`                 | Memory resource limits                           | `512Mi`                                                 |
-| `resources.requests.cpu`                  | CPU resource requests                            | `100m`                                                  |
-| `resources.requests.memory`               | Memory resource requests                         | `128Mi`                                                 |
-| `nodeSelector`                            | Node labels for pod assignment                   | `{}`                                                    |
-| `tolerations`                             | Tolerations for pod assignment                   | `[]`                                                    |
-| `affinity`                                | Affinity for pod assignment                       | `{}`                                                    |
-| `autoscaling.enabled`                      | Enable autoscaling for the deployment               | `false`                                                 |
-| `autoscaling.minReplicas`                  | Minimum number of replicas                          | `1`                                                     |
-| `autoscaling.maxReplicas`                  | Maximum number of replicas                          | `10`                                                    |
-| `autoscaling.targetCPUUtilizationPercentage` | Target CPU utilization percentage                 | `80`                                                    |
-| `autoscaling.targetMemoryUtilizationPercentage` | Target memory utilization percentage           | `80`                                                    |
-| `autoscaling.customMetrics`                | Custom metrics for autoscaling (optional)           | `[]`                                                    |
-| `autoscaling.behavior.scaleDown`           | Scale down behavior configuration (optional)        | `{}`                                                    |
-| `autoscaling.behavior.scaleUp`             | Scale up behavior configuration (optional)          | `{}`                                                    |
-| `serviceAccount.create`                    | Specifies whether a service account should be created | `true`                                                 |
-| `serviceAccount.annotations`               | Annotations to add to the service account           | `{}`                                                    |
-| `serviceAccount.name`                      | The name of the service account to use              | `""`                                                    |
-| `probes.readiness.enabled`                 | Enable readiness probe                              | `true`                                                  |
-| `probes.readiness.path`                    | Path for readiness probe                            | `/health`                                               |
-| `probes.readiness.initialDelaySeconds`     | Initial delay seconds for readiness probe           | `10`                                                    |
-| `probes.readiness.periodSeconds`           | Period seconds for readiness probe                  | `10`                                                    |
-| `probes.readiness.timeoutSeconds`          | Timeout seconds for readiness probe                 | `5`                                                     |
-| `probes.readiness.successThreshold`        | Success threshold for readiness probe               | `1`                                                     |
-| `probes.readiness.failureThreshold`        | Failure threshold for readiness probe               | `3`                                                     |
-| `probes.liveness.enabled`                  | Enable liveness probe                               | `true`                                                  |
-| `probes.liveness.path`                     | Path for liveness probe                             | `/health`                                               |
-| `probes.liveness.initialDelaySeconds`      | Initial delay seconds for liveness probe            | `20`                                                    |
-| `probes.liveness.periodSeconds`            | Period seconds for liveness probe                   | `10`                                                    |
-| `probes.liveness.timeoutSeconds`           | Timeout seconds for liveness probe                  | `5`                                                     |
-| `probes.liveness.successThreshold`         | Success threshold for liveness probe                | `1`                                                     |
-| `probes.liveness.failureThreshold`         | Failure threshold for liveness probe                | `3`                                                     |
+| Parameter                                          | Description                                             | Default                  |
+|----------------------------------------------------|---------------------------------------------------------|--------------------------|
+| `replicaCount`                                     | Number of replicas                                      | `1`                      |
+| `image.repository`                                 | Image repository                                        | `puttable`               |
+| `image.tag`                                        | Image tag                                               | `latest`                 |
+| `image.pullPolicy`                                 | Image pull policy                                       | `IfNotPresent`           |
+| `service.type`                                     | Kubernetes Service type                                 | `ClusterIP`              |
+| `service.port`                                     | Service HTTP port                                       | `80`                     |
+| `service.targetPort`                               | Port in container to expose                             | `3000`                   |
+| `ingress.enabled`                                  | Enable ingress controller resource                      | `false`                  |
+| `ingress.className`                                | IngressClass that will be be used                       | `""`                     |
+| `ingress.annotations`                              | Ingress annotations                                     | `{}`                     |
+| `ingress.hosts[0].host`                            | Hostname to your Puttable installation                  | `chart-example.local`    |
+| `ingress.hosts[0].paths[0].path`                   | Path within the host                                    | `/`                      |
+| `ingress.hosts[0].paths[0].pathType`               | Ingress path type                                       | `ImplementationSpecific` |
+| `ingress.tls`                                      | TLS configuration for ingress                           | `[]`                     |
+| `puttable.baseUrl`                                 | Base URL for the Puttable application                   | `""`                     |
+| `puttable.supabase.url`                            | Supabase URL                                            | `"supabase-url"`         |
+| `puttable.supabase.apiKey.value`                   | Supabase API key value (plain text)                     | `""`                     |
+| `puttable.supabase.apiKey.secret.secretName`       | Name of the secret containing the Supabase API key      | `""`                     |
+| `puttable.supabase.apiKey.secret.secretKey`        | Key in the secret for the Supabase API key              | `""`                     |
+| `puttable.keycloak.clientId`                       | Keycloak client ID                                      | `""`                     |
+| `puttable.keycloak.clientSecret.value`             | Keycloak client secret value (plain text)               | `""`                     |
+| `puttable.keycloak.clientSecret.secret.secretName` | Name of the secret containing the Keycloak client secret | `""`                     |
+| `puttable.keycloak.clientSecret.secret.secretKey`  | Key in the secret for the Keycloak client secret        | `""`                     |
+| `puttable.keycloak.redirectUri`                    | Keycloak redirect URI                                   | `""`                     |
+| `puttable.keycloak.realmUrl`                       | Keycloak realm URL                                      | `""`                     |
+| `env.HOST`                                         | Host to bind to                                         | `"0.0.0.0"`              |
+| `env.TRUSTED_ORIGINS`                              | List of trusted origins when behind a reverse proxy     | `[]`                     |
+| `env.NODE_ENV`                                     | Node environment                                        | `"production"`           |
+| `resources.limits.cpu`                             | CPU resource limits                                     | `500m`                   |
+| `resources.limits.memory`                          | Memory resource limits                                  | `512Mi`                  |
+| `resources.requests.cpu`                           | CPU resource requests                                   | `100m`                   |
+| `resources.requests.memory`                        | Memory resource requests                                | `128Mi`                  |
+| `nodeSelector`                                     | Node labels for pod assignment                          | `{}`                     |
+| `tolerations`                                      | Tolerations for pod assignment                          | `[]`                     |
+| `affinity`                                         | Affinity for pod assignment                             | `{}`                     |
+| `autoscaling.enabled`                              | Enable autoscaling for the deployment                   | `false`                  |
+| `autoscaling.minReplicas`                          | Minimum number of replicas                              | `1`                      |
+| `autoscaling.maxReplicas`                          | Maximum number of replicas                              | `10`                     |
+| `autoscaling.targetCPUUtilizationPercentage`       | Target CPU utilization percentage                       | `80`                     |
+| `autoscaling.targetMemoryUtilizationPercentage`    | Target memory utilization percentage                    | `80`                     |
+| `autoscaling.customMetrics`                        | Custom metrics for autoscaling (optional)               | `[]`                     |
+| `autoscaling.behavior.scaleDown`                   | Scale down behavior configuration (optional)            | `{}`                     |
+| `autoscaling.behavior.scaleUp`                     | Scale up behavior configuration (optional)              | `{}`                     |
+| `serviceAccount.create`                            | Specifies whether a service account should be created   | `true`                   |
+| `serviceAccount.annotations`                       | Annotations to add to the service account               | `{}`                     |
+| `serviceAccount.name`                              | The name of the service account to use                  | `""`                     |
+| `probes.readiness.enabled`                         | Enable readiness probe                                  | `true`                   |
+| `probes.readiness.path`                            | Path for readiness probe                                | `/health`                |
+| `probes.readiness.initialDelaySeconds`             | Initial delay seconds for readiness probe               | `10`                     |
+| `probes.readiness.periodSeconds`                   | Period seconds for readiness probe                      | `10`                     |
+| `probes.readiness.timeoutSeconds`                  | Timeout seconds for readiness probe                     | `5`                      |
+| `probes.readiness.successThreshold`                | Success threshold for readiness probe                   | `1`                      |
+| `probes.readiness.failureThreshold`                | Failure threshold for readiness probe                   | `3`                      |
+| `probes.liveness.enabled`                          | Enable liveness probe                                   | `true`                   |
+| `probes.liveness.path`                             | Path for liveness probe                                 | `/health`                |
+| `probes.liveness.initialDelaySeconds`              | Initial delay seconds for liveness probe                | `20`                     |
+| `probes.liveness.periodSeconds`                    | Period seconds for liveness probe                       | `10`                     |
+| `probes.liveness.timeoutSeconds`                   | Timeout seconds for liveness probe                      | `5`                      |
+| `probes.liveness.successThreshold`                 | Success threshold for liveness probe                    | `1`                      |
+| `probes.liveness.failureThreshold`                 | Failure threshold for liveness probe                    | `3`                      |
 
 ## Values.yaml Structure
 

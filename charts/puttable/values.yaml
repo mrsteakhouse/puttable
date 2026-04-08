@@ -30,6 +30,7 @@ ingress:
 # Environment variables for the application
 puttable:
   baseUrl:
+  trustedOrigins: []
 #  sentry:
 #    authToken:
 #      secretName: sentry
@@ -54,7 +55,6 @@ puttable:
 
 env:
   HOST: "0.0.0.0"
-  CHECK_ORIGIN: "true"
   NODE_ENV: "production"
 
 resources:
