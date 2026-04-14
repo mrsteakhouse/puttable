@@ -5,7 +5,7 @@
     import { Button, Input } from 'flowbite-svelte';
     import { type SuperValidated } from "sveltekit-superforms";
     import type { PlayerFormSchema, SessionSchema } from "$lib/schemas";
-    import fuzzysearch from 'fuzzysearch-ts';
+    import Fuse from 'fuse.js';
     import CreatePlayerModal from '$lib/components/CreatePlayerModal.svelte';
     import { PlusIcon } from 'lucide-svelte';
     import { m } from "$lib/paraglide/messages";
@@ -32,7 +32,7 @@
     let players = $derived(data.players ?? [] as Player[]);
     let search = $state('');
     let filteredPlayers = $derived(players.filter((p) =>
-        fuzzysearch(search.toLowerCase(), `${p.firstName.toLowerCase()} ${p.lastName.toLowerCase()}`)
+        Fuse.match(search.toLowerCase(), `${p.firstName.toLowerCase()} ${p.lastName.toLowerCase()}`).isMatch
     ));
     let createPlayerModalOpen = $state(false);
 

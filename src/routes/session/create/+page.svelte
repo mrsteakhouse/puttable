@@ -3,11 +3,11 @@
     import type { PageProps } from './$types';
     import { Button, Input, Label, Range } from 'flowbite-svelte';
     import { type SuperValidated } from "sveltekit-superforms";
-    import fuzzysearch from 'fuzzysearch-ts';
     import CreatePlayerModal from '$lib/components/CreatePlayerModal.svelte';
     import { PlusIcon } from 'lucide-svelte';
     import type { PlayerFormSchema, SessionSchema } from '$lib/schemas';
     import { m } from "$lib/paraglide/messages";
+    import Fuse from "fuse.js";
 
     // Define player type for better type safety
     type Player = {
@@ -31,7 +31,7 @@
     let players = $derived(data.players ?? [] as Player[]);
     let search = $state('');
     let filteredPlayers = $derived(players.filter((p) =>
-        fuzzysearch(search.toLowerCase(), `${p.firstName.toLowerCase()} ${p.lastName.toLowerCase()}`)
+        Fuse.match(search.toLowerCase(), `${p.firstName.toLowerCase()} ${p.lastName.toLowerCase()}`).isMatch
     ));
     let createPlayerModalOpen = $state(false);
 

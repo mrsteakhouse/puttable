@@ -2,7 +2,6 @@
     import { Button, Input } from "flowbite-svelte";
 
     import { CirclePlusSolid } from "flowbite-svelte-icons"
-    import fuzzysearch from "fuzzysearch-ts";
     import moment from "moment";
     import TournamentCard from "$lib/components/TournamentCard.svelte";
     import type { PageProps } from './$types'
@@ -13,6 +12,7 @@
     import { goto } from '$app/navigation';
     import { m } from "$lib/paraglide/messages";
     import * as Sentry from "@sentry/sveltekit";
+    import Fuse from "fuse.js";
 
     let { data }: PageProps = $props();
 
@@ -48,8 +48,8 @@
     let searchTerm = $state("");
     let filteredItems = $derived(tournaments?.filter((item) =>
             !searchTerm
-            || fuzzysearch(searchTerm.toLowerCase(), item.name.toLowerCase())
-            || fuzzysearch(searchTerm.toLowerCase(), item.description.toLowerCase()))
+            || Fuse.match(searchTerm.toLowerCase(), item.name.toLowerCase()).isMatch
+            || Fuse.match(searchTerm.toLowerCase(), item.description.toLowerCase()).is)
         ?? []);
 
     let now = $state(moment());
