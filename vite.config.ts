@@ -30,6 +30,8 @@ export default defineConfig({
     }),
     tailwindcss(),
     sveltekit(),
-    nodePolyfills(),
+    nodePolyfills({
+      exclude: ['module']
+    }),
   ],
 });
