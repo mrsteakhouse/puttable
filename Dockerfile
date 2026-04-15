@@ -44,5 +44,6 @@ ENV NODE_ENV=production
 
 # Expose the port the app runs on
 EXPOSE $PORT
+USER puttable:puttable
 
 CMD ["node", "build"]
