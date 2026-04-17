@@ -35,7 +35,7 @@ docker compose up -d
 Nach dem Start sind folgende Dienste verfügbar:
 
 - **Puttable Anwendung**: http://localhost:5173
-- **Keycloak Admin**: http://localhost:8080 (Zugangsdaten: admin/admin)
+- **Keycloak Admin**: http://localhost:8085 (Zugangsdaten: admin/admin)
 - **Supabase Studio**: http://localhost:54323
 
 ### Entwicklung

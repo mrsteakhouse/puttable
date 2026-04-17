@@ -10,7 +10,7 @@
 
     const handleLogin = async () => {
         const { error } = await data.supabase.auth.signInWithOAuth({
-            provider: 'custom:keycloak',
+            provider: 'keycloak',
             options: {
                 scopes: 'openid',
                 redirectTo: env.PUBLIC_SITE_BASE_URL + '/tournament'
