@@ -1,7 +1,7 @@
 {
   "name": "puttable",
   "private": true,
-  "version": "19.2.0",
+  "version": "19.7.0",
   "type": "module",
   "license": "MIT",
   "scripts": {
