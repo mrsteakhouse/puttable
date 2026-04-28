@@ -2,7 +2,7 @@ import { type Actions, error, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { superValidate, type SuperValidated } from 'sveltekit-superforms';
 import { type TournamentSchema, tournamentSchema } from '$lib/schemas';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import moment from 'moment/moment';
 import type { TournamentDto } from '$lib/dto';
 import { patchRatingClasses } from '$lib/server/RatingClassesPatcher';
@@ -31,14 +31,14 @@ export const load: PageServerLoad = async ({ parent, locals: { supabase } }) => 
         holeCount: tournament.numberOfHoles,
         description: tournament.description,
         ratingClasses: tournament.ratingClasses
-    } as TournamentSchema, zod(tournamentSchema));
+    } as TournamentSchema, zod4(tournamentSchema));
 
     return { form };
 }
 
 export const actions = {
     default: async ({request, locals: {supabase}, params}) => {
-        const form = await superValidate(request, zod(tournamentSchema))
+        const form = await superValidate(request, zod4(tournamentSchema))
 
         if (!form.valid) {
             return fail(400, { form });

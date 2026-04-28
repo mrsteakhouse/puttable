@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { playerFormSchema, type PlayerFormSchema } from '$lib/schemas';
 import { SessionDto } from '$lib/dto';
 import { canAccessResource } from '$lib/rbac';
@@ -103,7 +103,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase } }) => 
         firstName: player.firstname,
         lastName: player.lastname,
         ratingClassId: player.rating_class_id
-    }, zod(playerFormSchema));
+    }, zod4(playerFormSchema));
 
     // Fetch sessions the player has participated in
     const { data: playerSessions, error: sessionsError } = await supabase
@@ -195,7 +195,7 @@ export const actions: Actions = {
         }
 
         // Validate form data
-        const form = await superValidate(request, zod(playerFormSchema));
+        const form = await superValidate(request, zod4(playerFormSchema));
 
         if (!form.valid) {
             return fail(400, { form });

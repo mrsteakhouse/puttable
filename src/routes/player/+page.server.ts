@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { error, fail } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import type { RatingClassDto } from '$lib/dto';
 import { type PlayerFormSchema, playerFormSchema } from '$lib/schemas';
 import { hasPermission } from '$lib/rbac';
@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
         return {
             players: [],
             ratingClasses: [],
-            form: await superValidate<PlayerFormSchema>(zod(playerFormSchema))
+            form: await superValidate<PlayerFormSchema>(zod4(playerFormSchema))
         };
     }
 
@@ -55,7 +55,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
     }));
 
     // Initialize the form
-    const form = await superValidate<PlayerFormSchema>(zod(playerFormSchema));
+    const form = await superValidate<PlayerFormSchema>(zod4(playerFormSchema));
 
     return {
         players,
@@ -68,7 +68,7 @@ export const actions: Actions = {
     // New action for the CreatePlayerModal component
     createPlayer: async ({ request, locals: { supabase } }) => {
         // Validate form data
-        const form = await superValidate(request, zod(playerFormSchema));
+        const form = await superValidate(request, zod4(playerFormSchema));
 
         if (!form.valid) {
             return fail(400, { form });

@@ -1,6 +1,6 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { error, fail, redirect } from "@sveltejs/kit";
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { tournamentSchema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms';
 import moment from 'moment';
@@ -9,7 +9,7 @@ import { patchRatingClasses } from '$lib/server/RatingClassesPatcher';
 import * as Sentry from "@sentry/sveltekit";
 
 export const load: PageServerLoad = async ({ locals: { supabase }, parent }) => {
-    const form = await superValidate(zod(tournamentSchema));
+    const form = await superValidate(zod4(tournamentSchema));
 
     const { data, error: err } = await supabase
         .from('rating_classes')
@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ locals: { supabase }, parent }) => 
 
 export const actions = {
     default: async ({ request, locals: { supabase } }) => {
-        const form = await superValidate(request, zod(tournamentSchema))
+        const form = await superValidate(request, zod4(tournamentSchema))
 
         if (!form.valid) {
             return fail(400, { form });

@@ -1,7 +1,7 @@
 import { superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types';
 import { error, fail, redirect } from '@sveltejs/kit';
-import { zod } from "sveltekit-superforms/adapters";
+import { zod4 } from "sveltekit-superforms/adapters";
 import type { SuperValidated } from "sveltekit-superforms";
 import { playerFormSchema, type SessionSchema, sessionSchema } from "$lib/schemas";
 import type { RatingClassDto } from '$lib/dto';
@@ -52,10 +52,10 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
         player: [],
         holeCount: 18,
         tournamentId: 0
-    }, zod(sessionSchema));
+    }, zod4(sessionSchema));
 
     // Initialize the player form for the modal
-    const playerForm = await superValidate(zod(playerFormSchema));
+    const playerForm = await superValidate(zod4(playerFormSchema));
 
     return {
         form,
@@ -67,7 +67,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 
 export const actions: Actions = {
     createSession: async ({ locals: { supabase }, request }) => {
-        const form = await superValidate(request, zod(sessionSchema));
+        const form = await superValidate(request, zod4(sessionSchema));
         if (!form.valid) return { form };
 
         // Create a new session without a tournament_id (freeplay mode)
@@ -105,7 +105,7 @@ export const actions: Actions = {
     // Action for creating a new player
     createPlayer: async ({ request, locals: { supabase } }) => {
         // Validate form data
-        const form = await superValidate(request, zod(playerFormSchema));
+        const form = await superValidate(request, zod4(playerFormSchema));
 
         if (!form.valid) {
             return fail(400, { form });
