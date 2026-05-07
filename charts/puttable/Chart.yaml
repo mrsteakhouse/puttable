@@ -3,5 +3,5 @@ name: puttable
 description: A Helm charts for Puttable application
 type: application
 version: 2.0.1
-appVersion: 19.7.0
+appVersion: 19.9.2
 icon: file://./icon.png
