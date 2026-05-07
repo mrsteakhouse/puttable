@@ -2,6 +2,6 @@ apiVersion: v2
 name: puttable
 description: A Helm charts for Puttable application
 type: application
-version: 2.0.1
+version: 2.2.1
 appVersion: 19.9.2
 icon: file://./icon.png
