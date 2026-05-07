@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   labels:
     {{ include "puttable.labels" . | nindent 4 }}
-    helm.sh/chart: {{ include "puttable.chart" . }}
   name: {{ template "puttable.fullname" . }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
