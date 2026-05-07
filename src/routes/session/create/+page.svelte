@@ -20,18 +20,19 @@
     let { data }: PageProps = $props();
 
     // Form handling
-    const { form, enhance, submitting } = superForm<SessionSchema>(data.form as SuperValidated<SessionSchema>, {
+    let { form, enhance, submitting } = $derived(superForm<SessionSchema>(data.form as SuperValidated<SessionSchema>, {
         dataType: 'json'
-    });
+    }));
 
     // Initialize player form for the modal
     let playerForm = $derived(data.playerForm as SuperValidated<PlayerFormSchema>);
 
     // Player state management
     let players = $derived(data.players ?? [] as Player[]);
+    $inspect(players);
     let search = $state('');
     let filteredPlayers = $derived(players.filter((p) =>
-        Fuse.match(search.toLowerCase(), `${p.firstName.toLowerCase()} ${p.lastName.toLowerCase()}`).isMatch
+        search === '' || Fuse.match(search.toLowerCase(), `${p.firstName.toLowerCase()} ${p.lastName.toLowerCase()}`).isMatch
     ));
     let createPlayerModalOpen = $state(false);
 
