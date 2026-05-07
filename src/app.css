@@ -2,7 +2,7 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@plugin "../node_modules/flowbite/plugin.js";
+@plugin "flowbite/plugin";
 
 @theme {
     --color-primary-50: #fff5f2;
