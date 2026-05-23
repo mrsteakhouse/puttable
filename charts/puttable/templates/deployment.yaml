@@ -123,7 +123,7 @@ spec:
       {{- end }}
       {{- if .Values.puttable.login.secret }}
       volumes:
-        login-secret:
+        - name: login-secret
           secret:
             secretName: {{ .Values.puttable.login.secret.secretName }}
             secretKey: {{ .Values.puttable.login.secret.secretKey }}
