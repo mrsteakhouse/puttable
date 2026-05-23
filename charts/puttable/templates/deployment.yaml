@@ -100,7 +100,7 @@ spec:
           {{- end }}
           resources:
             {{ toYaml .Values.resources | nindent 12 }}
-          {{- if .Values.login.secret }}
+          {{- if .Values.puttable.login.secret }}
           volumeMounts:
             - name: login-secret
               mountPath: /app/secret
@@ -121,10 +121,10 @@ spec:
       securityContext:
         {{ toDate . | nindent 8 }}
       {{- end }}
-      {{- if .Values.login.secret }}
+      {{- if .Values.puttable.login.secret }}
       volumes:
         login-secret:
           secret:
-            secretName: {{ .Values.login.secret.secretName }}
-            secretKey: {{ .Values.login.secret.secretKey }}
+            secretName: {{ .Values.puttable.login.secret.secretName }}
+            secretKey: {{ .Values.puttable.login.secret.secretKey }}
       {{- end }}
