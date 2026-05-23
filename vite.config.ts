@@ -31,7 +31,10 @@ export default defineConfig({
     tailwindcss(),
     sveltekit(),
     nodePolyfills({
-      exclude: ['module']
+      exclude: ['module', 'fs', 'path']
     }),
   ],
+  ssr: {
+    external: ['fs', 'path']
+  }
 });
