@@ -42,6 +42,10 @@ puttable:
 #      secret:
 #        secretName:
 #        secretKey:
+  login:
+    secret:
+#      secretName:
+#      secretKey:
   keycloak:
     clientId:
     clientSecret:
