@@ -27,9 +27,9 @@
 
     let { session, supabase, user } = $derived(data)
     let activeUrl = $derived(page.url.pathname);
-    let userLoggedIn = $derived(user?.is_anonymous);
+    let userLoggedIn = $derived(!!user);
     // Use user_metadata.name from the session user
-    let username = $derived(user?.user_metadata.name || session?.user?.email);
+    let username = $derived(user?.user_metadata.name || session?.user?.email || "User");
     let currentLocale = $state(getLocale());
 
     onMount(() => {
@@ -79,7 +79,7 @@
         <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">{m.brand_name()}</span>
     </NavBrand>
     <div class="flex items-center md:order-2">
-        {#if !(userLoggedIn ?? true)}
+        {#if userLoggedIn}
             <NavHamburger/>
         {/if}
         <div class="flex items-center mr-2">
@@ -109,7 +109,7 @@
         <DarkMode/>
     </div>
 
-    {#if !(userLoggedIn ?? true)}
+    {#if userLoggedIn}
         <NavUl {activeUrl}>
 
             <PermissionGuard supabase={data.supabase} resource={Resource.Tournaments} action={Action.Read}>
@@ -137,7 +137,7 @@
 <div class="text-gray-900 dark:text-white text-base font-medium tracking-tight p-8">
     {@render children()}
 </div>
-{#if !(userLoggedIn ?? true)}
+{#if userLoggedIn}
     <div class="fixed right-2 bottom-2">
         <Button class="shadow-2xl rounded-4xl mr-4" onclick={showFeedbackModal} color="gray" aria-label="Feedback">
             <MessageCircleHeartIcon aria-hidden="true"/>
