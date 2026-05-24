@@ -6,6 +6,7 @@ export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetS
   const { session } = await safeGetSession()
 
   if (session) {
+    console.log("User is already logged in");
     throw redirect(307, "/tournament");
   }
 
@@ -13,12 +14,14 @@ export const GET: RequestHandler = async ({ params, locals: { supabase, safeGetS
   try {
     secret = readFileSync("secret", "utf-8").trim();
   } catch (error) {
+    console.error("Error reading secret file:", error);
     throw redirect(307, "/");
   }
 
-  let decoded = Buffer.from(params.code, 'base64').toString('ascii');
+  const decoded = Buffer.from(params.code, 'base64').toString('ascii').trim();
 
-  if (!!secret || decoded !== secret) {
+  if (!secret || decoded !== secret) {
+    console.error("Invalid code or empty secret.");
     throw redirect(307, "/");
   }
 
