@@ -104,6 +104,7 @@ spec:
           volumeMounts:
             - name: login-secret
               mountPath: /app/secret
+              subPath: secret
           {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -126,5 +127,7 @@ spec:
         - name: login-secret
           secret:
             secretName: {{ .Values.puttable.login.secret.secretName }}
-            secretKey: {{ .Values.puttable.login.secret.secretKey }}
+            items:
+              - key: {{ .Values.puttable.login.secret.key }}
+                path: secret
       {{- end }}
